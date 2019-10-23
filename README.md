@@ -1,1 +1,1 @@
-# gameprog-detecitve-game
+# gam**PR**rog-deteci**TV**e-game
