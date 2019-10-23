@@ -22,3 +22,5 @@ Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über i
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Quellenkommunikation nicht auch in der App?*  
 Da Telegram das Hauptkommunikationsmittel am HPI ist, hoffen wir durch das Integrieren dieser Plattform die Grenzen zwischen dem Programm und echten Personen zu verwischen (indem der Botaccount zwischen echten Kontakten auftaucht, die Nachrichten von echten Menschen und die des Bots in einer Push-Notification stehen, usw.). Außerdem spart uns diese Entscheidung die Arbeit an einem Chatprogramm, welche für einen Prototypen nicht notwendig ist.
+- *Warum heißt der Bot "AndyAbbot"?  
+Weil Telegram Bots auf "bot" enden müssen, und wir einen möglichst menschlichen Eindruck vermitteln wollen, um eine höhere Bindung aufzubauen. "Andy" ist einfach ein häufiger Name und außerdem eine Alliteration
