@@ -16,7 +16,7 @@ Die App muss vom Spieler heruntergeladen werden, um den Telegram-Chat mit dem Bo
 Außerdem planen wir, über die App den "Sicherheitsstatus" und das "Vertrauenslevel" der Quelle anzuzeigen.
 
 ### Bot
-Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über ihn wir sowohl die (adaptive) Spielgeschichte selbst erzählt als auch die Aufgaben der Quelle an den Spieler kommuniziert.
+Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über ihn wird die (adaptive) Spielgeschichte erzählt und die Aufgaben der Quelle an den Spieler kommuniziert.
 
 
 ## FAQ
