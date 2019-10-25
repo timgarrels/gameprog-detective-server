@@ -12,7 +12,7 @@ Die Software besteht aus 2 Hauptkomponenten, der quellenvermittelnden App (im Fo
 
 ### App
 Diese App ist der Hauptdatensammler des Spiels. Da wir über die Telegram-API nur an sehr begrenzte Daten kommen, versuchen wir mit dieser App an Berechtigungen auf dem Smartphone des Spielers zu erlangen. Die aus solchen Berechtigungen resultierenden Daten können wir dann über das Internet teilen und anhand dieser Daten das Verhalten des Bots anpassen.  
-Die App muss vom Spieler heruntergeladen werden, um den Telegram-Handle des Bots zu erfahren.  
+Die App muss vom Spieler heruntergeladen werden, um den Telegram-Chat mit dem Bot zu starten (dabei wird ein Schlüssel übermittelt, damit die gesammelten Daten der App mit einem Telegram-User korreliert werden können). 
 Außerdem planen wir, über die App den "Sicherheitsstatus" und das "Vertrauenslevel" der Quelle anzuzeigen.
 
 ### Bot
