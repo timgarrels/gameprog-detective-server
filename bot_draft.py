@@ -1,15 +1,20 @@
 import logging
+from telegram.ext import Updater, CommandHandler
+import requests
+
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-TOKEN = "1042823918:AAHiTdfqEu9viydzvPagWszqNw6LiPWutKA"
-user_auth_association = {'henry': 'passphrase', 'anna': 'anna123'}
-blocked = []
 
-from telegram.ext import Updater, CommandHandler
+
+TOKEN = "1042823918:AAHiTdfqEu9viydzvPagWszqNw6LiPWutKA"
+SERVER_URL = "localhost:5000/"
+
 updater = Updater(token=TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 
 def is_valid_auth(auth_key):
+    r = requests.get(SERVER_URL + "/user/{}/register/{}".format(auth_key))
     if auth_key in user_auth_association.values():
         return True
     return False
