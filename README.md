@@ -15,6 +15,13 @@ Diese App ist der Hauptdatensammler des Spiels. Da wir über die Telegram-API nu
 Die App muss vom Spieler heruntergeladen werden, um den Telegram-Chat mit dem Bot zu starten (dabei wird ein Schlüssel übermittelt, damit die gesammelten Daten der App mit einem Telegram-User korreliert werden können). 
 Außerdem planen wir, über die App den "Sicherheitsstatus" und das "Vertrauenslevel" der Quelle anzuzeigen.
 
+##### Setup
+
+- (Starte `virtualenv` und `source bin/activate`)
+- Installiere benötigte Pakete mit `pip install -r requirements`
+- Erstelle die Datenbank mit `./setup_db.sh`
+- Starte den Server mit `flask run`
+
 ### Bot
 Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über ihn wird die (adaptive) Spielgeschichte erzählt und die Aufgaben der Quelle an den Spieler kommuniziert.
 
