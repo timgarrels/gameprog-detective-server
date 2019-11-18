@@ -1,20 +1,20 @@
 from app import app
 from flask import Response, jsonify, request
 import json
-from app.models import User
+from app.models import User, Contact
 from app import db
 
 # ---------- User Creation and Info ----------
 @app.route('/user/all')
 def all_users():
-    return jsonify({"userIds": [id[0] for id in User.query.with_entities(User.user_id).all()]})
+    return jsonify({"userIds": [id[0] for id in User.query.with_entities(User.id).all()]})
 
 @app.route('/user/create')
 def create_user():
     user = User()
     db.session.add(user)
     db.session.commit()
-    return jsonify({"userId": user.user_id})
+    return jsonify({"userId": user.id})
 
 @app.route('/user/<user_id>')
 def get_user(user_id):
@@ -47,23 +47,50 @@ def register_users_telegram_handle(user_id, telegram_handle):
 @app.route('/user/<user_id>/data', methods=['POST'])
 def recieve_user_data(user_id):
 
-    data = request.get_json()
+    def contact_handler(contact):
+        if "firstname" not in contact or "lastname" not in contact:
+            # Corrupt data
+            return False
+        else:
+            contact = Contact(user_id=int(user_id),
+                        firstname=contact.get("firstname"),
+                        lastname=contact.get("lastname"))
+            db.session.add(contact)
+            db.session.commit()
+        return True
 
-    if not data:
+    datatype_handlers = {"contacts": contact_handler}
+    json_data = request.get_json()
+
+    if not json_data:
         return jsonify("Please provide data!"), 400
 
-    data_origin = data.get("origin", None)
-    data_type = data.get("type", None)
+    data_origin = json_data.get("origin", None)
+    data = json_data.get("data", {})
 
     if not data_origin:
         return jsonify("Please specify the data <origin>"), 400
-    if not data_type:
-        return jsonify("Please provide a <type>"), 400
 
     if data_origin not in ["app", "bot"]:
         return jsonify("I only take data <origin>ating from app or bot"), 400
 
-    if data_type not in ["contact"]:
-        return jsonify("I only handle contact data"), 400
+    for datatype, value_list in data.items():
+        # TODO: Handle data
+        handled_types = {}
+        if datatype in datatype_handlers.keys():
+            handled_types[datatype] = 0
 
-    return data["first_name"], 200
+            for value in value_list:
+                if datatype_handlers[datatype](value):
+                    handled_types[datatype] += 1
+
+    return jsonify("Added {} to db".format(handled_types)), 200
+
+@app.route('/user/<user_id>/data/<datatype>')
+def get_data_by_type(user_id, datatype):
+    datatype_to_db_col = {"contacts": Contact}
+
+    if datatype_to_db_col.get(datatype, None):
+        contacts = datatype_to_db_col[datatype].query.filter_by(user_id=int(user_id)).all()
+        return jsonify([contact.as_dict() for contact in contacts]), 200
+    return jsonify("not implemented yet"), 400
