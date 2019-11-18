@@ -10,17 +10,13 @@ Der Spieler nimmt die Rolle eines Kriminaldetektivs ein. Er ermittelt in einem M
 ## Softwarekomponenten
 Die Software besteht aus 2 Hauptkomponenten, der quellenvermittelnden App (im Folgenden "App" genannt) und dem quellensimulierenden Chatbot (im Folgenden "Bot" genannt)
 
+![First Architecture Draft](/docs/basic_architecture.jpeg)
+
 ### App
 Diese App ist der Hauptdatensammler des Spiels. Da wir über die Telegram-API nur an sehr begrenzte Daten kommen, versuchen wir mit dieser App an Berechtigungen auf dem Smartphone des Spielers zu erlangen. Die aus solchen Berechtigungen resultierenden Daten können wir dann über das Internet teilen und anhand dieser Daten das Verhalten des Bots anpassen.  
 Die App muss vom Spieler heruntergeladen werden, um den Telegram-Chat mit dem Bot zu starten (dabei wird ein Schlüssel übermittelt, damit die gesammelten Daten der App mit einem Telegram-User korreliert werden können). 
 Außerdem planen wir, über die App den "Sicherheitsstatus" und das "Vertrauenslevel" der Quelle anzuzeigen.
 
-##### Setup
-
-- (Starte `virtualenv` und `source bin/activate`)
-- Installiere benötigte Pakete mit `pip install -r requirements`
-- Erstelle die Datenbank mit `./setup_db.sh`
-- Starte den Server mit `flask run`
 
 ### Bot
 Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über ihn wird die (adaptive) Spielgeschichte erzählt und die Aufgaben der Quelle an den Spieler kommuniziert.
@@ -29,6 +25,24 @@ Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über i
 - Ein Smartphone (Android Version?)
 - Eine Telegram-Account
 
+## Setup
+
+### App
+- TODO
+
+### Bot & Server
+- Clone the repo
+- (Starte `virtualenv` und `source bin/activate`)
+- Installiere benötigte Pakete mit `pip install -r requirements`
+- Erstelle die Datenbank mit `./setup_db.sh`
+- Starte den Server mit `flask run`
+
+
+## Arbeitsetappen
+Um die ersten Schritte für unser Projekt zu machen implementieren wir den Handshake App -> Server -> Bot -> Server um den neuen User auf dem Server zu registrieren und die App Daten mit dem Telegramaccount assoziieren zu können. 
+![TOP0](/docs/top0.jpeg)
+Anschließend möchten wir bereits einen Geschichtsprototypen haben: Der Bot soll eine lineare Geschichte erzählen können, die mithilfe von Buttons gesteuert werden kann. Diese Geschichte soll hardgecoded personalisiert werden können. Diese Personalisierung soll durch die erste Abhörfunktion der App realisiert werden: Das Stehlen von Kontakdaten. Des Weiteren soll die Apps entdeckte Clues speichern und anzeigen können.
+![TOP1](/docs/top1.jpeg)
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Quellenkommunikation nicht auch in der App?*  
 Da Telegram das Hauptkommunikationsmittel am HPI ist, hoffen wir durch das Integrieren dieser Plattform die Grenzen zwischen dem Programm und echten Personen zu verwischen (indem der Botaccount zwischen echten Kontakten auftaucht, die Nachrichten von echten Menschen und die des Bots in einer Push-Notification stehen, usw.). Außerdem spart uns diese Entscheidung die Arbeit an einem Chatprogramm, welche für einen Prototypen nicht notwendig ist.
