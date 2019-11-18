@@ -11,6 +11,7 @@ __pycache__/
 # Virtualenv
 bin/
 include/
+share/
 
 # Distribution / packaging
 .Python
