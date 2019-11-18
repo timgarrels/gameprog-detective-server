@@ -41,7 +41,7 @@ Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über i
 ## Arbeitsetappen
 Um die ersten Schritte für unser Projekt zu machen implementieren wir den Handshake App -> Server -> Bot -> Server um den neuen User auf dem Server zu registrieren und die App Daten mit dem Telegramaccount assoziieren zu können. 
 ![TOP0](/docs/top0.jpeg)
-Anschließend möchten wir bereits einen Geschichtsprototypen haben: Der Bot soll eine lineare Geschichte erzählen können, die mithilfe von Buttons gesteuert werden kann. Diese Geschichte soll hardgecoded personalisiert werden können. Diese Personalisierung soll durch die erste Abhörfunktion der App realisiert werden: Das Stehlen von Kontakdaten. Des Weiteren soll die Apps entdeckte Clues speichern und anzeigen können.
+Anschließend möchten wir bereits einen Geschichtsprototypen haben: Der Bot soll eine lineare Geschichte erzählen können, die mithilfe von Buttons gesteuert werden kann. Diese Geschichte soll hardgecoded personalisiert werden können. Diese Personalisierung soll durch die erste Abhörfunktion der App realisiert werden: Das Stehlen von Kontakdaten. Des Weiteren soll die Apps entdeckte Clues speichern und anzeigen zu können.
 ![TOP1](/docs/top1.jpeg)
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Quellenkommunikation nicht auch in der App?*  
