@@ -21,7 +21,7 @@ def get_user(user_id):
     # TODO: jsonify does not work on this object
     try:
         user = User.query.get(int(user_id))
-        return jsonify(user.to_dict()), 200
+        return jsonify(user.as_dict()), 200
     except ValueError:
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
