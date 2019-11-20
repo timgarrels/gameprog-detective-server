@@ -10,7 +10,7 @@ fi
 if [ -f logs/server_pid ]; then
     if ps -p `cat logs/server_pid` > /dev/null; then
         echo "Killing running server..."
-        kill `cat logs/server_pid`
+        kill -9 `cat logs/server_pid`
     else
         echo "Server not running"
     fi
@@ -19,17 +19,19 @@ fi
 if [ -f logs/bot_pid ]; then
     if ps -p `cat logs/bot_pid` > /dev/null; then
         echo "Killing running bot..."
-        kill `cat logs/bot_pid`
+        kill -9 `cat logs/bot_pid`
     else
         echo "Bot not running"
     fi
 fi
 # Restart Server
 echo "Starting server..."
+echo "" > logs/server_log
 flask run --host 0.0.0.0 > logs/server_log 2>&1 &
 echo $! > logs/server_pid
 # Restart Bot
 echo "Starting bot..."
+echo "" > logs/bot_log
 python3 bot_draft.py > logs/bot_log 2>&1 &
 echo $! > logs/bot_pid
 sleep 1
