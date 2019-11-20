@@ -13,8 +13,8 @@ def redeploy():
         subprocess.Popen(['git', 'pull'])
         subprocess.Popen(['./restart.sh'])
     except Exception as e:
-        return jsonify(e)
-    return jsonify("Successfull Redeploy")
+        return jsonify(e), 400
+    return jsonify("Successfull Redeploy"), 200
 
 # ---------- User Creation and Info ----------
 @app.route('/user/all')
@@ -26,7 +26,8 @@ def create_user():
     user = User()
     db.session.add(user)
     db.session.commit()
-    return jsonify({"userId": user.id})
+    return jsonify({"userId": user.id,
+                    "registerURL": "telegram.me/{botname}?start={token}".format(botname=Config.BOT_NAME, token=user.telegram_start_token)})
 
 @app.route('/user/<user_id>')
 def get_user(user_id):
@@ -41,24 +42,31 @@ def get_user(user_id):
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
 
-@app.route('/user/<user_id>/register/<telegram_handle>')
-def register_users_telegram_handle(user_id, telegram_handle):
+@app.route('/user/register')
+def register_users_telegram_handle():
+    telegram_handle = request.args.get("telegramHandle", None)
+    telegram_start_token = request.args.get("TelegramStartToken", None)
+
+    if not telegram_handle:
+        return jsonify("Please provide a telegram_handle"), 400
+    if not telegram_start_token:
+        return jsonify("Please provivde a telegram_start_token"), 400
+
     try:
-        user = User.query.get(int(user_id))
+        user = User.query.filter_by(telegram_start_token=telegram_start_token).first()
     except ValueError:
-        # Invalid ID Type
-        return jsonify("Invalid userId"), 400
+        return jsonify("Invalid telegram_start_token"), 400
+
+    if not user:
+        return jsonify("No user with such token"), 400
+
     if user.telegram_handle:
-        # Telegram already registered for user
         return jsonify("Telegram already registerd for this user"), 400
-    elif user:
-        # Register user with telegram
-        user.telegram_handle = telegram_handle
-        db.session.add(user)
-        db.session.commit()
-        return jsonify("Successfull register"), 200
-    else:
-        return jsonify("No such user"), 400
+
+    user.telegram_handle = telegram_handle
+    db.session.add(user)
+    db.session.commit()
+    return jsonify("Successfull register"), 200
 
 # ---------- User Data Dump ----------
 @app.route('/user/<user_id>/data', methods=['POST'])
