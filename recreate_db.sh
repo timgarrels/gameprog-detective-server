@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 
+source bin/activate
 # Remove old db
 rm app.db
 rm -rf migrations
