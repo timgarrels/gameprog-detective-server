@@ -1,4 +1,10 @@
+# Do not push DB
 *.db
+
+# Custom LogFiles
+bot_log
+server_log
+start_log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
