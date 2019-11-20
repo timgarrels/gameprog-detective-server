@@ -4,6 +4,7 @@ import json
 from app.models import User, Contact
 from app import db
 import subprocess
+from datetime import datetime
 
 
 # Git Webhook (Re-)Deployment
@@ -11,6 +12,7 @@ import subprocess
 def redeploy():
     try:
         subprocess.Popen(['git', 'pull'])
+        subprocess.Popen(['echo', str(datetime.now()), '>>', 'logs/last_pull'])
         subprocess.Popen(['./restart.sh'])
     except Exception as e:
         return jsonify(e), 400
