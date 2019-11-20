@@ -33,7 +33,10 @@ def get_user(user_id):
     # TODO: jsonify does not work on this object
     try:
         user = User.query.get(int(user_id))
-        return jsonify(user.as_dict()), 200
+        if user:
+            return jsonify(user.as_dict()), 200
+        else:
+            return jsonify("No such user"), 400
     except ValueError:
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
@@ -48,18 +51,21 @@ def register_users_telegram_handle(user_id, telegram_handle):
     if user.telegram_handle:
         # Telegram already registered for user
         return jsonify("Telegram already registerd for this user"), 400
-    else:
+    elif user:
         # Register user with telegram
         user.telegram_handle = telegram_handle
         db.session.add(user)
         db.session.commit()
         return jsonify("Successfull register"), 200
+    else:
+        return jsonify("No such user"), 400
 
 # ---------- User Data Dump ----------
 @app.route('/user/<user_id>/data', methods=['POST'])
 def recieve_user_data(user_id):
 
     def contact_handler(contact):
+        # TODO: Create a palce for handlers and extract this one
         if "firstname" not in contact or "lastname" not in contact:
             # Corrupt data
             return False
@@ -71,6 +77,7 @@ def recieve_user_data(user_id):
             db.session.commit()
         return True
 
+    # TODO: Refactor data control flow
     datatype_handlers = {"contacts": contact_handler}
     json_data = request.get_json()
 
@@ -85,6 +92,15 @@ def recieve_user_data(user_id):
 
     if data_origin not in ["app", "bot"]:
         return jsonify("I only take data <origin>ating from app or bot"), 400
+
+    try:
+        user = User.query.get(int(user_id))
+    except ValueError:
+        # Invalid ID Type
+        return jsonify("Invalid userId"), 400
+
+    if not user:
+        return jsonify("No such user"), 400
 
     for datatype, value_list in data.items():
         # TODO: Handle data
