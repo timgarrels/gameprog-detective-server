@@ -1,6 +1,8 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+# TODO: This all should probably be in env instead
+
 class Config(object):
     # Server
     SERVER_URL = "localhost:5000/"
