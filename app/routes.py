@@ -3,55 +3,45 @@ from flask import Response, jsonify, request
 import json
 from app.models import User
 from app import db
-import os
-import string
-import random
 
+# ---------- User Creation and Info ----------
+@app.route('/user/all')
+def all_users():
+    # TODO: jsonify does not work on this object
+    return jsonify(User.query.all())
 
-# ---------- Utility ----------
-@app.route('/bot/name')
-def bot_name():
-    """Returns the name (telegram_handle) of the bot"""
-    # TODO: How does the server talk to the bot-module to retrieve the name?
-    return "TODO"
-
-# ---------- User Creation----------
 @app.route('/user/create')
 def create_user():
-    """Called by the app to start register handshake.
-    Adds a new user entry to the db, creates a telegram auth token and returns the new user_id and the token"""
     user = User()
-    user.telegram_start_token = "".join(random.choice(string.ascii_letters) for i in range(64))
     db.session.add(user)
     db.session.commit()
-    return jsonify({"userID": user.user_id,
-                    "startToken": user.telegram_start_token})
+    return jsonify({"userID": user.user_id})
 
-@app.route('/user/register/<telegram_start_token>')
-def register_users_telegram_handle(telegram_start_token):
-    """Called by the bot to complete register handshake
-        A Telegram Handle has to be provided in the get params.
-        Said Telegram Handle will be associated with the user_id for provided auth token"""
+@app.route('/user/<user_id>')
+def get_user(user_id):
+    # TODO: jsonify does not work on this object
+    try:
+        user = User.query.get(int(user_id))
+    except ValueError:
+        # Invalid ID Type
+        return jsonify("Invalid userID"), 400
 
-    provided_telegram_handle = request.args.get("telegramHandle")
-    user = User.query.filter_by(telegram_start_token=telegram_start_token).first()
-
-    if not user:
-        # Not user with specified auth_token
-        return jsonify("Auth token invalid"), 400
-
-    if not provided_telegram_handle:
-        # No Handle provided to register
-        return jsonify("Please provide a telegramHandle as parameter"), 400
-    
+@app.route('/user/<user_id>/register/<telegram_handle>')
+def register_users_telegram_handle(user_id, telegram_handle):
+    try:
+        user = User.query.get(int(user_id))
+    except ValueError:
+        # Invalid ID Type
+        return jsonify("Invalid userID"), 400
     if user.telegram_handle:
-        # User already registered with other handle
-        return jsonify("Token already claimed"), 400
-
-    user.telegram_handle = provided_telegram_handle
-    db.session.add(user)
-    db.session.commit()
-    return jsonify("Registration succesfull"), 200
+        # Telegram already registered for user
+        return jsonify("Telegram already registerd for this user"), 400
+    else:
+        # Register user with telegram
+        user.telegram_handle = telegram_handle
+        db.session.add(user)
+        db.session.commit()
+        return jsonify(True), 200
 
 # ---------- User Data Dump ----------
 @app.route('/user/<user_id>/data', methods=['POST'])
