@@ -2,9 +2,7 @@
 *.db
 
 # Custom LogFiles
-bot_log
-server_log
-start_log
+logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
