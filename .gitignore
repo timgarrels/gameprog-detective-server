@@ -1,4 +1,8 @@
+# Do not push DB
 *.db
+
+# Custom LogFiles
+logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -11,6 +15,7 @@ __pycache__/
 # Virtualenv
 bin/
 include/
+share/
 
 # VSCode
 .vscode/

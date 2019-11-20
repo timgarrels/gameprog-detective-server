@@ -19,10 +19,6 @@ def is_valid_auth(auth_key):
     return False
 
 def start(update, context):
-    if update.effective_chat.id in blocked:
-        # Dont talk to blocked strangers
-        return None
-
     try:
         auth_key = context.args[0]
         if is_valid_auth(auth_key):
@@ -34,18 +30,15 @@ def start(update, context):
                     break
 
             context.bot.send_message(chat_id=update.effective_chat.id, text="Hello there, General {}".format(username))
-            
         else:
             # Invalid user auth key
             context.bot.send_message(chat_id=update.effective_chat.id, text="I don't know you!")
             context.bot.send_message(chat_id=update.effective_chat.id, text="I don't speak to strangers!")
-            blocked.append(update.effective_chat.id)
 
     except IndexError:
         # No Auth key
         context.bot.send_message(chat_id=update.effective_chat.id, text="Who are you?")
         context.bot.send_message(chat_id=update.effective_chat.id, text="I don't speak to people who don't introduce themselves!")
-        blocked.append(update.effective_chat.id)
 
 # Handl##ers
 start_handler = CommandHandler('start', start)
