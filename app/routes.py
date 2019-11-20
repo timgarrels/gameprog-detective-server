@@ -3,6 +3,18 @@ from flask import Response, jsonify, request
 import json
 from app.models import User, Contact
 from app import db
+import subprocess
+
+
+# Git Webhook (Re-)Deployment
+@app.route('/update')
+def redeploy():
+    try:
+        subprocess.Popen(['git', 'pull'])
+        subprocess.Popen(['./restart.sh'])
+    except Exception as e:
+        return jsonify(e)
+    return jsonify("Successfull Redeploy")
 
 # ---------- User Creation and Info ----------
 @app.route('/user/all')
