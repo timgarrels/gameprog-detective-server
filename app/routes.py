@@ -7,7 +7,7 @@ import subprocess
 
 
 # Git Webhook (Re-)Deployment
-@app.route('/update')
+@app.route('/update', methods=['POST'])
 def redeploy():
     try:
         subprocess.Popen(['git', 'pull'])
