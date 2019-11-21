@@ -9,6 +9,19 @@ def create_telegram_start_token():
     alphabet.extend(string.digits)
     return ''.join(random.choice(alphabet) for i in range(64))
 
+def dict_keys_to_camel_case(d):
+    converted_dict = {}
+    for key, value in d.items():
+        converted_dict[snake_to_camel_case(key)] = value
+    return converted_dict
+
+def snake_to_camel_case(s):
+    # TODO: This has a few bugs:
+    # abcAbc -> Abcabc instead of AbcAbc
+    # abc__abc -> Abc_Abc
+    # But suffices for Model key transfrom for now
+    return ''.join(x.capitalize() or '_' for x in s.split('_'))
+
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -17,7 +30,7 @@ class User(db.Model):
 
 
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return dict_keys_to_camel_case({c.name: getattr(self, c.name) for c in self.__table__.columns})
 
     def __repr__(self):
         return "<User {}.{}>".format(self.id, self.telegram_handle)
@@ -30,7 +43,7 @@ class Contact(db.Model):
     lastname = db.Column(db.String(64), nullable=True)
 
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return dict_keys_to_camel_case({c.name: getattr(self, c.name) for c in self.__table__.columns})
 
     def __repr__(self):
         return "<Contact {}.{} {}".format(self.id, self.firstname, self.lastname)
