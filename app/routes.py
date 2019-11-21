@@ -5,6 +5,7 @@ from app.models import User, Contact
 from app import db
 import subprocess
 from datetime import datetime
+from config import Config
 
 
 # Git Webhook (Re-)Deployment
