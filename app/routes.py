@@ -12,9 +12,14 @@ from config import Config
 @app.route('/update', methods=['POST'])
 def redeploy():
     try:
+        # Make sure server is up to date
         subprocess.Popen(['git', 'pull'])
+        # Make sure there are no local changes on server
+        subprocess.Popen(['git', 'reset', '--hard'])
+        # Log the pull
         with open('logs/last_pull', 'w+') as pull_log:
             pull_log.write(str(datetime.now()))
+        # Restart the server
         subprocess.Popen(['./restart.sh'])
     except Exception as e:
         return jsonify(e), 400

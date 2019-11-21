@@ -26,13 +26,13 @@ if [ -f logs/bot_pid ]; then
 fi
 # Restart Server
 echo "Starting server..."
-echo "" > logs/server_log
-flask run --host 0.0.0.0 > logs/server_log 2>&1 &
+echo "----------" >> logs/server_log
+flask run --host 0.0.0.0 >> logs/server_log 2>&1 &
 echo $! > logs/server_pid
 # Restart Bot
 echo "Starting bot..."
-echo "" > logs/bot_log
-python3 bot_draft.py > logs/bot_log 2>&1 &
+echo "----------" >> logs/bot_log
+python3 bot_draft.py >> logs/bot_log 2>&1 &
 echo $! > logs/bot_pid
 sleep 1
 echo "All up and running"
