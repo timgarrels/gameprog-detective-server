@@ -12,7 +12,7 @@ from datetime import datetime
 def redeploy():
     try:
         subprocess.Popen(['git', 'pull'])
-        with open('logs/last_pull', 'w') as pull_log:
+        with open('logs/last_pull', 'w+') as pull_log:
             pull_log.write(str(datetime.now()))
         subprocess.Popen(['./restart.sh'])
     except Exception as e:
