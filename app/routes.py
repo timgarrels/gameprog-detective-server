@@ -13,14 +13,14 @@ from config import Config
 def redeploy():
     try:
         # Make sure server is up to date
-        subprocess.Popen(['git', 'pull'])
+        subprocess.Popen(['git', 'pull'], stdout=FNULL)
         # Make sure there are no local changes on server
-        subprocess.Popen(['git', 'reset', '--hard'])
+        subprocess.Popen(['git', 'reset', '--hard'], stdout=FNULL)
         # Log the pull
         with open('logs/last_pull', 'w+') as pull_log:
             pull_log.write(str(datetime.now()))
         # Restart the server
-        subprocess.Popen(['./restart.sh'])
+        subprocess.Popen(['./restart.sh'], stdout=FNULL)
     except Exception as e:
         return jsonify(e), 400
     return jsonify("Successfull Redeploy"), 200
