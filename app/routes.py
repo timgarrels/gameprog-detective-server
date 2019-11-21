@@ -6,11 +6,13 @@ from app import db
 import subprocess
 from datetime import datetime
 from config import Config
+import os
 
 
 # Git Webhook (Re-)Deployment
 @app.route('/update', methods=['POST'])
 def redeploy():
+    FNULL = open(os.devnull, 'w')
     try:
         # Make sure server is up to date
         subprocess.Popen(['git', 'pull'], stdout=FNULL)
