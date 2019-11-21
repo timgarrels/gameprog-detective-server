@@ -11,6 +11,10 @@ if [ -f logs/server_pid ]; then
     if ps -p `cat logs/server_pid` > /dev/null; then
         echo "Killing running server..."
         kill -9 `cat logs/server_pid`
+        # Wait for process to really die
+        while ps -p `cat logs/server_pid` > /dev/null; do
+            :
+        done
     else
         echo "Server not running"
     fi
@@ -20,10 +24,15 @@ if [ -f logs/bot_pid ]; then
     if ps -p `cat logs/bot_pid` > /dev/null; then
         echo "Killing running bot..."
         kill -9 `cat logs/bot_pid`
+        # Wait for process to really die
+        while ps -p `cat logs/bot_pid` > /dev/null; do
+            :
+        done
     else
         echo "Bot not running"
     fi
 fi
+
 # Restart Server
 echo "Starting server..."
 echo "----------" >> logs/server_log
