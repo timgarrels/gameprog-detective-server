@@ -24,7 +24,7 @@ def redeploy():
         # Restart the server
         subprocess.Popen(['./restart.sh'], stdout=FNULL)
     except Exception as e:
-        return jsonify(e), 400
+        return jsonify(str(e)), 400
     return jsonify("Successfull Redeploy"), 200
 
 # ---------- User Creation and Info ----------
