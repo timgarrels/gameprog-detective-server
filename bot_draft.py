@@ -1,36 +1,102 @@
 import logging
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler
+from telegram.ext.filters import Filters
+from telegram import ReplyKeyboardMarkup, KeyboardButton
 import requests
+import random
+import time
 
 from config import Config
 
-# Logging for the bot as stdout wont work anymore
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Basic Bot Communication setup
-updater = Updater(token=Config.BOT_TOKEN, use_context=True)
-dispatcher = updater.dispatcher
-
-def is_valid_start_token(start_token):
-    r = requests.get(Config.SERVER_URL + "/user/register?telegram_handle={handle}&telegram_start_token={token}".format(handle="Mock handle", token=start_token))
+# --------- Uitility ---------
+def get_answers(user, message):
+    """This is the first main part of the bot. It asks the server for an answer depending on a telegram user and a send message"""
+    r = requests.get(Config.SERVER_URL + "/user/answersForUserAndMessage?user={username}&message={msg}".format(username=user.username, msg=message.text))
     if r.status_code == 200:
-        return r, True
-    return r, False
+        return r.json()
+    logging.debug("The Server did not provide answers for username {username} and message {message}".format(username=user.username, message=message.text))
+    return []
 
-def start(update, context):
+def get_new_user_reply_options(user):
+    """This i the second main part of the bot. It asks the server for replys depending on a telegram user.
+    As the server knows the gamestate of that user it can provide individual replys"""
+
+    r = requests.get(Config.SERVER_URL + "/user/replyOptionsForUser?user={username}".format(username=user.username))
+    if r.status_code == 200:
+        return r.json()
+    logging.debug("The Server did not provide reply options for username {username}".format(username=user.username))
+    return []
+
+def delay_answer(answer, update, context):
+    """Sends a message delayed"""
+    time.sleep(len(answer) * 0.1)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=answer)
+
+def delay_reply_keyboard(reply_keyboard, reserved_answer_for_reply_keyboard, update, context):
+    """Sends a message with a keyboard delayed"""
+    time.sleep(len(reserved_answer_for_reply_keyboard) * 0.1)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=reserved_answer_for_reply_keyboard, reply_markup=reply_keyboard)
+
+def send_filler(update, context):
+    """We need to remove the old repy keyboard. Telegram API does not allow us to replace the keyboard with an empty one
+    without a message send. Removing (not replacing) the keyboard would be possible, but makes the screen of the user jump up and down.
+    This function chooses a filler like "I see" from a list (which should contain a lot of __small__ filler statements) and sends
+    an empty keyboard to remove old keyboard"""
+    # TODO: This is a hacky solution, but I did not find a better one after exploring OneTimeKeyboards
+    # Needs further discussion
+    # Tim Garrels, 23_Nov_2019
+    filler = random.choice(["I see", "If you say so", "Mh", "Ah"])
+    context.bot.send_message(chat_id=update.effective_chat.id, text=filler, reply_markup=ReplyKeyboardMarkup([[KeyboardButton(" ")]]))
+
+# ---------- Communication ----------
+def reply(update, context):
+    send_filler(update, context)
+    answers = get_answers(update.effective_user, update.message)
+    # We can not reply if we did not get at least one answer for the reply keyboard
+    if answers:
+        # All messages require a text, even the reply markups. So reserve one answer for that markup
+        reserved_answer_for_reply_keyboard = answers.pop()
+
+        for answer in answers:
+            delay_answer(answer, update, context)
+
+        reply_options = sorted(get_new_user_reply_options(update.effective_user))
+        if reply_options:
+            reply_keyboard = ReplyKeyboardMarkup([[KeyboardButton(reply_option) for reply_option in reply_options]])
+            delay_reply_keyboard(reply_keyboard, reserved_answer_for_reply_keyboard, update, context)
+        else:
+            context.bot.send_message(chat_id=update.effective_chat.id, text="You are out of luck, the server did not provide further interaction...")
+    else:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="The server did not provide any answers at all")
+
+# --------- Register handshake ---------
+def try_to_register_user(start_token, user_handle):
+    """ Calls register API endpoint to register the handle that provided a token.
+    Returns True and response text if the register process was successfull (status 200),
+    False and response text otherwise"""
+    r = requests.get(Config.SERVER_URL + "/user/register?telegramHandle={handle}&telegramStartToken={token}".format(
+            handle=user_handle, token=start_token))
+    if r.status_code == 200:
+        return True, r.text
+    return False, r.text
+
+def start_command_callback(update, context):
+    """ Provides logic to handle a newly started chat with a user """
+    user = update.effective_user
+    chat_id = update.effective_chat.id
+
     try:
         auth_key = context.args[0]
-        response, valid = is_valid_start_token(auth_key)
+        valid, response_text = try_to_register_user(auth_key, user.username)
         if valid:
             # Valid user auth key
-            context.bot.send_message(chat_id=update.effective_chat.id, text="Hello there, General Kenobi!")
-            context.bot.send_message(chat_id=update.effective_chat.id, text="You were registered!")
+            context.bot.send_message(chat_id=chat_id, text="Hello there, General Kenobi!")
+            context.bot.send_message(chat_id=chat_id, text="You were registered!")
         else:
             # Invalid user auth key
-            context.bot.send_message(chat_id=update.effective_chat.id, text="I don't know you!")
-            context.bot.send_message(chat_id=update.effective_chat.id, text="I don't speak to strangers!")
-            context.bot.send_message(chat_id=update.effective_chat.id, text="<invalid token>")
+            context.bot.send_message(chat_id=chat_id, text="I don't know you!")
+            context.bot.send_message(chat_id=chat_id, text="I don't speak to strangers!")
+            context.bot.send_message(chat_id=chat_id, text="Server Response:\n{}".format(response_text))
 
     except IndexError:
         # No Auth key
@@ -38,10 +104,30 @@ def start(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="I don't speak to people who don't introduce themselves!")
         context.bot.send_message(chat_id=update.effective_chat.id, text="<no token>")
 
-# Handl##ers
-start_handler = CommandHandler('start', start)
-dispatcher.add_handler(start_handler)
 
-# Start Bot
-updater.start_polling()
-updater.idle()
+def main():
+
+    # Logging for the bot as stdout wont work anymore
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    # Basic Bot Communication setup
+    updater = Updater(token=Config.BOT_TOKEN, use_context=True)
+    dispatcher = updater.dispatcher
+
+
+    # Register \start command handler
+    start_handler = CommandHandler('start', start_command_callback)
+    dispatcher.add_handler(start_handler)
+
+    # Register all purpose text handler
+    text_handler = MessageHandler(Filters.all, reply)
+    dispatcher.add_handler(text_handler)
+
+    # Start Bot
+    updater.start_polling()
+    updater.idle()
+
+
+if __name__ == "__main__":
+    main()
