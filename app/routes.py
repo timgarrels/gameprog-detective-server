@@ -9,7 +9,7 @@ from config import Config
 import os
 
 
-# Git Webhook (Re-)Deployment
+# ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update', methods=['POST'])
 def redeploy():
     FNULL = open(os.devnull, 'w')
@@ -56,17 +56,17 @@ def get_user(user_id):
 @app.route('/user/register')
 def register_users_telegram_handle():
     telegram_handle = request.args.get("telegramHandle", None)
-    telegram_start_token = request.args.get("TelegramStartToken", None)
+    telegram_start_token = request.args.get("telegramStartToken", None)
 
     if not telegram_handle:
-        return jsonify("Please provide a telegram_handle"), 400
+        return jsonify("Please provide a telegramHandle"), 400
     if not telegram_start_token:
-        return jsonify("Please provivde a telegram_start_token"), 400
+        return jsonify("Please provivde a telegramStartToken"), 400
 
     try:
         user = User.query.filter_by(telegram_start_token=telegram_start_token).first()
     except ValueError:
-        return jsonify("Invalid telegram_start_token"), 400
+        return jsonify("Invalid telegramStartToken"), 400
 
     if not user:
         return jsonify("No user with such token"), 400
@@ -141,3 +141,31 @@ def get_data_by_type(user_id, datatype):
         contacts = datatype_to_db_col[datatype].query.filter_by(user_id=int(user_id)).all()
         return jsonify([contact.as_dict() for contact in contacts]), 200
     return jsonify("not implemented yet"), 400
+
+# ---------- Chat Bot API ----------
+@app.route('/user/answersForUserAndMessage')
+def get_answers_for_user_and_message():
+    # TODO
+    # Get user and message params
+    # Get proper answer (by a personalizer instance?)
+    # Reply answer array
+
+    # TEMP
+    import random
+    answers = [ ["You sound strange", "Are you a lizardman or -women?"],
+                ["You are talking to me", "Which means you are talking to a machine", "Dont you find this curious?"],
+                ["Dont you hate yourself sometimes?"]]
+    return jsonify(random.choice(answers))
+
+@app.route('/user/replyOptionsForUser')
+def get_reply_options_for_user():
+    # TODO
+    # Get user param
+    # Get proper reply options (by a personalizer instance?)
+    # Reply reply option array (already formatted as button layout?)
+
+    import random
+    replys = ["Yes", "No", "Maybe", "Later", "Soon"]
+    amount = random.randint(2, len(replys))
+    random.shuffle(replys)
+    return jsonify([ replys[n] for n in range(amount) ])
