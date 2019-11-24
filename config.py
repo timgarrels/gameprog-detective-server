@@ -3,9 +3,11 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+# TODO: This all should probably be in env instead
+
 class Config(object):
     # Server
-    SERVER_URL = "http://0.0.0.0:5000"
+    SERVER_URL = "http://localhost:5000"
 
     # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
@@ -13,12 +15,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Bot
-    # TODO: The token should probably be in env instead
-    BOT_TOKEN_ENV_VAR = "GP_TELEGRAM_BOT_TOKEN"
-    try:
-        BOT_TOKEN = os.environ[BOT_TOKEN_ENV_VAR]
-    except KeyError:
-        print("You did not set {}".format(BOT_TOKEN_ENV_VAR))
-        exit()
+    BOT_TOKEN = "1042823918:AAG4KsDj7Epu3ol1hlUNuI953Ou88K9OL6w"
     resp = requests.get("http://api.telegram.org/bot{token}/getMe".format(token=BOT_TOKEN))
     BOT_NAME = resp.json()["result"]["username"]
+
