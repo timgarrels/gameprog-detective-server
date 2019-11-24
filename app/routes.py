@@ -49,7 +49,6 @@ def create_user():
 @app.route('/user/<user_id>')
 def get_user(user_id):
     """Returns a user dict"""
-    # TODO: jsonify does not work on this object
     try:
         user = User.query.get(int(user_id))
         if user:
@@ -92,6 +91,7 @@ def register_users_telegram_handle():
 # ---------- User Data Dump ----------
 @app.route('/user/<user_id>/data', methods=['POST'])
 def recieve_user_data(user_id):
+    # TODO: Needs refactor (data control flow, handler architecture)
     """Common data dump point. Applies various handlers to put provided
     data into the db"""
 
@@ -109,7 +109,6 @@ def recieve_user_data(user_id):
             db.session.commit()
         return True
 
-    # TODO: Refactor data control flow
     datatype_handlers = {"contacts": contact_handler}
     json_data = request.get_json()
 
@@ -162,12 +161,11 @@ def get_answers():
     """Returns a json array of answers.
     The answers are based on the users gamestate
     ans personalized based on his data"""
-    # TODO
+    # TODO: Implement and remove mock up
     # Get user and message params
     # Get proper answer (by a personalizer instance?)
     # Reply answer array
 
-    # TEMP
     import random
     answers = [["You sound strange", "Are you a lizardman or -women?"],
                ["You are talking to me", "Which means you are talking to a machine",
@@ -178,7 +176,7 @@ def get_answers():
 @app.route('/user/replyOptionsForUser')
 def get_reply_options():
     """Returns a json array of reply options personalized for a user"""
-    # TODO
+    # TODO: Implement and remove mock up
     # Get user param
     # Get proper reply options (by a personalizer instance?)
     # Reply reply option array (already formatted as button layout?)
