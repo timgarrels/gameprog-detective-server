@@ -20,11 +20,13 @@ def dict_keys_to_camel_case(dictionary):
 
 def snake_to_camel_case(name):
     """snake_case String to camelCasse"""
-    # TODO: This has a few bugs:
-    # abcAbc -> Abcabc instead of AbcAbc
-    # abc__abc -> Abc_Abc
-    # But suffices for Model key transfrom for now
-    return ''.join(x.capitalize() or '_' for x in name.split('_'))
+    name = list(name)
+    while "_" in name:
+        idx = name.index("_")
+        if idx + 1 < len(name):
+            name[idx + 1] = name[idx + 1].capitalize()
+        del name[idx]
+    return ''.join(name)
 
 class User(db.Model):
     """Models a user that plays our game"""
