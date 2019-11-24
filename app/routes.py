@@ -1,17 +1,20 @@
+"""Server API endpoints"""
+from datetime import datetime
+import subprocess
+import os
+from flask import jsonify, request
+
 from app import app
-from flask import Response, jsonify, request
-import json
 from app.models import User, Contact
 from app import db
-import subprocess
-from datetime import datetime
 from config import Config
-import os
 
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update', methods=['POST'])
 def redeploy():
+    """Hook to redeploy prod server via github webhook
+    Performs a git pull and a restart of bot and server"""
     FNULL = open(os.devnull, 'w')
     try:
         # Make sure server is up to date
@@ -23,25 +26,29 @@ def redeploy():
             pull_log.write(str(datetime.now()))
         # Restart the server
         subprocess.Popen(['./restart.sh'], stdout=FNULL)
-    except Exception as e:
-        return jsonify(str(e)), 400
+    except Exception as exception:
+        return jsonify(str(exception)), 400
     return jsonify("Successfull Redeploy"), 200
 
 # ---------- User Creation and Info ----------
 @app.route('/user/all')
 def all_users():
-    return jsonify({"userIds": [id[0] for id in User.query.with_entities(User.id).all()]})
+    """Lists all created users"""
+    return jsonify({"userIds": [user_id[0] for user_id in User.query.with_entities(User.user_id).all()]})
 
 @app.route('/user/create')
 def create_user():
+    """Creates a new user and replies his id and register url"""
     user = User()
     db.session.add(user)
     db.session.commit()
-    return jsonify({"userId": user.id,
-                    "registerURL": "telegram.me/{botname}?start={token}".format(botname=Config.BOT_NAME, token=user.telegram_start_token)})
+    return jsonify({"userId": user.user_id,
+                    "registerURL": "telegram.me/{botname}?start={token}".format(
+                        botname=Config.BOT_NAME, token=user.telegram_start_token)})
 
 @app.route('/user/<user_id>')
 def get_user(user_id):
+    """Returns a user dict"""
     # TODO: jsonify does not work on this object
     try:
         user = User.query.get(int(user_id))
@@ -55,6 +62,9 @@ def get_user(user_id):
 
 @app.route('/user/register')
 def register_users_telegram_handle():
+    """Registeres provided telegramHandle for a user.
+    Last handshake action
+    Requires a valid auth token"""
     telegram_handle = request.args.get("telegramHandle", None)
     telegram_start_token = request.args.get("telegramStartToken", None)
 
@@ -82,16 +92,19 @@ def register_users_telegram_handle():
 # ---------- User Data Dump ----------
 @app.route('/user/<user_id>/data', methods=['POST'])
 def recieve_user_data(user_id):
+    """Common data dump point. Applies various handlers to put provided
+    data into the db"""
 
     def contact_handler(contact):
+        """Handler to put a single contact into the db"""
         # TODO: Create a palce for handlers and extract this one
         if "firstname" not in contact or "lastname" not in contact:
             # Corrupt data
             return False
         else:
             contact = Contact(user_id=int(user_id),
-                        firstname=contact.get("firstname"),
-                        lastname=contact.get("lastname"))
+                              firstname=contact.get("firstname"),
+                              lastname=contact.get("lastname"))
             db.session.add(contact)
             db.session.commit()
         return True
@@ -135,6 +148,7 @@ def recieve_user_data(user_id):
 
 @app.route('/user/<user_id>/data/<datatype>')
 def get_data_by_type(user_id, datatype):
+    """Tries to fetch a specific datattype from the db"""
     datatype_to_db_col = {"contacts": Contact}
 
     if datatype_to_db_col.get(datatype, None):
@@ -144,7 +158,10 @@ def get_data_by_type(user_id, datatype):
 
 # ---------- Chat Bot API ----------
 @app.route('/user/answersForUserAndMessage')
-def get_answers_for_user_and_message():
+def get_answers():
+    """Returns a json array of answers.
+    The answers are based on the users gamestate
+    ans personalized based on his data"""
     # TODO
     # Get user and message params
     # Get proper answer (by a personalizer instance?)
@@ -152,13 +169,15 @@ def get_answers_for_user_and_message():
 
     # TEMP
     import random
-    answers = [ ["You sound strange", "Are you a lizardman or -women?"],
-                ["You are talking to me", "Which means you are talking to a machine", "Dont you find this curious?"],
-                ["Dont you hate yourself sometimes?"]]
+    answers = [["You sound strange", "Are you a lizardman or -women?"],
+               ["You are talking to me", "Which means you are talking to a machine",
+                "Dont you find this curious?"],
+               ["Dont you hate yourself sometimes?"]]
     return jsonify(random.choice(answers))
 
 @app.route('/user/replyOptionsForUser')
-def get_reply_options_for_user():
+def get_reply_options():
+    """Returns a json array of reply options personalized for a user"""
     # TODO
     # Get user param
     # Get proper reply options (by a personalizer instance?)
@@ -168,4 +187,4 @@ def get_reply_options_for_user():
     replys = ["Yes", "No", "Maybe", "Later", "Soon"]
     amount = random.randint(2, len(replys))
     random.shuffle(replys)
-    return jsonify([ replys[n] for n in range(amount) ])
+    return jsonify([replys[n] for n in range(amount)])
