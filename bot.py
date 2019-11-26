@@ -92,7 +92,8 @@ def reply(update, context, filler=True):
                                  keyboard_message_text, update, context)
         else:
             context.bot.send_message(chat_id=update.effective_chat.id,
-                                     text="You are out of luck, the server did not provide further interaction...")
+                                     text="You are out of luck, the server did not provide further interaction...",
+                                     reply_markup=ReplyKeyboardMarkup([[KeyboardButton(" ")]]))
     else:
         pass
         # context.bot.send_message(chat_id=update.effective_chat.id,
