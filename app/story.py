@@ -1,6 +1,7 @@
 import json
 
 from app import db
+from app.models import User
 from config import Config
 
 class StoryController(object):
@@ -17,9 +18,9 @@ class StoryController(object):
         """Updates db stored story point for given user"""
         user = User.query.get(user_id)
         if not user:
-            return -1
+            raise ValueError("No such user")
         if not user.telegram_handle:
-            return -1
+            raise ValueError("User has no handle")
         
         if not user.current_story_point:
             # Start of Game
@@ -27,21 +28,20 @@ class StoryController(object):
             db.session.add(user)
             db.session.commit()
         else:
-            next_point = StoryController._getReplyToPointDict(user.current_story_point).get(last_reply, None)
-            if not next_point:
-                return -1
+            # Make sure reply is a valid reply
+            reply_name = StoryController._reply_text_to_reply_name(user.current_story_point, last_reply)
+            
+            next_point = StoryController.story_graph[user.current_story_point][reply_name]
             user.current_story_point = next_point
             db.session.add(user)
             db.session.commit()
-            
     
-    def _getReplyToPointDict(current_story_point):
-        # TODO: Undefined Behavior if a reply is defined two times for a story point
-        point_reply_dict = StoryController.story_content[current_story_point]["user_replies"]
-        reply_point_dict = {}
-        for key, value in point_reply_dict.items():
-            reply_point_dict[value] = key
-        return reply_point_dict
+    def _reply_text_to_reply_name(current_story_point, reply_text):
+        reply_dict = StoryController.story_content[current_story_point]["user_replies"]
+        for name, text in reply_dict.items():
+            if text == reply_text:
+                return name
+        raise ValueError("Invalid user reply")
 
     def current_bot_messages(user_id):
         """Returns the current messages to be sent by the bot"""
@@ -51,14 +51,16 @@ class StoryController(object):
         if not user.telegram_handle:
             return ["I dont know you!"]
 
-        return ["Mock Message 1", "Mock Message 2"]
+        messages = StoryController.story_content[user.current_story_point]["messages"]
+        return messages
 
     def current_user_replies(user_id):
         """Returns possible reply options available to the user_id in the current story state"""
         user = User.query.get(user_id)
         if not user:
-            return [" "]
+            raise ValueError("No such user")
         if not user.telegram_handle:
-            return [" "]
+            raise ValueError("No registerd telgram handle")
         
-        return ["Mock Reply Option 1", "Mock Reply Option 2"]
+        replies = list(StoryController.story_content[user.current_story_point]["user_replies"].values())
+        return replies

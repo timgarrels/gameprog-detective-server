@@ -22,7 +22,7 @@
         },
         "cellar_point": {
             "door": "monster_point",
-            "up": "right_point"
+            "up": "start_point"
         }
     },
 
@@ -45,7 +45,7 @@
             ],
             "user_replies": {
                 "back": "Go back to the starting point",
-                "got_to_cellar": "Climb down the ladder"
+                "go_to_cellar": "Climb down the ladder"
             }
         },
         "right_point": {

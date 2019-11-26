@@ -15,13 +15,13 @@ from config import Config
 def get_answers(user, message):
     """This is the first main part of the bot.
     It asks the server for an answer depending on a telegram user and a send message"""
-    response = requests.get(Config.SERVER_URL + "/user/answersForUserAndMessage\
-        ?user={username}&message={msg}".format(username=user.username, msg=message.text))
+    response = requests.get(Config.SERVER_URL + "/user/answersForUserAndMessage?telegramUser={username}&message={msg}".format(username=user.username, msg=message.text))
     if response.status_code == 200:
         return response.json()
     logging.debug("The Server did not provide answers for username \
         {username} and message {message}".format(
             username=user.username, message=message.text))
+    logging.debug("Server Reply: {}".format(response.text))
     return []
 
 def get_new_user_reply_options(user):
@@ -29,8 +29,7 @@ def get_new_user_reply_options(user):
     It asks the server for replys depending on a telegram user.
     As the server knows the gamestate of that user it can provide individual replys"""
 
-    response = requests.get(Config.SERVER_URL + "/user/replyOptionsForUser\
-        ?user={username}".format(username=user.username))
+    response = requests.get(Config.SERVER_URL + "/user/replyOptionsForUser?telegramUser={username}".format(username=user.username))
     if response.status_code == 200:
         return response.json()
     logging.debug("The Server did not provide reply options for username {username}".format(
@@ -87,8 +86,7 @@ def reply(update, context):
                                  keyboard_message_text, update, context)
         else:
             context.bot.send_message(chat_id=update.effective_chat.id,
-                                     text="You are out of luck, \
-                                        the server did not provide further interaction...")
+                                     text="You are out of luck, the server did not provide further interaction...")
     else:
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text="The server did not provide any answers at all")
@@ -98,8 +96,7 @@ def try_to_register_user(start_token, user_handle):
     """ Calls register API endpoint to register the handle that provided a token.
     Returns True and response text if the register process was successfull (status 200),
     False and response text otherwise"""
-    response = requests.get(Config.SERVER_URL + "/user/register\
-        ?telegramHandle={handle}&telegramStartToken={token}".format(
+    response = requests.get(Config.SERVER_URL + "/user/register?telegramHandle={handle}&telegramStartToken={token}".format(
             handle=user_handle, token=start_token))
     if response.status_code == 200:
         return True, response.text

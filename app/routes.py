@@ -66,6 +66,7 @@ def register_users_telegram_handle():
     """Registeres provided telegramHandle for a user.
     Last handshake action
     Requires a valid auth token"""
+    # TODO: Internal Server Error when trying to rgister multiple bots to same telegram user
     telegram_handle = request.args.get("telegramHandle", None)
     telegram_start_token = request.args.get("telegramStartToken", None)
 
@@ -173,9 +174,10 @@ def get_answers_for_user_and_message():
         return jsonify("No such user"), 400
 
     # Proceed in story
-    if StoryController.next_story_point(user.user_id, message) < 0:
-        # Error in StoryController
-        return jsonify("Error in StoryController"), 400
+    try:
+        StoryController.next_story_point(user.user_id, message)
+    except ValueError as e:
+        return jsonify(str(e)), 400
 
     # Return answers
     answers = StoryController.current_bot_messages(user.user_id)
