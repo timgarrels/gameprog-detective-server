@@ -9,6 +9,8 @@ from app.models import User, Contact
 from app import db
 from config import Config
 
+from app.story import StoryController
+
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update', methods=['POST'])
@@ -157,32 +159,37 @@ def get_data_by_type(user_id, datatype):
 
 # ---------- Chat Bot API ----------
 @app.route('/user/answersForUserAndMessage')
-def get_answers():
-    """Returns a json array of answers.
-    The answers are based on the users gamestate
-    ans personalized based on his data"""
-    # TODO: Implement and remove mock up
-    # Get user and message params
-    # Get proper answer (by a personalizer instance?)
-    # Reply answer array
+def get_answers_for_user_and_message():
+    # TODO
+    telegram_user = request.args.get("telegramUser")
+    if not telegram_user:
+        return jsonify("Please provide a username"), 400
+    message = request.args.get("message")
+    if not message:
+        return jsonify("Please provide a message"), 400
 
-    import random
-    answers = [["You sound strange", "Are you a lizardman or -women?"],
-               ["You are talking to me", "Which means you are talking to a machine",
-                "Dont you find this curious?"],
-               ["Dont you hate yourself sometimes?"]]
-    return jsonify(random.choice(answers))
+    user = User.query.filter_by(telegram_handle=telegram_user).first()
+    if not user:
+        return jsonify("No such user"), 400
+
+    # Proceed in story
+    if StoryController.next_story_point(user.user_id, message) < 0:
+        # Error in StoryController
+        return jsonify("Error in StoryController"), 400
+
+    # Return answers
+    answers = StoryController.current_bot_messages(user.user_id)
+    return jsonify(answers), 200
 
 @app.route('/user/replyOptionsForUser')
-def get_reply_options():
-    """Returns a json array of reply options personalized for a user"""
-    # TODO: Implement and remove mock up
-    # Get user param
-    # Get proper reply options (by a personalizer instance?)
-    # Reply reply option array (already formatted as button layout?)
+def get_reply_options_for_user():
+    telegram_user = request.args.get("telegramUser")
+    if not telegram_user:
+        return jsonify("Please provide a username"), 400
 
-    import random
-    replys = ["Yes", "No", "Maybe", "Later", "Soon"]
-    amount = random.randint(2, len(replys))
-    random.shuffle(replys)
-    return jsonify([replys[n] for n in range(amount)])
+    user = User.query.filter_by(telegram_handle=telegram_user).first()
+    if not user:
+        return jsonify("No such user"), 400
+
+    replies = StoryController.current_user_replies(user.user_id)
+    return jsonify(replies), 200
