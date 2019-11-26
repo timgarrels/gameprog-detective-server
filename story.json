@@ -1,0 +1,95 @@
+{
+    "start_story_point": "start_point",
+
+    "story_graph": {
+        "start_point": {
+            "left": "left_point",
+            "right": "right_point"
+        },
+        "left_point": {
+            "back": "start_point",
+            "go_to_cellar": "cellar_point"
+        },
+        "right_point": {
+            "back": "start_point",
+            "win": "win_point"
+        },
+        "win_point": {
+            "reset": "start_point"
+        },
+        "monster_point": {
+            "reset": "start_point"
+        },
+        "cellar_point": {
+            "door": "monster_point",
+            "up": "right_point"
+        }
+    },
+    
+    "story_content": {
+        "start_point": {
+            "messages": [
+                "You find yourself in a dark forest",
+                "It's cold and you want to go home",
+                "Will you find your way out of the forest?"
+            ],
+            "user_replies": {
+                "left": "Go left",
+                "right": "Go right"
+            }
+        },
+        "left_point": {
+            "messages": [
+                "You find a small stone structure",
+                "Seeking shelter you discover an old iron ladder leading down into the belly of the earth"
+            ],
+            "user_replies": {
+                "back": "Go back to the starting point",
+                "got_to_cellar": "Climb down the ladder"
+            }
+        },
+        "right_point": {
+            "messages": [
+                "You decide to follow the right path",
+                "In the distance you can see your home"
+            ],
+            "user_replies": {
+                "back": "Go back to the starting point",
+                "win": "End your journey and go home"
+            }
+        },
+        "win_point": {
+            "messages": [
+                "You open your home door, finding your family alright",
+                "You step to the fireplace, your wife hands you warm coco",
+                "You are safe"
+            ],
+            "user_replies": {
+                "reset": "Reset"
+            }
+        },
+        "cellar_point": {
+            "messages": [
+                "As you climb down the ladder a stenching smell hits your nose",
+                "The green gloomy stone blocks forming the cellar you climbed down to seem decades old",
+                "In the dim light you spot a door"
+            ],
+            "user_replies": {
+                "up": "Go back up the ladder",
+                "door": "Open up the door"
+            }
+        },
+        "monster_point": {
+            "messages": [
+                "As you crank the handle of the door, you hear a growling sound",
+                "You try to close the door, but it's too late",
+                "A giant wolf with red eyes jumps out of the dark behind the door and eats you alive",
+                "Hopefully he wont find your family"
+            ],
+            "user_replies": {
+                "reset": "Reset"
+            }
+        }
+    }
+
+}
