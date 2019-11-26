@@ -22,7 +22,7 @@
         },
         "cellar_point": {
             "door": "monster_point",
-            "up": "start_point"
+            "up": "left_point"
         }
     },
 

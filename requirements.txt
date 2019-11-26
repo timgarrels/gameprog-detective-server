@@ -3,3 +3,4 @@ flask-sqlalchemy
 flask-migrate
 python-telegram-bot
 requests
+graphviz
