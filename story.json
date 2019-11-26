@@ -1,5 +1,5 @@
 {
-    "start_story_point": "start_point",
+    "story_start_point": "start_point",
 
     "story_graph": {
         "start_point": {
@@ -25,7 +25,7 @@
             "up": "right_point"
         }
     },
-    
+
     "story_content": {
         "start_point": {
             "messages": [
