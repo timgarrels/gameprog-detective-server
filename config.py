@@ -21,3 +21,5 @@ class Config(object):
         exit()
     resp = requests.get("http://api.telegram.org/bot{token}/getMe".format(token=BOT_TOKEN))
     BOT_NAME = resp.json()["result"]["username"]
+
+    STORY_FILE = os.path.join(basedir, "story.json")
