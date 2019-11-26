@@ -63,13 +63,14 @@ def send_filler(update, context):
                              text=filler, reply_markup=ReplyKeyboardMarkup([[KeyboardButton(" ")]]))
 
 # ---------- Communication ----------
-def reply(update, context):
+def reply(update, context, filler=True):
     """Proceesd the user in the story. Replys to message send by the player with API provided
     answers and displays new buttons"""
     answers = get_answers(update.effective_user, update.message)
     # We can not reply if we did not get at least one answer for the reply keyboard
     if answers:
-        send_filler(update, context)
+        if filler:
+            send_filler(update, context)
         # All messages require a text, even the reply markups. So reserve one answer for that markup
         keyboard_message_text = answers.pop()
 
@@ -113,7 +114,7 @@ def start_command_callback(update, context):
         if valid:
             # Valid user auth key
             context.bot.send_message(chat_id=chat_id, text="Always nice to see new faces")
-            reply(update, context)
+            reply(update, context, filler=False)
         else:
             # Invalid user auth key
             context.bot.send_message(chat_id=chat_id, text="I don't know you!")
