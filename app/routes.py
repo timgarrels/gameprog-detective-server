@@ -61,6 +61,17 @@ def get_user(user_id):
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
 
+@app.route('/user/byTelegramHandle')
+def get_user_by_telegram_handle():
+    telegram_handle = request.args.get("telegramHandle")
+    if not telegram_handle:
+        return jsonify("Please provide a telegramHandle"), 400
+
+    user = User.query.filter_by(telegram_handle=telegram_handle).first()
+    if not user:
+        return jsonify("No such user"), 400
+    return jsonify(user.as_dict()), 200
+
 @app.route('/user/register')
 def register_users_telegram_handle():
     """Registeres provided telegramHandle for a user.

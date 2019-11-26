@@ -62,6 +62,12 @@ def send_filler(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text=filler, reply_markup=ReplyKeyboardMarkup([[KeyboardButton(" ")]]))
 
+def user_already_registerd(telegram_handle):
+    response = requests.get(Config.SERVER_URL + "/user/byTelegramHandle?telegramHandle={}".format(telegram_handle))
+    if response.status_code == 200:
+        return True
+    return False
+
 # ---------- Communication ----------
 def reply(update, context, filler=True):
     """Proceesd the user in the story. Replys to message send by the player with API provided
@@ -107,6 +113,9 @@ def start_command_callback(update, context):
     """ Provides logic to handle a newly started chat with a user """
     user = update.effective_user
     chat_id = update.effective_chat.id
+
+    if user_already_registerd(user.username):
+        return 1
 
     try:
         auth_key = context.args[0]
