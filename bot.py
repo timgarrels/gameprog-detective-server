@@ -18,8 +18,7 @@ def get_answers(user, message):
     response = requests.get(Config.SERVER_URL + "/user/answersForUserAndMessage?telegramUser={username}&message={msg}".format(username=user.username, msg=message.text))
     if response.status_code == 200:
         return response.json()
-    logging.debug("The Server did not provide answers for username \
-        {username} and message {message}".format(
+    logging.debug("The Server did not provide answers for username {username} and message {message}".format(
             username=user.username, message=message.text))
     logging.debug("Server Reply: {}".format(response.text))
     return []
@@ -32,13 +31,13 @@ def get_new_user_reply_options(user):
     response = requests.get(Config.SERVER_URL + "/user/replyOptionsForUser?telegramUser={username}".format(username=user.username))
     if response.status_code == 200:
         return response.json()
-    logging.debug("The Server did not provide reply options for username {username}".format(
+    logging.debug("The Server did not provide rep   ly options for username {username}".format(
         username=user.username))
     return []
 
 def delay_answer(answer, update, context):
     """Sends a message delayed"""
-    time.sleep(len(answer) * 0.1)
+    time.sleep(len(answer) * 0.04)
     context.bot.send_message(chat_id=update.effective_chat.id, text=answer)
 
 def delay_reply_keyboard(reply_keyboard, keyboard_message_text, update, context):
@@ -67,10 +66,10 @@ def send_filler(update, context):
 def reply(update, context):
     """Proceesd the user in the story. Replys to message send by the player with API provided
     answers and displays new buttons"""
-    send_filler(update, context)
     answers = get_answers(update.effective_user, update.message)
     # We can not reply if we did not get at least one answer for the reply keyboard
     if answers:
+        send_filler(update, context)
         # All messages require a text, even the reply markups. So reserve one answer for that markup
         keyboard_message_text = answers.pop()
 
@@ -88,8 +87,9 @@ def reply(update, context):
             context.bot.send_message(chat_id=update.effective_chat.id,
                                      text="You are out of luck, the server did not provide further interaction...")
     else:
-        context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="The server did not provide any answers at all")
+        pass
+        # context.bot.send_message(chat_id=update.effective_chat.id,
+        #                          text="The server did not provide any answers at all")
 
 # --------- Register handshake ---------
 def try_to_register_user(start_token, user_handle):
@@ -112,8 +112,8 @@ def start_command_callback(update, context):
         valid, response_text = try_to_register_user(auth_key, user.username)
         if valid:
             # Valid user auth key
-            context.bot.send_message(chat_id=chat_id, text="Hello there, General Kenobi!")
-            context.bot.send_message(chat_id=chat_id, text="You were registered!")
+            context.bot.send_message(chat_id=chat_id, text="Always nice to see new faces")
+            reply(update, context)
         else:
             # Invalid user auth key
             context.bot.send_message(chat_id=chat_id, text="I don't know you!")
