@@ -61,6 +61,23 @@ def get_user(user_id):
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
 
+@app.route('/user/<user_id>/reset')
+def reset_user(user_id):
+    try:
+        user = User.query.get(int(user_id))
+        if user:
+            user.telegram_handle = None
+            user.current_story_point = None
+            db.session.add(user)
+            db.session.commit()
+
+            return jsonify("User was reset"), 200
+        else:
+            return jsonify("No such user"), 400
+    except ValueError:
+        # Invalid ID Type
+        return jsonify("Invalid userId"), 400
+
 @app.route('/user/byTelegramHandle')
 def get_user_by_telegram_handle():
     telegram_handle = request.args.get("telegramHandle")

@@ -34,7 +34,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     telegram_handle = db.Column(db.String(64), nullable=True, unique=True)
     telegram_start_token = db.Column(db.String(64), nullable=False, unique=False, default=create_telegram_start_token)
-    current_story_point = db.Column(db.String(64), nullable=True, unique=True)
+    current_story_point = db.Column(db.String(64), nullable=True, unique=False)
 
     def as_dict(self):
         """As sqlalchemy obj cant be parsed to json we build a custom converter"""
