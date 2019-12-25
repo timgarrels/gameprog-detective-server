@@ -223,3 +223,11 @@ def get_reply_options_for_user():
 
     replies = StoryController.current_user_replies(user.user_id)
     return jsonify(replies), 200
+
+@app.route('/user/<user_id>/clues')
+def get_clues(user_id):
+    return jsonify([{
+            "personalized": True,
+            "text": "Hello World",
+            "name": "bla"
+        }])
