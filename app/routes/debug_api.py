@@ -59,11 +59,12 @@ def reset_user(user_id):
     except ValueError:
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
-        
+
 @app.route('/user/all')
 def all_users():
     """Lists all created users"""
-    return jsonify({"userIds": [user_id[0] for user_id in User.query.with_entities(User.user_id).all()]})
+    users = User.query.with_entities(User.user_id).all()
+    return jsonify({"userIds": [user_id[0] for user_id in users]}), 200
 
 @app.route('/user/<user_id>/data/<datatype>')
 def get_data_by_type(user_id, datatype):

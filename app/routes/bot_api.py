@@ -6,15 +6,16 @@ from app.models.models import User
 from app.story import StoryController
 
 
-@app.route('/user/answersForUserAndMessage')
-def get_answers_for_user_and_message():
+@app.route('/user/answersForUserAndReply')
+def get_answers_for_user_and_reply():
+    """Return answers the bot can give dependent on a user and his coice of reply"""
     # TODO
     telegram_user = request.args.get("telegramUser")
     if not telegram_user:
         return jsonify("Please provide a username"), 400
-    message = request.args.get("message")
-    if not message:
-        return jsonify("Please provide a message"), 400
+    reply = request.args.get("reply")
+    if not reply:
+        return jsonify("Please provide a reply"), 400
 
     user = User.query.filter_by(telegram_handle=telegram_user).first()
     if not user:
@@ -22,9 +23,9 @@ def get_answers_for_user_and_message():
 
     # Proceed in story
     try:
-        StoryController.next_story_point(user.user_id, message)
-    except ValueError as e:
-        return jsonify(str(e)), 400
+        StoryController.next_story_point(user.user_id, reply)
+    except ValueError as error:
+        return jsonify(str(error)), 400
 
     # Return answers
     answers = StoryController.current_bot_messages(user.user_id)
@@ -32,6 +33,7 @@ def get_answers_for_user_and_message():
 
 @app.route('/user/replyOptionsForUser')
 def get_reply_options_for_user():
+    """Return reply options for user dependent on current story point"""
     telegram_user = request.args.get("telegramUser")
     if not telegram_user:
         return jsonify("Please provide a username"), 400
@@ -77,6 +79,7 @@ def register_users_telegram_handle():
 # But bot.py is currently using this endpoint to check whether he should react to a \start command
 @app.route('/user/byTelegramHandle')
 def get_user_by_telegram_handle():
+    """User Lookup by telegram handle"""
     telegram_handle = request.args.get("telegramHandle")
     if not telegram_handle:
         return jsonify("Please provide a telegramHandle"), 400

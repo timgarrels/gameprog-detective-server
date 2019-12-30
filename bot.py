@@ -15,7 +15,7 @@ from config import Config
 def get_answers(user, message):
     """This is the first main part of the bot.
     It asks the server for an answer depending on a telegram user and a send message"""
-    response = requests.get(Config.SERVER_URL + "/user/answersForUserAndMessage?telegramUser={username}&message={msg}".format(username=user.username, msg=message.text))
+    response = requests.get(Config.SERVER_URL + "/user/answersForUserAndReply?telegramUser={username}&reply={reply}".format(username=user.username, reply=message.text))
     if response.status_code == 200:
         return response.json()
     logging.debug("The Server did not provide answers for username {username} and message {message}".format(

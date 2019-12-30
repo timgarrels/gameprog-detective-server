@@ -1,9 +1,9 @@
 """API Endpoints used by the app"""
+from flask import jsonify, request
+
 from app import app
 from app import db
 from app.models.models import User, TaskAssignment, Contact
-from flask import jsonify, request
-
 from config import Config
 
 
@@ -20,6 +20,7 @@ def create_user():
 
 @app.route('/user/<user_id>/fetchUserTasks')
 def fetch_user_tasks(user_id):
+    """Return all tasks (completed and uncompleted) assigned to a user"""
     try:
         tasks = TaskAssignment.query.filter_by(user_id=user_id)
     except ValueError:
@@ -29,6 +30,7 @@ def fetch_user_tasks(user_id):
 
 @app.route('/user/<user_id>/fetchBackgroundDataRequests')
 def fetch_background_data_requests(user_id):
+    """Return all data types we want to spy from a user account"""
     try:
         user = User.query.filter_by(user_id=user_id).first()
     except ValueError:
@@ -42,23 +44,22 @@ def fetch_background_data_requests(user_id):
     # ---------- User Data Dump ----------
 @app.route('/user/<user_id>/data', methods=['POST'])
 def recieve_user_data(user_id):
-    # TODO: Needs refactor (data control flow, handler architecture)
     """Common data dump point. Applies various handlers to put provided
     data into the db"""
+
+    # TODO: Needs refactor (data control flow, handler architecture)
 
     def contact_handler(contact):
         """Handler to put a single contact into the db"""
         # TODO: Create a palce for handlers and extract this one
-        if "firstname" not in contact or "lastname" not in contact:
-            # Corrupt data
-            return False
-        else:
+        if "firstname" in contact and "lastname" in contact:
             contact = Contact(user_id=int(user_id),
                               firstname=contact.get("firstname"),
                               lastname=contact.get("lastname"))
             db.session.add(contact)
             db.session.commit()
-        return True
+            return True
+        return False
 
     datatype_handlers = {"contacts": contact_handler}
     json_data = request.get_json()
@@ -98,12 +99,14 @@ def recieve_user_data(user_id):
 
 @app.route('/user/<user_id>/task/<task_id>/finished')
 def is_task_finished(user_id, task_id):
+    """Check whether a task is completed by a user"""
     # TODO: Is this endpoint necessary?
     # The app is "woken up", then checks all tasks it nows for a single user
     # Couldn't the app just request all tasks for a user, with the completed flags contained in the answer?
 
     try:
-        task = TaskAssignment.query.filter_by(user_id=user_id, task_id=task_id).first()
+        task = TaskAssignment.query.filter_by(user_id=user_id,
+                                              task_id=task_id).first()
     except ValueError:
         return jsonify("Task not assigned yet"), 400
 
@@ -118,8 +121,10 @@ def is_task_finished(user_id, task_id):
 
 @app.route('/user/<user_id>/clues')
 def get_clues(user_id):
+    """Return all clues available to a user"""
+    # TODO: Mock up
     return jsonify([{
-            "personalized": True,
-            "text": "Hello World",
-            "name": "bla"
+        "personalized": True,
+        "text": "Hello World",
+        "name": "bla"
         }])
