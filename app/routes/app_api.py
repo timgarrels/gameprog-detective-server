@@ -42,7 +42,7 @@ def fetch_background_data_requests(user_id):
 
     return user.requested_data_types
 
-    # ---------- User Data Dump ----------
+# ---------- User Data Dump ----------
 @app.route('/user/<user_id>/data', methods=['POST'])
 def recieve_user_data(user_id):
     """Common data dump point. Applies various handlers to put provided
