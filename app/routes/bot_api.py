@@ -50,7 +50,6 @@ def register_users_telegram_handle():
     """Registeres provided telegramHandle for a user.
     Last handshake action
     Requires a valid auth token"""
-    # TODO: Internal Server Error when trying to rgister multiple bots to same telegram user
     telegram_handle = request.args.get("telegramHandle", None)
     telegram_start_token = request.args.get("telegramStartToken", None)
 
@@ -69,6 +68,14 @@ def register_users_telegram_handle():
 
     if user.telegram_handle:
         return jsonify("Telegram already registerd for this user"), 400
+
+    try:
+        users_with_same_handle = User.query.filter_by(telegram_handle=telegram_handle).first()
+    except ValueError:
+        return jsonify("Invalid telegramHandle"), 400
+
+    if users_with_same_handle:
+        return jsonify("This telegramHandle is already in use by another user"), 400
 
     user.telegram_handle = telegram_handle
     db.session.add(user)
