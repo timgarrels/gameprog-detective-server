@@ -1,0 +1,87 @@
+"""API Endpoints used by the bot"""
+from flask import request, jsonify
+
+from app import app, db
+from app.models.models import User
+from app.story import StoryController
+
+
+@app.route('/user/answersForUserAndMessage')
+def get_answers_for_user_and_message():
+    # TODO
+    telegram_user = request.args.get("telegramUser")
+    if not telegram_user:
+        return jsonify("Please provide a username"), 400
+    message = request.args.get("message")
+    if not message:
+        return jsonify("Please provide a message"), 400
+
+    user = User.query.filter_by(telegram_handle=telegram_user).first()
+    if not user:
+        return jsonify("No such user"), 400
+
+    # Proceed in story
+    try:
+        StoryController.next_story_point(user.user_id, message)
+    except ValueError as e:
+        return jsonify(str(e)), 400
+
+    # Return answers
+    answers = StoryController.current_bot_messages(user.user_id)
+    return jsonify(answers), 200
+
+@app.route('/user/replyOptionsForUser')
+def get_reply_options_for_user():
+    telegram_user = request.args.get("telegramUser")
+    if not telegram_user:
+        return jsonify("Please provide a username"), 400
+
+    user = User.query.filter_by(telegram_handle=telegram_user).first()
+    if not user:
+        return jsonify("No such user"), 400
+
+    replies = StoryController.current_user_replies(user.user_id)
+    return jsonify(replies), 200
+
+@app.route('/user/register')
+def register_users_telegram_handle():
+    """Registeres provided telegramHandle for a user.
+    Last handshake action
+    Requires a valid auth token"""
+    # TODO: Internal Server Error when trying to rgister multiple bots to same telegram user
+    telegram_handle = request.args.get("telegramHandle", None)
+    telegram_start_token = request.args.get("telegramStartToken", None)
+
+    if not telegram_handle:
+        return jsonify("Please provide a telegramHandle"), 400
+    if not telegram_start_token:
+        return jsonify("Please provivde a telegramStartToken"), 400
+
+    try:
+        user = User.query.filter_by(telegram_start_token=telegram_start_token).first()
+    except ValueError:
+        return jsonify("Invalid telegramStartToken"), 400
+
+    if not user:
+        return jsonify("No user with such token"), 400
+
+    if user.telegram_handle:
+        return jsonify("Telegram already registerd for this user"), 400
+
+    user.telegram_handle = telegram_handle
+    db.session.add(user)
+    db.session.commit()
+    return jsonify("Successfull register"), 200
+
+# TODO: This should be in debug_api.py
+# But bot.py is currently using this endpoint to check whether he should react to a \start command
+@app.route('/user/byTelegramHandle')
+def get_user_by_telegram_handle():
+    telegram_handle = request.args.get("telegramHandle")
+    if not telegram_handle:
+        return jsonify("Please provide a telegramHandle"), 400
+
+    user = User.query.filter_by(telegram_handle=telegram_handle).first()
+    if not user:
+        return jsonify("No such user"), 400
+    return jsonify(user.as_dict()), 200

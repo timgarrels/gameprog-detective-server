@@ -1,7 +1,7 @@
 import json
 
 from app import db
-from app.models import User
+from app.models.models import User
 from config import Config
 
 class StoryController(object):

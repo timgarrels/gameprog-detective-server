@@ -19,7 +19,11 @@ class Config(object):
     except KeyError:
         print("You did not set {}".format(BOT_TOKEN_ENV_VAR))
         exit()
-    resp = requests.get("http://api.telegram.org/bot{token}/getMe".format(token=BOT_TOKEN))
-    BOT_NAME = resp.json()["result"]["username"]
+    try:
+        resp = requests.get("http://api.telegram.org/bot{token}/getMe".format(token=BOT_TOKEN))
+        BOT_NAME = resp.json()["result"]["username"]
+    except requests.exceptions.ConnectionError:
+        print("No connecion, bot name will be set to default <andy abbot>")
+        BOT_NAME = "andy abbot"
 
     STORY_FILE = os.path.join(basedir, "story.json")

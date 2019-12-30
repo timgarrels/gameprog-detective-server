@@ -108,6 +108,8 @@ def try_to_register_user(start_token, user_handle):
             handle=user_handle, token=start_token))
     if response.status_code == 200:
         return True, response.text
+    if response.status_code == 500:
+        return False, "Internal Server Error"
     return False, response.text
 
 def start_command_callback(update, context):
@@ -115,6 +117,8 @@ def start_command_callback(update, context):
     user = update.effective_user
     chat_id = update.effective_chat.id
 
+    # TODO: What does this do?
+    # Nothing should happen if a user types "\start" if he is already registered
     if user_already_registerd(user.username):
         return 1
 
