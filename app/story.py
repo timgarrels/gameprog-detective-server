@@ -2,7 +2,7 @@
 import json
 
 from app import db
-from app.models.models import User
+from app.models.game_models import User
 from config import Config
 
 class StoryController():

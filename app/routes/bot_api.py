@@ -2,7 +2,7 @@
 from flask import request, jsonify
 
 from app import app, db
-from app.models.models import User
+from app.models.game_models import User
 from app.story import StoryController
 
 

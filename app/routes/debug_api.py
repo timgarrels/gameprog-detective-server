@@ -5,7 +5,8 @@ from flask import jsonify
 from datetime import datetime
 
 from app import app, db
-from app.models.models import User, Contact
+from app.models.game_models import User
+from app.models.userdata_models import Contact
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update', methods=['POST'])

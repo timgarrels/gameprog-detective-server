@@ -3,7 +3,8 @@ from flask import jsonify, request
 
 from app import app
 from app import db
-from app.models.models import User, TaskAssignment, Contact
+from app.models.game_models import User, TaskAssignment
+from app.models.userdata_models import Contact
 from config import Config
 
 
@@ -52,6 +53,9 @@ def recieve_user_data(user_id):
     def contact_handler(contact):
         """Handler to put a single contact into the db"""
         # TODO: Create a palce for handlers and extract this one
+        # Maybe the import of userdata_models together with the
+        # game_models import is a hint to another abstraction possiblity?
+        # Handlers should live in their DB model instance
         if "firstname" in contact and "lastname" in contact:
             contact = Contact(user_id=int(user_id),
                               firstname=contact.get("firstname"),

@@ -1,9 +1,6 @@
 """Server ORM"""
 from app import db
-
-
-# TODO: extract data types in a enum like object
-DATA_TYPES = ["CONTACT"]
+from app.models import utility
 
 
 class User(db.Model):
@@ -12,7 +9,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     telegram_handle = db.Column(db.String(64), nullable=True, unique=True)
     telegram_start_token = db.Column(db.String(64), nullable=False, unique=False,
-                                     default=create_telegram_start_token)
+                                     default=utility.create_telegram_start_token)
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
     # TODO: This should be some sort of array, which sqllite does not support
     requested_data_types = db.Column(db.String(64), nullable=True)
@@ -21,27 +18,12 @@ class User(db.Model):
 
     def as_dict(self):
         """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return dict_keys_to_camel_case(
+        return utility.dict_keys_to_camel_case(
             {c.name: getattr(self, c.name) for c in self.__table__.columns})
 
     def __repr__(self):
         return "<User {}.{}>".format(self.user_id, self.telegram_handle)
 
-class Contact(db.Model):
-    """Models a stolen contact from a user"""
-    __tablename__ = "contact"
-    contact_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
-    firstname = db.Column(db.String(64), nullable=True)
-    lastname = db.Column(db.String(64), nullable=True)
-
-    def as_dict(self):
-        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return dict_keys_to_camel_case(
-            {c.name: getattr(self, c.name) for c in self.__table__.columns})
-
-    def __repr__(self):
-        return "<Contact {}.{} {}>".format(self.contact_id, self.firstname, self.lastname)
 
 class Task(db.Model):
     """Models a task to be completed by a user"""
