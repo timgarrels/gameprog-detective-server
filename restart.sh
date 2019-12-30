@@ -41,7 +41,7 @@ echo $! > logs/server_pid
 # Restart Bot
 echo "Starting bot..."
 echo "----------" >> logs/bot_log
-python3 bot.py >> logs/bot_log 2>&1 &
+python3 bot/bot.py >> logs/bot_log 2>&1 &
 echo $! > logs/bot_pid
 sleep 1
 echo "All up and running"
