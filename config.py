@@ -5,11 +5,16 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     # Server
-    SERVER_URL = "http://0.0.0.0:5000"
+    _SERVER_URL_ENV_VAR = "GP_SERVER_URL"
+    try:
+        SERVER_URL = os.environ[_SERVER_URL_ENV_VAR]
+    except KeyError:
+        print("You did not set {}".format(_SERVER_URL_ENV_VAR))
+        exit()
 
     # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+        'sqlite:///' + os.path.join(basedir, 'app/app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Bot
@@ -26,4 +31,4 @@ class Config(object):
         print("No connecion, bot name will be set to default <andy abbot>")
         BOT_NAME = "andy abbot"
 
-    STORY_FILE = os.path.join(basedir, "story.json")
+    STORY_FILE = os.path.join(basedir, "app/story.json")
