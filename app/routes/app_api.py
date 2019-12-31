@@ -4,7 +4,7 @@ from flask import jsonify, request
 from app import app
 from app import db
 from app.models.game_models import User, TaskAssignment
-from app.models.userdata_models import Contact
+from app.models.userdata_models import DATA_TYPES, Contact
 from config import Config
 
 
@@ -32,6 +32,8 @@ def fetch_user_tasks(user_id):
 @app.route('/user/<user_id>/fetchBackgroundDataRequests')
 def fetch_background_data_requests(user_id):
     """Return all data types we want to spy from a user account"""
+    # TODO: The following creation of a user object with all fail checks is used a lot
+    # and should be extracted into a method
     try:
         user = User.query.filter_by(user_id=user_id).first()
     except ValueError:
@@ -42,37 +44,40 @@ def fetch_background_data_requests(user_id):
 
     return user.requested_data_types
 
-# ---------- User Data Dump ----------
-@app.route('/user/<user_id>/data', methods=['POST'])
-def recieve_user_data(user_id):
+@app.route('/user/<user_id>/data/<data_type>', methods=['GET', 'POST'])
+def user_data_by_type(user_id, data_type):
+    """Either returns all existing data (GET) or adds new data (POST)"""
+
+    if request.method == "GET":
+        return fetch_user_data_by_type(user_id, data_type)
+    elif request.method == "POST":
+        return recieve_user_data(user_id, data_type)
+
+def fetch_user_data_by_type(user_id, data_type):
+    """Returns all existing user data of a specified type"""
+    db_type_table = DATA_TYPES.get(data_type, None)
+    if not db_type_table:
+        return jsonify("No such type {}".format(data_type)), 400
+
+    formatted_data = [entry.as_dict() for entry in db_type_table.query.filter_by(user_id=user_id)]
+    return jsonify(formatted_data), 200
+
+def recieve_user_data(user_id, data_type):
     """Common data dump point. Applies various handlers to put provided
     data into the db"""
+    try:
+        data_handler = DATA_TYPES[data_type].userdata_post_handler
+    except KeyError:
+        return jsonify("No such datatype {}".format(data_type)), 400
+    except AttributeError:
+        return jsonify("No handler for datatype {}".format(data_type)), 400
 
-    # TODO: Needs refactor (data control flow, handler architecture)
-
-    def contact_handler(contact):
-        """Handler to put a single contact into the db"""
-        # TODO: Create a palce for handlers and extract this one
-        # Maybe the import of userdata_models together with the
-        # game_models import is a hint to another abstraction possiblity?
-        # Handlers should live in their DB model instance
-        if "firstname" in contact and "lastname" in contact:
-            contact = Contact(user_id=int(user_id),
-                              firstname=contact.get("firstname"),
-                              lastname=contact.get("lastname"))
-            db.session.add(contact)
-            db.session.commit()
-            return True
-        return False
-
-    datatype_handlers = {"contacts": contact_handler}
     json_data = request.get_json()
-
     if not json_data:
-        return jsonify("Please provide data!"), 400
+        return jsonify("Please provide json data!"), 400
 
     data_origin = json_data.get("origin", None)
-    data = json_data.get("data", {})
+    data = json_data.get("data", [])
 
     if not data_origin:
         return jsonify("Please specify the data <origin>"), 400
@@ -80,26 +85,20 @@ def recieve_user_data(user_id):
     if data_origin not in ["app", "bot"]:
         return jsonify("I only take data <origin>ating from app or bot"), 400
 
-    try:
-        user = User.query.get(int(user_id))
-    except ValueError:
-        # Invalid ID Type
-        return jsonify("Invalid userId"), 400
+    if not data:
+        return jsonify("Please provide data!"), 400
 
-    if not user:
-        return jsonify("No such user"), 400
+    if type(data) is not list:
+        return jsonify("Please provide a data list [dict, dict, ...]"), 400
 
-    for datatype, value_list in data.items():
-        # TODO: Handle data
-        handled_types = {}
-        if datatype in datatype_handlers.keys():
-            handled_types[datatype] = 0
-
-            for value in value_list:
-                if datatype_handlers[datatype](value):
-                    handled_types[datatype] += 1
-
-    return jsonify("Added {} to db".format(handled_types)), 200
+    added_data = 0
+    for data_dict in data:
+        try:
+            data_handler(user_id, data_dict)
+            added_data += 1
+        except KeyError as error:
+            return jsonify("Data could not be added: {}".format(error)), 400
+    return jsonify("Added {} new entries to db".format(added_data)), 200
 
 @app.route('/user/<user_id>/task/<task_id>/finished')
 def is_task_finished(user_id, task_id):
