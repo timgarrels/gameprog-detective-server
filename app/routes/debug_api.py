@@ -48,13 +48,16 @@ def reset_user(user_id):
     try:
         user = User.query.get(int(user_id))
         if user:
-            # TODO: React to newly added user fields?
             user.telegram_handle = None
             user.current_story_point = None
             db.session.add(user)
 
             for assignment in TaskAssignment.query.filter_by(user_id=user.user_id):
                 db.session.delete(assignment)
+
+            for requested_datatype in RequestedDatatype.query.filter_by(user_id=user.user_id):
+                db.session.delete(requested_datatype)
+
             db.session.commit()
 
             return jsonify("User was reset"), 200
