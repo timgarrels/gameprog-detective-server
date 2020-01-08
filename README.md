@@ -23,12 +23,12 @@ Diese App ist der Hauptdatensammler des Spiels. Da wir über die Telegram-API nu
 Die App muss vom Spieler heruntergeladen werden, um den Telegram-Chat mit dem Bot zu starten (dabei wird ein Schlüssel übermittelt, damit die gesammelten Daten der App mit einem Telegram-User korreliert werden können). 
 Außerdem planen wir, über die App den "Sicherheitsstatus" und das "Vertrauenslevel" der Quelle anzuzeigen.
 
-TODO: Link zum Repo der App
+[Link zum Repo der App](https://github.com/ADimeo/gameprog-detective-app)
 
 ### Bot
 Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über ihn wird die (adaptive) Spielgeschichte erzählt und die Aufgaben der Quelle an den Spieler kommuniziert.
 
-TODO: Link zum Repo des Bots
+[Link zum Repo des Bots](https://github.com/EatingBacon/gameprog-detective-bot)
 
 ### Server
 Der Server bietet sowohl für die App als auch für den Bot die notwendigen API Endpunkte. Er erhält Daten von der App und speichert und analysiert diese. Er liefert dem Bot die Story, bereits personalisiert für den jeweiligen User. Dafür verwaltet der Server sowohl die Grundstory als auch die Userdaten (persönliche Daten und story-relevante Daten wie aktuellen Spielstand).
