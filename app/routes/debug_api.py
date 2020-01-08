@@ -5,7 +5,7 @@ from flask import jsonify
 from datetime import datetime
 
 from app import app, db
-from app.models.game_models import User
+from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, RequestedDatatype, Spydatatype
 
 # ---------- Git Webhook (Re-)Deployment ----------
@@ -52,6 +52,9 @@ def reset_user(user_id):
             user.telegram_handle = None
             user.current_story_point = None
             db.session.add(user)
+
+            for assignment in TaskAssignment.query.filter_by(user_id=user.user_id):
+                db.session.delete(assignment)
             db.session.commit()
 
             return jsonify("User was reset"), 200
