@@ -12,7 +12,7 @@ class User(db.Model):
                                      default=utility.create_telegram_start_token)
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
     # TODO: This should be some sort of array, which sqllite does not support
-    requested_data_types = db.Column(db.Array(db.String(64)), nullable=True)
+    requested_data_types = db.relationship("RequestedDatatype")
     # TODO: Placeholder, has no real function/use in code
     current_story_point = db.Column(db.String(64))
     task_assigments = db.relationship("TaskAssignment")

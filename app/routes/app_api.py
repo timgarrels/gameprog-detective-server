@@ -4,7 +4,7 @@ from flask import jsonify, request
 from app import app
 from app import db
 from app.models.game_models import User, TaskAssignment
-from app.models.userdata_models import DATA_TYPES, Contact
+from app.models.userdata_models import Contact, Spydatatype
 from config import Config
 
 
@@ -55,7 +55,14 @@ def user_data_by_type(user_id, data_type):
 
 def fetch_user_data_by_type(user_id, data_type):
     """Returns all existing user data of a specified type"""
-    db_type_table = DATA_TYPES.get(data_type, None)
+    try:
+        spydata_type = Spydatatype.query.filter_by(name=data_type).first()
+    except ValueError:
+        return jsonify("Invalid datatype"), 400
+
+    if not spydata_type:
+        return jsonify("No such datatype"), 400
+
     if not db_type_table:
         return jsonify("No such type {}".format(data_type)), 400
 
@@ -66,7 +73,7 @@ def recieve_user_data(user_id, data_type):
     """Common data dump point. Applies various handlers to put provided
     data into the db"""
     try:
-        data_handler = DATA_TYPES[data_type].userdata_post_handler
+        data_handler = Spydatatype.handler_association.get(data_type)
     except KeyError:
         return jsonify("No such datatype {}".format(data_type)), 400
     except AttributeError:

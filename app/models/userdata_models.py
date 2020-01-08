@@ -27,5 +27,20 @@ class Contact(db.Model):
     def __repr__(self):
         return "<Contact {}.{} {}>".format(self.contact_id, self.firstname, self.lastname)
 
-# TODO: extract data types in a enum like object
-DATA_TYPES = {"contact": Contact}
+class Spydatatype(db.Model):
+    """Models all datatypes we can request to be spied from the app"""
+    __tablename__ = "spydatatype"
+    spydatatype_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(64), nullable=False, unique=True)
+
+    handler_association = {"contact": Contact.userdata_post_handler,}
+
+    def __repr__(self):
+        return "<Spydatatype {}".format(self.name)
+
+class RequestedDatatype(db.Model):
+    """Models the association from datatypes needed for a user"""
+    __tablename__ = "requested_datatype"
+    requested_data_type_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
+    spydatatype_id = db.Column(db.Integer, db.ForeignKey("spydatatype.spydatatype_id"))
