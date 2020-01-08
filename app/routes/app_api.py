@@ -6,6 +6,7 @@ from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, Spydatatype
 from app.story import StoryController
+from app.models.utility import db_single_element_query
 
 from config import Config
 
@@ -40,16 +41,10 @@ def fetch_user_tasks(user_id):
 @app.route('/user/<user_id>/fetchBackgroundDataRequests')
 def fetch_background_data_requests(user_id):
     """Return all data types we want to spy from a user account"""
-    # TODO: The following creation of a user object with all fail checks is used a lot
-    # and should be extracted into a method
     try:
-        user = User.query.filter_by(user_id=user_id).first()
-    except ValueError:
-        return jsonify("Invalid userId"), 400
-
-    if not user:
-        return jsonify("No user with such Id"), 400
-
+        user = db_single_element_query(User, {"user_id": user_id}, "user")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
     return jsonify([request.as_dict() for request in user.requested_data_types]), 400
 
 @app.route('/user/<user_id>/data/<data_type>', methods=['GET', 'POST'])
@@ -64,13 +59,11 @@ def user_data_by_type(user_id, data_type):
 def fetch_user_data_by_type(user_id, data_type):
     """Returns all existing user data of a specified type"""
     try:
-        spydata_type = Spydatatype.query.filter_by(name=data_type).first()
-    except ValueError:
-        return jsonify("Invalid datatype"), 400
+        spydata_type = db_single_element_query(Spydatatype, {"name": data_type}, "datatype")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
 
-    if not spydata_type:
-        return jsonify("No such datatype"), 400
-
+    # TODO: Where is db_type_table comming from?
     if not db_type_table:
         return jsonify("No such type {}".format(data_type)), 400
 
@@ -120,16 +113,12 @@ def recieve_user_data(user_id, data_type):
 def update_requested_datatype(datatype, user_id):
     """Removes user -> datatype association in """
 
-@app.route('/user/<user_id>/task/<task_id>/finished')
-def is_task_finished(user_id, task_id):
+@app.route('/user/<user_id>/task/<task_name>/completed')
+def is_task_completed(user_id, task_name):
     """Check whether a task is completed by a user"""
-    # TODO: Is this endpoint necessary?
-    # The app is "woken up", then checks all tasks it nows for a single user
-    # Couldn't the app just request all tasks for a user, with the completed flags contained in the answer?
-
     try:
         task = TaskAssignment.query.filter_by(user_id=user_id,
-                                              task_id=task_id).first()
+                                              task_name=task_name).first()
     except ValueError:
         return jsonify("Task not assigned yet"), 400
 

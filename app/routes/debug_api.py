@@ -91,20 +91,14 @@ def all_available_datatypes():
 @app.route('/user/<user_id>/data/<datatype>/request')
 def request_datatype(user_id, datatype):
     try:
-        user = User.query.filter_by(user_id=user_id).first()
-    except ValueError:
-        return jsonify("Invalid userId"), 400
-
-    if not user:
-        return jsonify("No user with such Id"), 400
+        user = db_single_element_query(User, {"user_id": user_id}, "user")
+    except ValueError as e:
+        return jsonify(str(e)), 400
 
     try:
-        spydatatype = Spydatatype.query.filter_by(name=datatype).first()
-    except ValueError:
-        return jsonify("Invalid datatype"), 400
-
-    if not spydatatype:
-        return jsonify("No such datatype"), 400
+        spydatatype = db_single_element_query(Spydatatype, {"name": datatype}, "datatype")
+    except ValueError as e:
+        return jsonify(str(e)), 400
 
     requested_data_type = RequestedDatatype(user_id=user.user_id, spydatatype_id=spydatatype.spydatatype_id)
     db.session.add(requested_data_type)

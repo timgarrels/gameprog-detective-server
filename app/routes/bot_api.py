@@ -4,20 +4,21 @@ from flask import request, jsonify
 from app import app, db
 from app.models.game_models import User
 from app.story import StoryController
+from app.models.utility import db_single_element_query
 
 
 @app.route('/user/answersForUserAndReply')
 def get_answers_for_user_and_reply():
     """Return answers the bot can give dependent on a user and his coice of reply"""
-    # TODO
     telegram_user = request.args.get("telegramUser")
     if not telegram_user:
         return jsonify(["Please provide a username"]), 400
     reply = request.args.get("reply")
 
-    user = User.query.filter_by(telegram_handle=telegram_user).first()
-    if not user:
-        return jsonify(["No such user"]), 400
+    try:
+        user = db_single_element_query(User, {"telegram_handle": telegram_user}, "user")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
 
     # Return answers
     answers = StoryController.current_bot_messages(user.user_id, reply)
@@ -30,9 +31,10 @@ def get_reply_options_for_user():
     if not telegram_user:
         return jsonify("Please provide a username"), 400
 
-    user = User.query.filter_by(telegram_handle=telegram_user).first()
-    if not user:
-        return jsonify("No such user"), 400
+    try:
+        user = db_single_element_query(User, {"telegram_handle": telegram_user}, "user")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
 
     replies = StoryController.current_user_replies(user.user_id)
     return replies
@@ -51,12 +53,9 @@ def register_users_telegram_handle():
         return jsonify("Please provivde a telegramStartToken"), 400
 
     try:
-        user = User.query.filter_by(telegram_start_token=telegram_start_token).first()
-    except ValueError:
-        return jsonify("Invalid telegramStartToken"), 400
-
-    if not user:
-        return jsonify("No user with such token"), 400
+        user = db_single_element_query(User, {"telegram_start_token": telegram_start_token}, "startToken")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
 
     if user.telegram_handle:
         return jsonify("Telegram already registerd for this user"), 400
@@ -83,7 +82,9 @@ def get_user_by_telegram_handle():
     if not telegram_handle:
         return jsonify("Please provide a telegramHandle"), 400
 
-    user = User.query.filter_by(telegram_handle=telegram_handle).first()
-    if not user:
-        return jsonify("No such user"), 400
+    try:
+        user = db_single_element_query(User, {"telegram_handle": telegram_handle}, "user")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
+
     return jsonify(user.as_dict()), 200

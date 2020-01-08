@@ -24,3 +24,14 @@ def snake_to_camel_case(name):
             name[idx + 1] = name[idx + 1].capitalize()
         del name[idx]
     return ''.join(name)
+
+def db_single_element_query(table, arg_dict, element_name):
+    try:
+        element = table.query.filter_by(arg_dict).first()
+    except ValueError:
+        raise ValueError("Invalid args: {}".format(arg_dict))
+
+    if not element:
+        raise ValueError("No such {}".format(element_name))
+
+    return element
