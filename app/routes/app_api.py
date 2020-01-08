@@ -5,6 +5,8 @@ from app import app
 from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, Spydatatype
+from app.story import StoryController
+
 from config import Config
 
 
@@ -26,7 +28,13 @@ def fetch_user_tasks(user_id):
         tasks = TaskAssignment.query.filter_by(user_id=user_id)
     except ValueError:
         return jsonify("Invalid userId"), 400
-    return jsonify(tasks), 200
+
+    task_dicts = []
+    for task in tasks:
+        task_dict = StoryController._task_name_to_dict(task.task_name)
+        task_dict.update([("completed", task.completed)])
+        task_dicts.append(task_dict)
+    return jsonify(task_dicts), 200
 
 
 @app.route('/user/<user_id>/fetchBackgroundDataRequests')
@@ -108,6 +116,7 @@ def recieve_user_data(user_id, data_type):
             return jsonify("Data could not be added: {}".format(error)), 400
     return jsonify("Added {} new entries to db".format(added_data)), 200
 
+# TODO
 def update_requested_datatype(datatype, user_id):
     """Removes user -> datatype association in """
 

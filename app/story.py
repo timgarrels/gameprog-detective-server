@@ -57,10 +57,13 @@ class StoryController():
     def _tasks_for_storypoint(story_point):
         tasks = []
         for task_name in story_point["tasks"]:
-            task = StoryController.tasks[task_name]
-            task.update([("name", task_name)])
-            tasks.append(task)
+            tasks.append(StoryController._task_name_to_dict(task_name))
         return tasks
+
+    def _task_name_to_dict(task_name):
+        task = StoryController.tasks[task_name]
+        task.update([("name", task_name)])
+        return task
 
     def incomplete_tasks(user_id):
         """Returns a list of incomplete tasks of a certain user"""
