@@ -35,7 +35,7 @@
                 "You will need to call one!"
             ],
             "paths": {
-                "Call a HPI student": "Call HPI Student",
+                "Call a HPI student": "Call HPI Student"
             },
             "tasks": [
                 "HPI Student Contact Data"
@@ -65,12 +65,16 @@
         "Go to HPI": {
             "description": "Get to the Griebnitzsee!",
             "datatype": "location",
-            "incomplete_message": "You cant do that while not at Griebnitzsee!"
+            "incomplete_message": [
+                "You cant do that while not at Griebnitzsee!"
+            ]
         },
         "HPI Student Contact Data": {
             "description": "Get contact data of at least one HPI student",
             "datatype": "contact",
-            "incomplete_message": "You cant call anybody without contact data!"
+            "incomplete_message": [
+                "You cant call anybody without contact data!"
+            ]
         }
     }
 }
