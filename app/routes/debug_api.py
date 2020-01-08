@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models.game_models import User
-from app.models.userdata_models import Contact
+from app.models.userdata_models import Contact, RequestedDatatype, Spydatatype
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update', methods=['POST'])
@@ -76,3 +76,39 @@ def get_data_by_type(user_id, datatype):
         contacts = datatype_to_db_col[datatype].query.filter_by(user_id=int(user_id)).all()
         return jsonify([contact.as_dict() for contact in contacts]), 200
     return jsonify("not implemented yet"), 400
+
+
+@app.route('/data/types')
+def all_available_datatypes():
+    return jsonify([spydatatype.name for spydatatype in Spydatatype.query.all()]), 200
+
+@app.route('/user/<user_id>/data/<datatype>/request')
+def request_datatype(user_id, datatype):
+    try:
+        user = User.query.filter_by(user_id=user_id).first()
+    except ValueError:
+        return jsonify("Invalid userId"), 400
+
+    if not user:
+        return jsonify("No user with such Id"), 400
+
+    try:
+        spydatatype = Spydatatype.query.filter_by(name=datatype).first()
+    except ValueError:
+        return jsonify("Invalid datatype"), 400
+
+    if not spydatatype:
+        return jsonify("No such datatype"), 400
+
+    requested_data_type = RequestedDatatype(user_id=user.user_id, spydatatype_id=spydatatype.spydatatype_id)
+    db.session.add(requested_data_type)
+    db.session.commit()
+
+    return jsonify(requested_data_type.as_dict()), 200
+
+
+# Create task
+
+# Finish task
+
+# Check

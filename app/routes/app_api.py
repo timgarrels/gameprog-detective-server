@@ -42,7 +42,7 @@ def fetch_background_data_requests(user_id):
     if not user:
         return jsonify("No user with such Id"), 400
 
-    return user.requested_data_types
+    return jsonify([request.as_dict() for request in user.requested_data_types]), 400
 
 @app.route('/user/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):
@@ -93,7 +93,7 @@ def recieve_user_data(user_id, data_type):
         return jsonify("I only take data <origin>ating from app or bot"), 400
 
     if not data:
-        return jsonify("Please provide data!"), 400
+        return jsonify("Please provide data!"), d400
 
     if type(data) is not list:
         return jsonify("Please provide a data list [dict, dict, ...]"), 400
@@ -102,10 +102,14 @@ def recieve_user_data(user_id, data_type):
     for data_dict in data:
         try:
             data_handler(user_id, data_dict)
+            update_requested_datatype(datatype, user_id)
             added_data += 1
         except KeyError as error:
             return jsonify("Data could not be added: {}".format(error)), 400
     return jsonify("Added {} new entries to db".format(added_data)), 200
+
+def update_requested_datatype(datatype, user_id):
+    """Removes user -> datatype association in """
 
 @app.route('/user/<user_id>/task/<task_id>/finished')
 def is_task_finished(user_id, task_id):
