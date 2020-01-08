@@ -1,95 +1,76 @@
 {
-    "story_start_point": "start_point",
+    "start_storypoint": "start",
 
-    "story_graph": {
-        "start_point": {
-            "left": "left_point",
-            "right": "right_point"
+    "story_points": {
+        "start": {
+            "description": [
+                "Welcome to the HPI",
+                "Lets get you enrolled!"
+            ],
+            "paths": {
+                "Talk to Prof. Meinel": "Meinels Office",
+                "Talk to HPI students": "Mensa",
+                "Talk to IfI students": "IfI"
+            },
+            "tasks": [
+                "Go to HPI"
+            ]
         },
-        "left_point": {
-            "back": "start_point",
-            "go_to_cellar": "cellar_point"
+        "Meinels Office": {
+            "description": [
+                "You are infront of Prof. Meinels Office",
+                "Lets knock!"
+            ],
+            "paths": {
+                "Knock": "Meinels Office",
+                "Go back": "start"
+            },
+            "tasks": []
         },
-        "right_point": {
-            "back": "start_point",
-            "win": "win_point"
+        "Mensa": {
+            "description": [
+                "You stand in the full mensa",
+                "There are hundredts of chairs and thousands of students",
+                "You cant spot any HPI student",
+                "You will need to call one!"
+            ],
+            "paths": {
+                "Call a HPI student": "Call HPI Student",
+            },
+            "tasks": [
+                "HPI Student Contact Data"
+            ]
         },
-        "win_point": {
-            "reset": "start_point"
+        "Ifi": {
+            "description": [
+                "You go to the Ifi",
+                "You lose"
+            ],
+            "paths": {},
+            "tasks": []
         },
-        "monster_point": {
-            "reset": "start_point"
-        },
-        "cellar_point": {
-            "door": "monster_point",
-            "up": "left_point"
+        "Call HPI Student": {
+            "description": [
+                "You call and finally meet some HPI students",
+                "They help you out",
+                "You are now enrolled",
+                "You win!"
+            ],
+            "paths": {},
+            "tasks": []
         }
     },
 
-    "story_content": {
-        "start_point": {
-            "messages": [
-                "You find yourself in a dark forest",
-                "It's cold and you want to go home",
-                "Will you find your way out of the forest?"
-            ],
-            "user_replies": {
-                "left": "Go left",
-                "right": "Go right"
-            }
+    "tasks": {
+        "Go to HPI": {
+            "description": "Get to the Griebnitzsee!",
+            "datatype": "location",
+            "incomplete_message": "You cant do that while not at Griebnitzsee!"
         },
-        "left_point": {
-            "messages": [
-                "You find a small stone structure",
-                "Seeking shelter you discover an old iron ladder leading down into the belly of the earth"
-            ],
-            "user_replies": {
-                "back": "Go back to the starting point",
-                "go_to_cellar": "Climb down the ladder"
-            }
-        },
-        "right_point": {
-            "messages": [
-                "You decide to follow the right path",
-                "In the distance you can see your home"
-            ],
-            "user_replies": {
-                "back": "Go back to the starting point",
-                "win": "End your journey and go home"
-            }
-        },
-        "win_point": {
-            "messages": [
-                "You open your home door, finding your family alright",
-                "You step to the fireplace, your wife hands you warm coco",
-                "You are safe"
-            ],
-            "user_replies": {
-                "reset": "Reset"
-            }
-        },
-        "cellar_point": {
-            "messages": [
-                "As you climb down the ladder a stenching smell hits your nose",
-                "The green gloomy stone blocks forming the cellar you climbed down to seem decades old",
-                "In the dim light you spot a door"
-            ],
-            "user_replies": {
-                "up": "Go back up the ladder",
-                "door": "Open up the door"
-            }
-        },
-        "monster_point": {
-            "messages": [
-                "As you crank the handle of the door, you hear a growling sound",
-                "You try to close the door, but it's too late",
-                "A giant wolf with red eyes jumps out of the dark behind the door and eats you alive",
-                "Hopefully he wont find your family"
-            ],
-            "user_replies": {
-                "reset": "Reset"
-            }
+        "HPI Student Contact Data": {
+            "description": "Get contact data of at least one HPI student",
+            "datatype": "contact",
+            "incomplete_message": "You cant call anybody without contact data!"
         }
     }
-
 }
