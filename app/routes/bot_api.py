@@ -12,24 +12,16 @@ def get_answers_for_user_and_reply():
     # TODO
     telegram_user = request.args.get("telegramUser")
     if not telegram_user:
-        return jsonify("Please provide a username"), 400
+        return jsonify(["Please provide a username"]), 400
     reply = request.args.get("reply")
-    if not reply:
-        return jsonify("Please provide a reply"), 400
 
     user = User.query.filter_by(telegram_handle=telegram_user).first()
     if not user:
-        return jsonify("No such user"), 400
-
-    # Proceed in story
-    try:
-        StoryController.next_story_point(user.user_id, reply)
-    except ValueError as error:
-        return jsonify(str(error)), 400
+        return jsonify(["No such user"]), 400
 
     # Return answers
-    answers = StoryController.current_bot_messages(user.user_id)
-    return jsonify(answers), 200
+    answers = StoryController.current_bot_messages(user.user_id, reply)
+    return answers
 
 @app.route('/user/replyOptionsForUser')
 def get_reply_options_for_user():
@@ -43,7 +35,7 @@ def get_reply_options_for_user():
         return jsonify("No such user"), 400
 
     replies = StoryController.current_user_replies(user.user_id)
-    return jsonify(replies), 200
+    return replies
 
 @app.route('/user/register')
 def register_users_telegram_handle():

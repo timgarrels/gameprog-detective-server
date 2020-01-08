@@ -2,8 +2,9 @@
 import json
 
 from app import db
-from app.models.game_models import User
+from app.models.game_models import User, TaskAssignment
 from config import Config
+from flask import jsonify
 
 class StoryController():
     """Method collection to handle story progression"""
@@ -12,9 +13,17 @@ class StoryController():
     with open(Config.STORY_FILE, "r") as story_file:
         story = json.loads(story_file.read())
 
-    start_point = story["story_start_point"]
-    story_graph = story["story_graph"]
-    story_content = story["story_content"]
+    start_point = story["start_storypoint"]
+    story_points = story["story_points"]
+    tasks = story["tasks"]
+
+    def assign_tasks(story_point, user_id):
+        for task_name in StoryController.story_points[story_point]["tasks"]:
+            task_assignment = TaskAssignment()
+            task_assignment.user_id = user_id
+            task_assignment.task_name = task_name
+            db.session.add(task_assignment)
+            db.session.commit()
 
     def next_story_point(user_id, last_reply):
         """Updates db stored story point for given user"""
@@ -29,33 +38,66 @@ class StoryController():
             user.current_story_point = StoryController.start_point
             db.session.add(user)
             db.session.commit()
+            StoryController.assign_tasks(StoryController.start_point, user_id)
         else:
             # Make sure reply is a valid reply
-            reply_name = StoryController._reply_text_to_reply_name(user.current_story_point,
+            story_point = StoryController._reply_text_to_storypoint(user.current_story_point,
                                                                    last_reply)
 
-            next_point = StoryController.story_graph[user.current_story_point][reply_name]
-            user.current_story_point = next_point
+            user.current_story_point = story_point
+            StoryController.assign_tasks(story_point, user_id)
+
             db.session.add(user)
             db.session.commit()
 
-    def _reply_text_to_reply_name(current_story_point, reply_text):
-        reply_dict = StoryController.story_content[current_story_point]["user_replies"]
-        for name, text in reply_dict.items():
-            if text == reply_text:
-                return name
-        raise ValueError("Invalid user reply")
+    def _reply_text_to_storypoint(current_story_point, reply_text):
+        reply_dict = StoryController.story_points[current_story_point]["paths"]
+        return reply_dict[reply_text]
 
-    def current_bot_messages(user_id):
+    def _tasks_for_storypoint(story_point):
+        tasks = []
+        for task_name in story_point["tasks"]:
+            task = StoryController.tasks[task_name]
+            task.update([("name", task_name)])
+            tasks.append(task)
+        return tasks
+
+    def incomplete_tasks(user_id):
+        """Returns a list of incomplete tasks of a certain user"""
+        user = User.query.get(user_id)
+        if not user:
+            raise ValueError("No such user")
+
+        return [task.task_name for task in user.task_assigments]
+
+    def incomplete_message(user_id):
+        """Returns the message of the first incomplete tasks of a certain user"""
+        try:
+            incomplete_task = StoryController.incomplete_tasks(user_id)[0]
+            return StoryController.tasks[incomplete_task]["incomplete_message"]
+        except IndexError:
+            return ["Not incomplete tasks"]
+
+    def current_bot_messages(user_id, reply):
         """Returns the current messages to be sent by the bot"""
         user = User.query.get(user_id)
         if not user:
-            return ["You are not even real!"]
+            return jsonify(["You are not even real!"]), 200
         if not user.telegram_handle:
-            return ["I dont know you!"]
+            return jsonify(["I dont know you!"]), 200
 
-        messages = StoryController.story_content[user.current_story_point]["messages"]
-        return messages
+        if StoryController.incomplete_tasks(user.user_id):
+            # There are incomplete tasks
+            return jsonify(StoryController.incomplete_message(user.user_id)), 200
+
+        if not reply:
+            return jsonify(["You are already in game! Please provide a reply"]), 200
+        try:
+            StoryController.next_story_point(user.user_id, reply)
+        except ValueError as error:
+            return jsonify([str(error)]), 400
+        messages = StoryController.story_points[user.current_story_point]["description"]
+        return jsonify(messages), 200
 
     def current_user_replies(user_id):
         """Returns possible reply options available to the user_id in the current story state"""
@@ -65,6 +107,6 @@ class StoryController():
         if not user.telegram_handle:
             raise ValueError("No registerd telgram handle")
 
-        story_point = StoryController.story_content[user.current_story_point]
-        replies = list(story_point["user_replies"].values())
-        return replies
+        story_point = StoryController.story_points[user.current_story_point]
+        replies = list(story_point["paths"].keys())
+        return jsonify(replies), 200

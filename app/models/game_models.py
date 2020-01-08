@@ -25,27 +25,12 @@ class User(db.Model):
     def __repr__(self):
         return "<User {}.{}>".format(self.user_id, self.telegram_handle)
 
-class Task(db.Model):
-    """Models a task to be completed by a user"""
-    __tablename__ = "task"
-    task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(64), nullable=False)
-    description = db.Column(db.String(64), nullable=False)
-    datatype_id = db.Column(db.Integer, db.ForeignKey("spydatatype.spydatatype_id"))
-    task_assigments = db.relationship("TaskAssignment")
-    # TODO: validation_function
-    # How to reference a function that can check whether available data suffices to complete a task?
-    # Maybe hardcode "needed data" with placeholders/wildcards?
-
-    def __repr__(self):
-        return "<Task{}>".format(self.description[:12] + "...")
-
 class TaskAssignment(db.Model):
     """Models an assigned (and maybe already completed) task to a user"""
     __tablename__ = "task_assignment"
     task_assignment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
-    task_id = db.Column(db.Integer, db.ForeignKey("task.task_id"))
+    task_name = db.Column(db.String(64))
     completed = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
