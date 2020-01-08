@@ -12,9 +12,10 @@ class User(db.Model):
                                      default=utility.create_telegram_start_token)
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
     # TODO: This should be some sort of array, which sqllite does not support
-    requested_data_types = db.Column(db.String(64), nullable=True)
-    # TODO: Placeholder, no real function in code
+    requested_data_types = db.Column(db.Array(db.String(64)), nullable=True)
+    # TODO: Placeholder, has no real function/use in code
     current_story_point = db.Column(db.String(64))
+    task_assigments = db.relationship("TaskAssignment")
 
     def as_dict(self):
         """As sqlalchemy obj cant be parsed to json we build a custom converter"""
@@ -24,22 +25,23 @@ class User(db.Model):
     def __repr__(self):
         return "<User {}.{}>".format(self.user_id, self.telegram_handle)
 
-
 class Task(db.Model):
     """Models a task to be completed by a user"""
     __tablename__ = "task"
     task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(64), nullable=False)
-    # TODO: validation_function = How to implement
+    task_assigments = db.relationship("TaskAssignment")
+    # TODO: validation_function
+    # How to reference a function that can check whether available data suffices to complete a task?
+    # Maybe hardcode "needed data" with placeholders/wildcards?
+
 
     def __repr__(self):
         return "<Task{}>".format(self.description[:12] + "...")
 
 class TaskAssignment(db.Model):
     """Models an assigned (and maybe already completed) task to a user"""
-    __tablename = "task_assigment"
-    # TODO: This is not relational! This is a mistake. Its 4am in the morning, sorry
-    # Or is it?
+    __tablename__ = "task_assignment"
     task_assignment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     task_id = db.Column(db.Integer, db.ForeignKey("task.task_id"))

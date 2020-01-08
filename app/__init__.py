@@ -16,3 +16,6 @@ migrate = Migrate(app, db)
 from app.routes.app_api import *
 from app.routes.bot_api import *
 from app.routes.debug_api import *
+
+db.create_all()
+db.session.commit()
