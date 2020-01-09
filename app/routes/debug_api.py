@@ -7,6 +7,7 @@ from datetime import datetime
 from app import app, db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, RequestedDatatype, Spydatatype
+from app.models.utility import db_single_element_query
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update', methods=['POST'])
@@ -91,12 +92,12 @@ def all_available_datatypes():
 @app.route('/user/<user_id>/data/<datatype>/request')
 def request_datatype(user_id, datatype):
     try:
-        user = db_single_element_query(User, {"user_id": user_id}, "user")
+        user = db_single_element_query(User, **{"user_id": user_id}, "user")
     except ValueError as e:
         return jsonify(str(e)), 400
 
     try:
-        spydatatype = db_single_element_query(Spydatatype, {"name": datatype}, "datatype")
+        spydatatype = db_single_element_query(Spydatatype, **{"name": datatype}, "datatype")
     except ValueError as e:
         return jsonify(str(e)), 400
 

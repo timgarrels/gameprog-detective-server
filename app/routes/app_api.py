@@ -42,7 +42,7 @@ def fetch_user_tasks(user_id):
 def fetch_background_data_requests(user_id):
     """Return all data types we want to spy from a user account"""
     try:
-        user = db_single_element_query(User, {"user_id": user_id}, "user")
+        user = db_single_element_query(User, **{"user_id": user_id}, "user")
     except ValueError as e:
         return jsonify([str(e)]), 400
     return jsonify([request.as_dict() for request in user.requested_data_types]), 400
@@ -59,7 +59,7 @@ def user_data_by_type(user_id, data_type):
 def fetch_user_data_by_type(user_id, data_type):
     """Returns all existing user data of a specified type"""
     try:
-        spydata_type = db_single_element_query(Spydatatype, {"name": data_type}, "datatype")
+        spydata_type = db_single_element_query(Spydatatype, **{"name": data_type}, "datatype")
     except ValueError as e:
         return jsonify([str(e)]), 400
 
@@ -109,9 +109,16 @@ def recieve_user_data(user_id, data_type):
             return jsonify("Data could not be added: {}".format(error)), 400
     return jsonify("Added {} new entries to db".format(added_data)), 200
 
-# TODO
+
 def update_requested_datatype(datatype, user_id):
-    """Removes user -> datatype association in """
+    # TODO: Implement
+    # This should get all incompleted tasks for a user concerning the specified datatype
+    # THen it should call the validate function of those tasks
+    # If all tasks are now completed it should remove the datatype from the requested list of this user
+    # if tasks some of those tasks are still open, it should not remove them
+    # Maybe implement a "can be removed (user_id, dataype) funciton?
+    # If there are no tasks the datatype should be removed
+    pass
 
 @app.route('/user/<user_id>/task/<task_name>/completed')
 def is_task_completed(user_id, task_name):
