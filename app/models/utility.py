@@ -27,7 +27,7 @@ def snake_to_camel_case(name):
 
 def db_single_element_query(table, arg_dict, element_name):
     try:
-        element = table.query.filter_by(arg_dict).first()
+        element = table.query.filter_by(**arg_dict).first()
     except ValueError:
         raise ValueError("Invalid args: {}".format(arg_dict))
 

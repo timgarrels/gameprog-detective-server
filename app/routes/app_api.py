@@ -42,7 +42,7 @@ def fetch_user_tasks(user_id):
 def fetch_background_data_requests(user_id):
     """Return all data types we want to spy from a user account"""
     try:
-        user = db_single_element_query(User, **{"user_id": user_id}, "user")
+        user = db_single_element_query(User, {"user_id": user_id}, "user")
     except ValueError as e:
         return jsonify([str(e)]), 400
     return jsonify([request.as_dict() for request in user.requested_data_types]), 400
@@ -59,7 +59,7 @@ def user_data_by_type(user_id, data_type):
 def fetch_user_data_by_type(user_id, data_type):
     """Returns all existing user data of a specified type"""
     try:
-        spydata_type = db_single_element_query(Spydatatype, **{"name": data_type}, "datatype")
+        spydata_type = db_single_element_query(Spydatatype, {"name": data_type}, "datatype")
     except ValueError as e:
         return jsonify([str(e)]), 400
 

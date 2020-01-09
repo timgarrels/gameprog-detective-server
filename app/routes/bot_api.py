@@ -16,7 +16,7 @@ def get_answers_for_user_and_reply():
     reply = request.args.get("reply")
 
     try:
-        user = db_single_element_query(User, **{"telegram_handle": telegram_user}, "user")
+        user = db_single_element_query(User, {"telegram_handle": telegram_user}, "user")
     except ValueError as e:
         return jsonify([str(e)]), 400
 
@@ -32,7 +32,7 @@ def get_reply_options_for_user():
         return jsonify("Please provide a username"), 400
 
     try:
-        user = db_single_element_query(User, **{"telegram_handle": telegram_user}, "user")
+        user = db_single_element_query(User, {"telegram_handle": telegram_user}, "user")
     except ValueError as e:
         return jsonify([str(e)]), 400
 
@@ -53,7 +53,7 @@ def register_users_telegram_handle():
         return jsonify("Please provivde a telegramStartToken"), 400
 
     try:
-        user = db_single_element_query(User, **{"telegram_start_token": telegram_start_token}, "startToken")
+        user = db_single_element_query(User, {"telegram_start_token": telegram_start_token}, "startToken")
     except ValueError as e:
         return jsonify([str(e)]), 400
 
@@ -83,7 +83,7 @@ def get_user_by_telegram_handle():
         return jsonify("Please provide a telegramHandle"), 400
 
     try:
-        user = db_single_element_query(User, **{"telegram_handle": telegram_handle}, "user")
+        user = db_single_element_query(User, {"telegram_handle": telegram_handle}, "user")
     except ValueError as e:
         return jsonify([str(e)]), 400
 
