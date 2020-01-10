@@ -9,7 +9,7 @@ from app.models.utility import db_single_element_query
 
 @app.route('/user/answersForUserAndReply')
 def get_answers_for_user_and_reply():
-    """Return answers the bot can give dependent on a user and his coice of reply"""
+    """Return answers the bot can give dependent on a user and his choice of reply"""
     telegram_user = request.args.get("telegramUser")
     if not telegram_user:
         return jsonify(["Please provide a username"]), 400

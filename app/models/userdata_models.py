@@ -38,6 +38,7 @@ class Spydatatype(db.Model):
     def __repr__(self):
         return "<Spydatatype {}".format(self.name)
 
+# TODO: could this be implemented dynamically?
 class RequestedDatatype(db.Model):
     """Models the association from datatypes needed for a user"""
     __tablename__ = "requested_datatype"
