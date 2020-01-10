@@ -1,8 +1,11 @@
 """Game Story Implementation: Import and Pogress"""
 import json
+import random
 
 from app import db
 from app.models.game_models import User, TaskAssignment
+from app.models.userdata_models import Contact
+from app.models.utility import db_single_element_query
 from config import Config
 from flask import jsonify
 
@@ -73,6 +76,15 @@ class StoryController():
 
         return [task.task_name for task in user.task_assigments]
 
+    def personalize_messages(messages, user_id):
+        user = db_single_element_query(User, {"user_id": user_id}, "user")
+        #contacts = Contact.query.filter_by(user_id=user_id)
+        user_data = {
+            "user_name": user.first_name,
+            #"random_contact": random.choice(contacts)
+        }
+        return [message.format(**user_data) for message in messages]
+
     def incomplete_message(user_id):
         """Returns the message of the first incomplete tasks of a certain user"""
         try:
@@ -86,21 +98,20 @@ class StoryController():
         user = User.query.get(user_id)
         if not user:
             return jsonify(["You are not even real!"]), 200
-        if not user.telegram_handle:
+        elif not user.telegram_handle:
             return jsonify(["I dont know you!"]), 200
-
-        if StoryController.incomplete_tasks(user.user_id):
+        elif StoryController.incomplete_tasks(user.user_id):
             # There are incomplete tasks
-            return jsonify(StoryController.incomplete_message(user.user_id)), 200
-
-        if not reply:
+            messages = StoryController.incomplete_message(user.user_id)
+        elif not reply:
             return jsonify(["You are already in game! Please provide a reply"]), 200
-        try:
-            StoryController.next_story_point(user.user_id, reply)
-        except ValueError as error:
-            return jsonify([str(error)]), 400
-        messages = StoryController.story_points[user.current_story_point]["description"]
-        return jsonify(messages), 200
+        else:
+            try:
+                StoryController.next_story_point(user.user_id, reply)
+            except ValueError as error:
+                return jsonify([str(error)]), 400
+            messages = StoryController.story_points[user.current_story_point]["description"]
+        return jsonify(StoryController.personalize_messages(messages, user_id)), 200
 
     def current_user_replies(user_id):
         """Returns possible reply options available to the user_id in the current story state"""
