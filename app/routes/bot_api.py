@@ -9,7 +9,7 @@ from app.models.utility import db_single_element_query
 
 @app.route('/user/answersForUserAndReply')
 def get_answers_for_user_and_reply():
-    """Return answers the bot can give dependent on a user and his coice of reply"""
+    """Return answers the bot can give dependent on a user and his choice of reply"""
     telegram_user = request.args.get("telegramUser")
     if not telegram_user:
         return jsonify(["Please provide a username"]), 400
@@ -45,12 +45,15 @@ def register_users_telegram_handle():
     Last handshake action
     Requires a valid auth token"""
     telegram_handle = request.args.get("telegramHandle", None)
+    user_first_name = request.args.get("userFirstName", None)
     telegram_start_token = request.args.get("telegramStartToken", None)
 
     if not telegram_handle:
         return jsonify("Please provide a telegramHandle"), 400
+    if not user_first_name:
+        return jsonify("Please provide a userFirstName"), 400
     if not telegram_start_token:
-        return jsonify("Please provivde a telegramStartToken"), 400
+        return jsonify("Please provide a telegramStartToken"), 400
 
     try:
         user = db_single_element_query(User, {"telegram_start_token": telegram_start_token}, "startToken")
@@ -69,6 +72,7 @@ def register_users_telegram_handle():
         return jsonify("This telegramHandle is already in use by another user"), 400
 
     user.telegram_handle = telegram_handle
+    user.first_name = user_first_name
     db.session.add(user)
     db.session.commit()
     return jsonify("Successfull register"), 200

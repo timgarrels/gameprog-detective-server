@@ -20,10 +20,10 @@ task_validation_lookup = {"go_to_hpi_validator": go_to_hpi_validator,
                           "hpi_student_contact_data_validator": hpi_student_contact_data_validator,
 }
 
-
 # Placeholder Method Implementation
 def placeholder_method_1(user_id):
     return "Filler"
+
 
 def placeholder_method_2(user_id):
     return db.User.query.filter_by("something")[0]
