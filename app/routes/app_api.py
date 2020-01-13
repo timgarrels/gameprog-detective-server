@@ -103,7 +103,7 @@ def recieve_user_data(user_id, data_type):
     for data_dict in data:
         try:
             data_handler(user_id, data_dict)
-            update_requested_datatype(datatype, user_id)
+            update_requested_datatype(data_type, user_id)
             added_data += 1
         except KeyError as error:
             return jsonify("Data could not be added: {}".format(error)), 400
