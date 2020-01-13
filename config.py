@@ -4,13 +4,6 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
-    # Server
-    _SERVER_URL_ENV_VAR = "GP_SERVER_URL"
-    try:
-        SERVER_URL = os.environ[_SERVER_URL_ENV_VAR]
-    except KeyError:
-        print("You did not set {}".format(_SERVER_URL_ENV_VAR))
-        exit()
 
     # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \

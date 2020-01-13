@@ -3,10 +3,15 @@ from flask import jsonify, request
 
 from app import app
 from app import db
+from app.story import task_validation_lookup
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, Spydatatype
 from app.story_controller import StoryController
+<<<<<<< HEAD
 from app.models.utility import db_single_element_query, as_dict
+=======
+from app.models.utility import db_single_element_query
+>>>>>>> master
 
 from config import Config
 
@@ -110,16 +115,6 @@ def recieve_user_data(user_id, data_type):
     return jsonify("Added {} new entries to db".format(added_data)), 200
 
 
-def update_requested_datatype(datatype, user_id):
-    # TODO: Implement
-    # This should get all incompleted tasks for a user concerning the specified datatype
-    # THen it should call the validate function of those tasks
-    # If all tasks are now completed it should remove the datatype from the requested list of this user
-    # if tasks some of those tasks are still open, it should not remove them
-    # Maybe implement a "can be removed (user_id, dataype) funciton?
-    # If there are no tasks the datatype should be removed
-    pass
-
 @app.route('/user/<user_id>/task/<task_name>/completed')
 def is_task_completed(user_id, task_name):
     """Check whether a task is completed by a user"""
@@ -132,16 +127,19 @@ def is_task_completed(user_id, task_name):
     if not task:
         return jsonify("No such task!"), 400
 
-    # TODO: Call tasks validate function to check whether task is completed by now
-    # completed = task.validate_function(user)
-    # update_task_status(user, task, completed)
+    validation_method = task_validation_lookup.get(task_name, None)
+    completed = validation_method(user_id)
+    task.completed = completed
+    db.session.add(task)
+    db.session.commit()
 
-    return task.completed
+    return completed
+
 
 @app.route('/user/<user_id>/clues')
 def get_clues(user_id):
     """Return all clues available to a user"""
-    # TODO: Mock up
+    # TODO: Mock up and only nice to have, maybe deprecated
     return jsonify([{
         "personalized": True,
         "text": "Hello World",

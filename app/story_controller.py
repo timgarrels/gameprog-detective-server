@@ -14,7 +14,7 @@ class StoryController():
     with open(Config.STORY_FILE, "r") as story_file:
         story = json.loads(story_file.read())
 
-    start_point = story["start_storypoint"]
+    start_point = story["start_point"]
     story_points = story["story_points"]
     tasks = story["tasks"]
 
@@ -121,3 +121,91 @@ class StoryController():
         story_point = StoryController.story_points[user.current_story_point]
         replies = list(story_point["paths"].keys())
         return jsonify(replies), 200
+
+
+def validate_story():
+    """Makes sure story.json is consistent"""
+    validate_references()
+    validate_lookups()
+
+def validate_references():
+    """Makes sure all storypoints and tasks referenced in story.json are defined in story.json"""
+    missing = {"points": set(),
+               "tasks": set(),
+    }
+
+    story = None
+    with open(Config.STORY_FILE, "r") as story_file:
+        story = json.loads(story_file.read())
+
+    existing_story_points = story["story_points"].keys()
+
+    referenced_story_points = []
+    # Start
+    referenced_story_points.append(story["start_point"])
+    # Actual story points
+    referenced_story_points.extend(story["story_points"].keys())
+    # Path Destinations
+    for story_point in story["story_points"].keys():
+        destinations = story["story_points"][story_point]["paths"].values()
+        referenced_story_points.extend(destinations)
+    
+    for referenced_story_point in referenced_story_points:
+        if referenced_story_point not in existing_story_points:
+            missing["points"].add(referenced_story_point)
+
+    existing_tasks = story["tasks"].keys()
+    referenced_tasks = []
+    # Actual tasks
+    referenced_tasks.extend(story["tasks"].keys())
+    # Tasks in story points
+    for story_point in story["story_points"].keys():
+        tasks = story["story_points"][story_point]["tasks"]
+        referenced_tasks.extend(tasks)
+
+    for referenced_task in referenced_tasks:
+        if referenced_task not in existing_tasks:
+            missing["tasks"].add(referenced_task)
+
+    if len(missing["points"]):
+        raise KeyError("There are referenced, but unkown storypoints: {}".format(missing["points"]))
+
+    if len(missing["points"]):
+        raise KeyError("There are referenced, but unkown tasks: {}".format(missing["tasks"]))
+
+    print("All references in story.json found!")
+
+def validate_lookups():
+    """Makes sure all task validation and placeholder methods referenced in story.json 
+    are implemented in story.py""" 
+    # Assert referenced methods are implemented
+    try:
+        from app.story import task_validation_lookup, placeholder_lookup
+    except NameError as e:
+        exit("Not all references defined: {}".format(e))
+
+    missing = {"task_validation_lookup": set(),
+               "placeholder_lookup": set(),
+    }
+
+    story = None
+    with open(Config.STORY_FILE, "r") as story_file:
+        story = json.loads(story_file.read())
+
+    # Assert validation methods are in lookup table
+    referenced_validation_methods = []
+
+    for task in story["tasks"].keys():
+        validation_method = story["tasks"][task]["validation_method"]
+        referenced_validation_methods.append(validation_method)
+
+    for referenced_validation_method in referenced_validation_methods:
+        if referenced_validation_method not in task_validation_lookup.keys():
+            missing["task_validation_lookup"].add(referenced_validation_method)
+
+    if len(missing["task_validation_lookup"]):
+        raise KeyError("There are referenced, but unkown task validation methods: {}".format(missing["task_validation_lookup"]))
+
+    print("All validtion method lookups found!")
+    # Assert placeholder methods are in lookup table
+    # TODO: What can conatin a placeholder
