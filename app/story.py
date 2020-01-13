@@ -1,6 +1,5 @@
 """Game Story Implementation: Import and Pogress"""
 import json
-import random
 
 from app import db
 from app.models.game_models import User, TaskAssignment
@@ -78,10 +77,8 @@ class StoryController():
 
     def personalize_messages(messages, user_id):
         user = db_single_element_query(User, {"user_id": user_id}, "user")
-        #contacts = Contact.query.filter_by(user_id=user_id)
         user_data = {
             "user_name": user.first_name,
-            #"random_contact": random.choice(contacts)
         }
         return [message.format(**user_data) for message in messages]
 
