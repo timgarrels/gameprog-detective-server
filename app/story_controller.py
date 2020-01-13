@@ -4,10 +4,11 @@ import json
 from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.utility import db_single_element_query
+from app.story import task_validation_lookup, placeholder_lookup
 from config import Config
 from flask import jsonify
 
-
+# TODO: split in parts
 class StoryController():
     """Method collection to handle story progression"""
 
@@ -73,7 +74,7 @@ class StoryController():
         if not user:
             raise ValueError("No such user")
 
-        return [task.task_name for task in user.task_assigments]
+        return [task.task_name for task in user.task_assigments if not task.completed]
 
     def personalize_messages(messages, user_id):
         user = db_single_element_query(User, {"user_id": user_id}, "user")
@@ -89,6 +90,10 @@ class StoryController():
             return StoryController.tasks[incomplete_task]["incomplete_message"]
         except IndexError:
             return ["Not incomplete tasks"]
+
+    def task_validation_method(task_name):
+        validation_method = StoryController.tasks[task_name]["validation_method"]
+        return task_validation_lookup.get(validation_method, None)
 
     def current_bot_messages(user_id, reply):
         """Returns the current messages to be sent by the bot"""

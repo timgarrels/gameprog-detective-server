@@ -1,5 +1,5 @@
 """Lookup Table for functions and placeholders referenced in story.json"""
-from app import db
+from app import db, app
 from app.models.userdata_models import Contact
 
 import random
@@ -7,13 +7,12 @@ import random
 
 # Task Validation Method Implementation
 def go_to_hpi_validator(user_id):
-    if random.random() > 0.7:
-        return True
-    return False
+    # TODO: Implement location check
+    return True
 
 def hpi_student_contact_data_validator(user_id):
     contacts = Contact.query.filter_by(user_id=user_id)
-    return bool(len(contacts))
+    return bool(len(list(contacts)))
 
 # Task Validation Lookup Table
 task_validation_lookup = {"go_to_hpi_validator": go_to_hpi_validator,
