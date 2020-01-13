@@ -10,10 +10,10 @@ from app.models.userdata_models import Contact, RequestedDatatype, Spydatatype
 from app.models.utility import db_single_element_query  
 
 # ---------- Git Webhook (Re-)Deployment ----------
-@app.route('/update', methods=['POST'])
+@app.route('/update')
 def redeploy():
     """Hook to redeploy prod server via github webhook
-    Performs a git pull and a restart of bot    and server"""
+    Performs a git pull and a restart of server"""
     FNULL = open(os.devnull, 'w')
     try:
         # Make sure server is up to date
@@ -24,7 +24,7 @@ def redeploy():
         with open('logs/last_pull', 'w+') as pull_log:
             pull_log.write(str(datetime.now()))
         # Restart the server
-        subprocess.Popen(['./restart.sh'], stdout=FNULL)
+        subprocess.Popen(['./manage.sh', 'restart'], stdout=FNULL)
     except Exception as exception:
         return jsonify(str(exception)), 400
     return jsonify("Successfull Redeploy"), 200
