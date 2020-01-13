@@ -15,7 +15,7 @@ class StoryController():
     with open(Config.STORY_FILE, "r") as story_file:
         story = json.loads(story_file.read())
 
-    start_point = story["start_storypoint"]
+    start_point = story["start_point"]
     story_points = story["story_points"]
     tasks = story["tasks"]
 
