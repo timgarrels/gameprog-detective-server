@@ -14,15 +14,19 @@ def main():
 
     # Add start Node
     story_graph.attr('node', shape='doublecircle')
-    story_graph.node(story["story_start_point"])
+    story_graph.node(story["start_point"], margin="0.4")
     # Add Nodes
     story_graph.attr('node', shape='circle')
-    for story_point in story["story_graph"].keys():
-        story_graph.node(story_point)
+    for story_point, values in story["story_points"].items():
+        story_graph.node(story_point, margin="0.4")
+
+        for task in values.get("tasks", []):
+            story_graph.node(task, shape='box', margin="0.4")
+            story_graph.edge(task, story_point, style="dotted")
 
     # Add edges
-    for story_point, reply_dict in story["story_graph"].items():
-        for reply, next_point in reply_dict.items():
+    for story_point in story["story_points"].keys():
+        for reply, next_point in story["story_points"][story_point]["paths"].items():
             story_graph.edge(story_point, next_point, xlabel=reply)
 
     story_graph.view()
