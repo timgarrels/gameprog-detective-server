@@ -24,12 +24,12 @@ class User(db.Model):
         return "<User {}.{}>".format(self.user_id, self.telegram_handle)
 
 class TaskAssignment(db.Model):
-    """Models an assigned (and maybe already completed) task to a user"""
+    """Models an assigned (and maybe already finished) task to a user"""
     __tablename__ = "task_assignment"
     task_assignment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     task_name = db.Column(db.String(64))
-    completed = db.Column(db.Boolean, default=False)
+    finished = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return "<TaskAssignment user:{} task:{}".format(self.user_id, self.task_id)

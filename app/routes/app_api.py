@@ -111,9 +111,9 @@ def recieve_user_data(user_id, data_type):
     return jsonify("Added {} new entries to db".format(added_data)), 200
 
 
-@app.route('/user/<user_id>/task/<task_name>/completed')
-def is_task_completed(user_id, task_name):
-    """Check whether a task is completed by a user"""
+@app.route('/user/<user_id>/task/<task_name>/finished')
+def is_task_finished(user_id, task_name):
+    """Check whether a task is finished by a user"""
     try:
         task = TaskAssignment.query.filter_by(user_id=user_id,
                                               task_name=task_name).first()
@@ -127,8 +127,8 @@ def is_task_completed(user_id, task_name):
     if not validation_method:
         return jsonify("No such task {}".format(task_name)), 400
 
-    completed = validation_method(user_id)
-    task.completed = completed
+    finished = validation_method(user_id)
+    task.finished = finished
     db.session.add(task)
     db.session.commit()
 
