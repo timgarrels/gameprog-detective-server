@@ -24,5 +24,7 @@ class Config(object):
     except requests.exceptions.ConnectionError:
         print("No connecion, bot name will be set to default <andy abbot>")
         BOT_NAME = "andy abbot"
+    except KeyError:
+        exit("Bot Name could not be parsed from telegram api. Maybe the bot token is out of date?")
 
     STORY_FILE = os.path.join(basedir, "app/story.json")
