@@ -7,7 +7,7 @@ from datetime import datetime
 from app import app, db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, RequestedDatatype, Spydatatype
-from app.models.utility import db_single_element_query  
+from app.models.utility import db_single_element_query, as_dict
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update', methods=['POST'])
@@ -36,7 +36,7 @@ def get_user(user_id):
     try:
         user = User.query.get(int(user_id))
         if user:
-            return jsonify(user.as_dict()), 200
+            return jsonify(as_dict(user, camel_case=True)), 200
         else:
             return jsonify("No such user"), 400
     except ValueError:
@@ -81,7 +81,7 @@ def get_data_by_type(user_id, datatype):
 
     if datatype_to_db_col.get(datatype, None):
         contacts = datatype_to_db_col[datatype].query.filter_by(user_id=int(user_id)).all()
-        return jsonify([contact.as_dict() for contact in contacts]), 200
+        return jsonify([as_dict(contact, camel_case=True) for contact in contacts]), 200
     return jsonify("not implemented yet"), 400
 
 
@@ -105,7 +105,7 @@ def request_datatype(user_id, datatype):
     db.session.add(requested_data_type)
     db.session.commit()
 
-    return jsonify(requested_data_type.as_dict()), 200
+    return jsonify(as_dict(requested_data_type, camel_case=True)), 200
 
 
 # Create task

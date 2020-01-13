@@ -15,11 +15,6 @@ class User(db.Model):
     requested_data_types = db.relationship("RequestedDatatype")
     task_assigments = db.relationship("TaskAssignment")
 
-    def as_dict(self):
-        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return utility.dict_keys_to_camel_case(
-            {c.name: getattr(self, c.name) for c in self.__table__.columns})
-
     def __repr__(self):
         return "<User {}.{}>".format(self.user_id, self.telegram_handle)
 

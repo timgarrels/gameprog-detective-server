@@ -5,8 +5,8 @@ from app import app
 from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, Spydatatype
-from app.story import StoryController
-from app.models.utility import db_single_element_query
+from app.story_controller import StoryController
+from app.models.utility import db_single_element_query, as_dict
 
 from config import Config
 
@@ -45,7 +45,7 @@ def fetch_background_data_requests(user_id):
         user = db_single_element_query(User, {"user_id": user_id}, "user")
     except ValueError as e:
         return jsonify([str(e)]), 400
-    return jsonify([request.as_dict() for request in user.requested_data_types]), 400
+    return jsonify([as_dict(request, camel_case=True) for request in user.requested_data_types]), 400
 
 @app.route('/user/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):
@@ -67,7 +67,7 @@ def fetch_user_data_by_type(user_id, data_type):
     if not db_type_table:
         return jsonify("No such type {}".format(data_type)), 400
 
-    formatted_data = [entry.as_dict() for entry in db_type_table.query.filter_by(user_id=user_id)]
+    formatted_data = [as_dict(entry, camel_case=True) for entry in db_type_table.query.filter_by(user_id=user_id)]
     return jsonify(formatted_data), 200
 
 def recieve_user_data(user_id, data_type):

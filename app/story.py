@@ -3,7 +3,6 @@ import json
 
 from app import db
 from app.models.game_models import User, TaskAssignment
-from app.models.userdata_models import Contact
 from app.models.utility import db_single_element_query
 from config import Config
 from flask import jsonify
