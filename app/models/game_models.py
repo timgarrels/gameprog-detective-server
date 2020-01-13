@@ -1,6 +1,7 @@
 """Server ORM"""
 from app import db
 from app.models import utility
+from app.story import placeholder_lookup
 
 
 class User(db.Model):
@@ -28,3 +29,8 @@ class TaskAssignment(db.Model):
 
     def __repr__(self):
         return "<TaskAssignment user:{} task:{}".format(self.user_id, self.task_id)
+
+attr_dict = dict.fromkeys(placeholder_lookup.keys(), db.Column(db.String(64), nullable=True, unique=False))
+attr_dict['__tablename__'] = 'placeholders'
+attr_dict['user_id'] = db.Column(db.Integer, primary_key=True)
+Placeholders = type("Placeholders", (db.Model,), attr_dict)
