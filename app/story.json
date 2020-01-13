@@ -1,5 +1,5 @@
 {
-    "start_storypoint": "start",
+    "start_point": "start",
 
     "story_points": {
         "start": {
@@ -67,14 +67,16 @@
             "datatype": "location",
             "incomplete_message": [
                 "You cant do that while not at Griebnitzsee!"
-            ]
+            ],
+            "validation_method": "go_to_hpi_validator"
         },
         "HPI Student Contact Data": {
             "description": "Get contact data of at least one HPI student",
             "datatype": "contact",
             "incomplete_message": [
                 "You cant call anybody without contact data!"
-            ]
+            ],
+            "validation_method": "hpi_student_contact_data_validator"
         }
     }
 }

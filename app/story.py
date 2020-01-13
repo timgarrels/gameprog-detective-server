@@ -1,115 +1,34 @@
-"""Game Story Implementation: Import and Pogress"""
-import json
-
+"""Lookup Table for functions and placeholders referenced in story.json"""
 from app import db
-from app.models.game_models import User, TaskAssignment
-from config import Config
-from flask import jsonify
+from app.models.userdata_models import Contact
 
-class StoryController():
-    """Method collection to handle story progression"""
+import random
 
-    story = None
-    with open(Config.STORY_FILE, "r") as story_file:
-        story = json.loads(story_file.read())
 
-    start_point = story["start_storypoint"]
-    story_points = story["story_points"]
-    tasks = story["tasks"]
+# Task Validation Method Implementation
+def go_to_hpi_validator(user_id):
+    if random.random() > 0.7:
+        return True
+    return False
 
-    def assign_tasks(story_point, user_id):
-        for task_name in StoryController.story_points[story_point]["tasks"]:
-            task_assignment = TaskAssignment()
-            task_assignment.user_id = user_id
-            task_assignment.task_name = task_name
-            db.session.add(task_assignment)
-            db.session.commit()
+def hpi_student_contact_data_validator(user_id):
+    contacts = Contact.query.filter_by(user_id=user_id)
+    return bool(len(contacts))
 
-    def next_story_point(user_id, last_reply):
-        """Updates db stored story point for given user"""
-        user = User.query.get(user_id)
-        if not user:
-            raise ValueError("No such user")
-        if not user.telegram_handle:
-            raise ValueError("User has no handle")
+# Task Validation Lookup Table
+task_validation_lookup = {"go_to_hpi_validator": go_to_hpi_validator,
+                          "hpi_student_contact_data_validator": hpi_student_contact_data_validator,
+}
 
-        if not user.current_story_point:
-            # Start of Game
-            user.current_story_point = StoryController.start_point
-            db.session.add(user)
-            db.session.commit()
-            StoryController.assign_tasks(StoryController.start_point, user_id)
-        else:
-            # Make sure reply is a valid reply
-            story_point = StoryController._reply_text_to_storypoint(user.current_story_point,
-                                                                   last_reply)
 
-            user.current_story_point = story_point
-            StoryController.assign_tasks(story_point, user_id)
+# Placeholder Method Implementation
+def placeholder_method_1(user_id):
+    return "Filler"
 
-            db.session.add(user)
-            db.session.commit()
+def placeholder_method_2(user_id):
+    return db.User.query.filter_by("something")[0]
 
-    def _reply_text_to_storypoint(current_story_point, reply_text):
-        reply_dict = StoryController.story_points[current_story_point]["paths"]
-        return reply_dict[reply_text]
-
-    def _tasks_for_storypoint(story_point):
-        tasks = []
-        for task_name in story_point["tasks"]:
-            tasks.append(StoryController._task_name_to_dict(task_name))
-        return tasks
-
-    def _task_name_to_dict(task_name):
-        task = StoryController.tasks[task_name]
-        task.update([("name", task_name)])
-        return task
-
-    def incomplete_tasks(user_id):
-        """Returns a list of incomplete tasks of a certain user"""
-        user = User.query.get(user_id)
-        if not user:
-            raise ValueError("No such user")
-
-        return [task.task_name for task in user.task_assigments]
-
-    def incomplete_message(user_id):
-        """Returns the message of the first incomplete tasks of a certain user"""
-        try:
-            incomplete_task = StoryController.incomplete_tasks(user_id)[0]
-            return StoryController.tasks[incomplete_task]["incomplete_message"]
-        except IndexError:
-            return ["Not incomplete tasks"]
-
-    def current_bot_messages(user_id, reply):
-        """Returns the current messages to be sent by the bot"""
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify(["You are not even real!"]), 200
-        if not user.telegram_handle:
-            return jsonify(["I dont know you!"]), 200
-
-        if StoryController.incomplete_tasks(user.user_id):
-            # There are incomplete tasks
-            return jsonify(StoryController.incomplete_message(user.user_id)), 200
-
-        if not reply:
-            return jsonify(["You are already in game! Please provide a reply"]), 200
-        try:
-            StoryController.next_story_point(user.user_id, reply)
-        except ValueError as error:
-            return jsonify([str(error)]), 400
-        messages = StoryController.story_points[user.current_story_point]["description"]
-        return jsonify(messages), 200
-
-    def current_user_replies(user_id):
-        """Returns possible reply options available to the user_id in the current story state"""
-        user = User.query.get(user_id)
-        if not user:
-            raise ValueError("No such user")
-        if not user.telegram_handle:
-            raise ValueError("No registerd telgram handle")
-
-        story_point = StoryController.story_points[user.current_story_point]
-        replies = list(story_point["paths"].keys())
-        return jsonify(replies), 200
+# Placeholder Lookup Table
+placeholder_lookup = {"placeholder_name_1": placeholder_method_1,
+                      "placeholder_name_2": placeholder_method_2,
+}
