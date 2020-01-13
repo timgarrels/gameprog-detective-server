@@ -7,11 +7,7 @@ from app.story import task_validation_lookup
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, Spydatatype
 from app.story_controller import StoryController
-<<<<<<< HEAD
 from app.models.utility import db_single_element_query, as_dict
-=======
-from app.models.utility import db_single_element_query
->>>>>>> master
 
 from config import Config
 
@@ -78,6 +74,7 @@ def fetch_user_data_by_type(user_id, data_type):
 def recieve_user_data(user_id, data_type):
     """Common data dump point. Applies various handlers to put provided
     data into the db"""
+    # TODO: Validate user_id
     try:
         data_handler = Spydatatype.handler_association.get(data_type)
     except KeyError:
@@ -108,7 +105,6 @@ def recieve_user_data(user_id, data_type):
     for data_dict in data:
         try:
             data_handler(user_id, data_dict)
-            update_requested_datatype(data_type, user_id)
             added_data += 1
         except KeyError as error:
             return jsonify("Data could not be added: {}".format(error)), 400
@@ -127,13 +123,16 @@ def is_task_completed(user_id, task_name):
     if not task:
         return jsonify("No such task!"), 400
 
-    validation_method = task_validation_lookup.get(task_name, None)
+    validation_method = StoryController.task_validation_method(task_name)
+    if not validation_method:
+        return jsonify("No such task {}".format(task_name)), 400
+
     completed = validation_method(user_id)
     task.completed = completed
     db.session.add(task)
     db.session.commit()
 
-    return completed
+    return jsonify(completed), 200
 
 
 @app.route('/user/<user_id>/clues')
