@@ -13,7 +13,8 @@ from app.story_controller import StoryController
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update')
 def redeploy():
-    """Hook to redeploy prod server via github webhook
+    """ WARNING: This will delete the prod db!
+    Hook to redeploy prod server via github webhook
     Performs a git pull and a restart of server"""
     FNULL = open(os.devnull, 'w')
     try:
@@ -24,6 +25,8 @@ def redeploy():
         # Log the pull
         with open('logs/last_pull', 'w+') as pull_log:
             pull_log.write(str(datetime.now()))
+        # Reset the db
+        subprocess.Popen(['./manage.sh', 'reset_db'], stdout=FNULL)
         # Restart the server
         subprocess.Popen(['./manage.sh', 'restart'], stdout=FNULL)
     except Exception as exception:
