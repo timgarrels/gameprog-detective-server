@@ -145,7 +145,7 @@ def update_firebase_token(user_id, fbtoken):
     user.firebase_token = fbtoken
     db.session.add(user)
     db.session.commit()
-    return jsonif("Updated token!"), 200
+    return jsonify("Updated token!"), 200
 
 
 @app.route('/user/<user_id>/clues')
