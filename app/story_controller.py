@@ -8,6 +8,10 @@ from app.story import task_validation_lookup, placeholder_lookup
 from config import Config
 from flask import jsonify
 
+# TODO: temp
+import requests
+
+
 # TODO: split in parts
 class StoryController():
     """Method collection to handle story progression"""
@@ -27,6 +31,25 @@ class StoryController():
             task_assignment.task_name = task_name
             db.session.add(task_assignment)
             db.session.commit()
+        # TODO: This is not the right place to implement this method
+        StoryController.notify_app_task_update(user_id)
+
+    def notify_app_task_update(user_id):
+        # TODO: This is not the right place to implement this method
+        # TODO: This should be in a sepearate module
+        user = db_single_element_query(User, {"user_id": user_id}, "user")
+        token = user.firebase_token
+
+        tasks = []
+        for assignment in user.task_assigments:
+            tasks.append(StoryController._task_name_to_dict(assignment.task_name))
+
+        resp = requests.post(
+            "https://us-central1-detectivegame-1053a.cloudfunctions.net/newTasks?token={}".format(token),
+            headers={'Content-type': 'application/json', 'Accept': 'text/plain'},
+            data=json.dumps(tasks)
+        )
+
 
     def next_story_point(user_id, last_reply):
         """Updates db stored story point for given user"""
@@ -74,7 +97,7 @@ class StoryController():
         if not user:
             raise ValueError("No such user")
 
-        return [task.task_name for task in user.task_assigments if not task.completed]
+        return [task.task_name for task in user.task_assigments if not task.finished]
 
     def personalize_messages(messages, user_id):
         user = db_single_element_query(User, {"user_id": user_id}, "user")

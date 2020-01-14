@@ -25,7 +25,7 @@ def create_user():
 
 @app.route('/user/<user_id>/fetchUserTasks')
 def fetch_user_tasks(user_id):
-    """Return all tasks (completed and uncompleted) assigned to a user"""
+    """Return all tasks (finished and unfinished) assigned to a user"""
     try:
         tasks = TaskAssignment.query.filter_by(user_id=user_id)
     except ValueError:
@@ -34,7 +34,7 @@ def fetch_user_tasks(user_id):
     task_dicts = []
     for task in tasks:
         task_dict = StoryController._task_name_to_dict(task.task_name)
-        task_dict.update([("completed", task.completed)])
+        task_dict.update([("finished", task.finished)])
         task_dicts.append(task_dict)
     return jsonify(task_dicts), 200
 
@@ -132,7 +132,7 @@ def is_task_finished(user_id, task_name):
     db.session.add(task)
     db.session.commit()
 
-    return jsonify(completed), 200
+    return jsonify(finished), 200
 
 
 @app.route('/user/<user_id>/fbtoken/<fbtoken>')
