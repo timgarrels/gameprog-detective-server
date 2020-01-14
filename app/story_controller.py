@@ -5,11 +5,10 @@ from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.utility import db_single_element_query
 from app.story import task_validation_lookup, placeholder_lookup
+from app.firebase_interaction import FirebaseInteraction
 from config import Config
-from flask import jsonify
 
-# TODO: temp
-import requests
+from flask import jsonify
 
 
 # TODO: split in parts
@@ -31,25 +30,9 @@ class StoryController():
             task_assignment.task_name = task_name
             db.session.add(task_assignment)
             db.session.commit()
-        # TODO: This is not the right place to implement this method
-        StoryController.notify_app_task_update(user_id)
 
-    def notify_app_task_update(user_id):
-        # TODO: This is not the right place to implement this method
-        # TODO: This should be in a sepearate module
-        user = db_single_element_query(User, {"user_id": user_id}, "user")
-        token = user.firebase_token
-
-        tasks = []
-        for assignment in user.task_assigments:
-            tasks.append(StoryController._task_name_to_dict(assignment.task_name))
-
-        resp = requests.post(
-            "https://us-central1-detectivegame-1053a.cloudfunctions.net/newTasks?token={}".format(token),
-            headers={'Content-type': 'application/json', 'Accept': 'text/plain'},
-            data=json.dumps(tasks)
-        )
-
+        tasks = [StoryController._task_name_to_dict(task_name) for task_name in StoryController.story_points[story_point]["tasks"]]
+        FirebaseInteraction.update_tasks(user_id, tasks)
 
     def next_story_point(user_id, last_reply):
         """Updates db stored story point for given user"""
