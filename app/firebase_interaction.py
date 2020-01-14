@@ -1,13 +1,12 @@
 from app.models.utility import db_single_element_query
 from app.models.game_models import User
+from config import Config
 
 import requests
 import json
 
 
 class FirebaseInteraction():
-    # TODO: This could be an env var
-    firebase_url = "https://us-central1-detectivegame-1053a.cloudfunctions.net"
 
     def execute_call(relative_url, user_id, data):
         """Builds the full and token-authorized firebase url
@@ -18,7 +17,7 @@ class FirebaseInteraction():
             return jsonify(str(e)), 400
 
         resp = requests.post(
-            url=FirebaseInteraction.firebase_url + relative_url + "?token={}".format(user.firebase_token),
+            url=Config.FIREBASE_URL + relative_url + "?token={}".format(user.firebase_token),
             headers={'Content-type': 'application/json', 'Accept': 'text/plain'},
             data=json.dumps(data)
         )

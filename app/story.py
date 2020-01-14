@@ -6,6 +6,12 @@ from app.models.userdata_models import Contact
 # Task Validation Method Implementation
 def go_to_hpi_validator(user_id):
     # TODO: Implement location check
+    # Geopy
+    # geonames.org
+    # Find nearby populated place / reverse geocoding
+    # Webservice Type : REST
+    # Url : api.geonames.org/findNearbyPlaceName?
+    # Parameters : lat,lng,
     return True
 
 def hpi_student_contact_data_validator(user_id):
