@@ -5,7 +5,7 @@ from app import app
 from app import db
 from app.story import task_validation_lookup
 from app.models.game_models import User, TaskAssignment
-from app.models.userdata_models import Contact, Spydatatype
+from app.models.userdata_models import Contact, spydatatypes
 from app.story_controller import StoryController
 from app.models.utility import db_single_element_query
 
@@ -22,64 +22,39 @@ def create_user():
                     "registerURL": "telegram.me/{botname}?start={token}".format(
                         botname=Config.BOT_NAME, token=user.telegram_start_token)})
 
-
-@app.route('/user/<user_id>/fetchUserTasks')
-def fetch_user_tasks(user_id):
-    """Return all tasks (finished and unfinished) assigned to a user"""
-    try:
-        tasks = TaskAssignment.query.filter_by(user_id=user_id)
-    except ValueError:
-        return jsonify("Invalid userId"), 400
-
-    task_dicts = []
-    for task in tasks:
-        task_dict = StoryController._task_name_to_dict(task.task_name)
-        task_dict.update([("finished", task.finished)])
-        task_dicts.append(task_dict)
-    return jsonify(task_dicts), 200
-
-
-@app.route('/user/<user_id>/fetchBackgroundDataRequests')
-def fetch_background_data_requests(user_id):
-    """Return all data types we want to spy from a user account"""
-    try:
-        user = db_single_element_query(User, {"user_id": user_id}, "user")
-    except ValueError as e:
-        return jsonify([str(e)]), 400
-    return jsonify([request.as_dict() for request in user.requested_data_types]), 400
-
 @app.route('/user/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):
     """Either returns all existing data (GET) or adds new data (POST)"""
 
-    if request.method == "GET":
-        return fetch_user_data_by_type(user_id, data_type)
-    elif request.method == "POST":
-        return recieve_user_data(user_id, data_type)
-
-def fetch_user_data_by_type(user_id, data_type):
-    """Returns all existing user data of a specified type"""
-    try:
-        spydata_type = db_single_element_query(Spydatatype, {"name": data_type}, "datatype")
-    except ValueError as e:
-        return jsonify([str(e)]), 400
-
-    # TODO: Where is db_type_table comming from?
-    if not db_type_table:
+    data_table = spydatatypes.get(data_type, None)
+    if not data_table:
         return jsonify("No such type {}".format(data_type)), 400
 
-    formatted_data = [entry.as_dict() for entry in db_type_table.query.filter_by(user_id=user_id)]
+    try:
+        # Assert user is existing
+        db_single_element_query(User, {"user_id": user_id}, "user")
+    except ValueError as e:
+        return jsonify(str(e)), 400
+
+    if request.method == "GET":
+        return fetch_user_data_by_type(user_id, data_table)
+    elif request.method == "POST":
+        return recieve_user_data(user_id, data_table)
+
+def fetch_user_data_by_type(user_id, data_table):
+    """Returns all existing user data of a specified type"""
+
+    formatted_data = [entry.as_dict() for entry in data_table.query.filter_by(user_id=user_id)]
     return jsonify(formatted_data), 200
 
-def recieve_user_data(user_id, data_type):
+def recieve_user_data(user_id, data_table):
     """Common data dump point. Applies various handlers to put provided
     data into the db"""
+
     try:
-        data_handler = Spydatatype.handler_association.get(data_type)
-    except KeyError:
-        return jsonify("No such datatype {}".format(data_type)), 400
+        data_handler = data_table.userdata_post_handler
     except AttributeError:
-        return jsonify("No handler for datatype {}".format(data_type)), 400
+        return jsonify("Not userdata_post_handler for this datatype!"), 400
 
     json_data = request.get_json()
     if not json_data:
@@ -95,16 +70,10 @@ def recieve_user_data(user_id, data_type):
         return jsonify("I only take data <origin>ating from app or bot"), 400
 
     if not data:
-        return jsonify("Please provide data!"), d400
+        return jsonify("Please provide data!"), 400
 
     if type(data) is not list:
         return jsonify("Please provide a data list [dict, dict, ...]"), 400
-
-    try:
-        # Assert user exists
-        db_single_element_query(User, {"user_id": user_id}, "user")
-    except ValueError as e:
-        return jsonify([str(e)]), 400
 
     added_data = 0
     for data_dict in data:
@@ -114,7 +83,6 @@ def recieve_user_data(user_id, data_type):
         except KeyError as error:
             return jsonify("Data could not be added: {}".format(error)), 400
     return jsonify("Added {} new entries to db".format(added_data)), 200
-
 
 @app.route('/user/<user_id>/task/<task_name>/finished')
 def is_task_finished(user_id, task_name):
@@ -138,7 +106,6 @@ def is_task_finished(user_id, task_name):
     db.session.commit()
 
     return jsonify(finished), 200
-
 
 @app.route('/user/<user_id>/fbtoken/<fbtoken>')
 def update_firebase_token(user_id, fbtoken):

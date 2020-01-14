@@ -6,8 +6,9 @@ from datetime import datetime
 
 from app import app, db
 from app.models.game_models import User, TaskAssignment
-from app.models.userdata_models import Contact, RequestedDatatype, Spydatatype
-from app.models.utility import db_single_element_query  
+from app.models.userdata_models import Contact, spydatatypes
+from app.models.utility import db_single_element_query
+from app.story_controller import StoryController
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update')
@@ -56,9 +57,6 @@ def reset_user(user_id):
             for assignment in TaskAssignment.query.filter_by(user_id=user.user_id):
                 db.session.delete(assignment)
 
-            for requested_datatype in RequestedDatatype.query.filter_by(user_id=user.user_id):
-                db.session.delete(requested_datatype)
-
             db.session.commit()
 
             return jsonify("User was reset"), 200
@@ -87,29 +85,19 @@ def get_data_by_type(user_id, datatype):
 
 @app.route('/data/types')
 def all_available_datatypes():
-    return jsonify([spydatatype.name for spydatatype in Spydatatype.query.all()]), 200
+    return jsonify(spydatatypes.keys()), 200
 
-@app.route('/user/<user_id>/data/<datatype>/request')
-def request_datatype(user_id, datatype):
+@app.route('/user/<user_id>/fetchUserTasks')
+def fetch_user_tasks(user_id):
+    """Return all tasks (finished and unfinished) assigned to a user"""
     try:
-        user = db_single_element_query(User, {"user_id": user_id}, "user")
-    except ValueError as e:
-        return jsonify(str(e)), 400
+        tasks = TaskAssignment.query.filter_by(user_id=user_id)
+    except ValueError:
+        return jsonify("Invalid userId"), 400
 
-    try:
-        spydatatype = db_single_element_query(Spydatatype, {"name": datatype}, "datatype")
-    except ValueError as e:
-        return jsonify(str(e)), 400
-
-    requested_data_type = RequestedDatatype(user_id=user.user_id, spydatatype_id=spydatatype.spydatatype_id)
-    db.session.add(requested_data_type)
-    db.session.commit()
-
-    return jsonify(requested_data_type.as_dict()), 200
-
-
-# Create task
-
-# Finish task
-
-# Check
+    task_dicts = []
+    for task in tasks:
+        task_dict = StoryController._task_name_to_dict(task.task_name)
+        task_dict.update([("finished", task.finished)])
+        task_dicts.append(task_dict)
+    return jsonify(task_dicts), 200

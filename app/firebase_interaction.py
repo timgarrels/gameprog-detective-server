@@ -15,7 +15,7 @@ class FirebaseInteraction():
         try:
             user = db_single_element_query(User, {"user_id": user_id}, "user")
         except ValueError as e:
-            return jsonify([str(e)]), 400
+            return jsonify(str(e)), 400
 
         resp = requests.post(
             url=FirebaseInteraction.firebase_url + relative_url + "?token={}".format(user.firebase_token),
