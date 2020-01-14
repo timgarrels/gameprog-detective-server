@@ -12,6 +12,7 @@ class User(db.Model):
     telegram_start_token = db.Column(db.String(64), nullable=False, unique=False,
                                      default=utility.create_telegram_start_token)
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
+    firebase_token = db.Column(db.String(64), nullable=True, unique=True)
     requested_data_types = db.relationship("RequestedDatatype")
     task_assigments = db.relationship("TaskAssignment")
 

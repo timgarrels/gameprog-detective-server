@@ -135,6 +135,19 @@ def is_task_finished(user_id, task_name):
     return jsonify(completed), 200
 
 
+@app.route('/user/<user_id>/fbtoken/<fbtoken>')
+def update_firebase_token(user_id, fbtoken):
+    try:
+        user = db_single_element_query(User, {"user_id": user_id}, "user")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
+
+    user.firebase_token = fbtoken
+    db.session.add(user)
+    db.session.commit()
+    return jsonif("Updated token!"), 200
+
+
 @app.route('/user/<user_id>/clues')
 def get_clues(user_id):
     """Return all clues available to a user"""
