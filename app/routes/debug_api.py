@@ -87,7 +87,7 @@ def get_data_by_type(user_id, datatype):
 def all_available_datatypes():
     return jsonify(spydatatypes.keys()), 200
 
-@app.route('/user/<user_id>/fetchUserTasks')
+@app.route('/user/<user_id>/task/all')
 def fetch_user_tasks(user_id):
     """Return all tasks (finished and unfinished) assigned to a user"""
     try:

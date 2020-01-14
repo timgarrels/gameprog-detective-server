@@ -3,7 +3,6 @@ from flask import jsonify, request
 
 from app import app
 from app import db
-from app.story import task_validation_lookup
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, spydatatypes
 from app.story_controller import StoryController

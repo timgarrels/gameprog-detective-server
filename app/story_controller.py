@@ -4,7 +4,7 @@ import json
 from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.utility import db_single_element_query
-from app.story import task_validation_lookup, placeholder_lookup
+import app.story
 from app.firebase_interaction import FirebaseInteraction
 from config import Config
 
@@ -99,7 +99,7 @@ class StoryController():
 
     def task_validation_method(task_name):
         validation_method = StoryController.tasks[task_name]["validation_method"]
-        return task_validation_lookup.get(validation_method, None)
+        return getattr(app.story, validation_method, None)
 
     def current_bot_messages(user_id, reply):
         """Returns the current messages to be sent by the bot"""
@@ -189,11 +189,6 @@ def validate_references():
 def validate_lookups():
     """Makes sure all task validation and placeholder methods referenced in story.json 
     are implemented in story.py""" 
-    # Assert referenced methods are implemented
-    try:
-        from app.story import task_validation_lookup, placeholder_lookup
-    except NameError as e:
-        exit("Not all references defined: {}".format(e))
 
     missing = {"task_validation_lookup": set(),
                "placeholder_lookup": set(),
@@ -211,7 +206,9 @@ def validate_lookups():
         referenced_validation_methods.append(validation_method)
 
     for referenced_validation_method in referenced_validation_methods:
-        if referenced_validation_method not in task_validation_lookup.keys():
+        try:
+            getattr(app.story, referenced_validation_method)
+        except AttributeError:
             missing["task_validation_lookup"].add(referenced_validation_method)
 
     if len(missing["task_validation_lookup"]):
