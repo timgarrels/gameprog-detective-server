@@ -1,5 +1,6 @@
 """Game Story Implementation: Import and Pogress"""
 import json
+from flask import jsonify
 
 from app import db
 from app.models.game_models import User, TaskAssignment
@@ -7,8 +8,6 @@ from app.models.utility import db_single_element_query
 import app.story
 from app.firebase_interaction import FirebaseInteraction
 from config import Config
-
-from flask import jsonify
 
 
 # TODO: split in parts
@@ -23,17 +22,22 @@ class StoryController():
     story_points = story["story_points"]
     tasks = story["tasks"]
 
+    @staticmethod
     def assign_tasks(story_point, user_id):
-        for task_name in StoryController.story_points[story_point]["tasks"]:
+        """Assigns all tasks of a story point to a user
+        Triggers app update with new tasks"""
+        task_names = StoryController.story_points[story_point]["tasks"]
+        for task_name in task_names:
             task_assignment = TaskAssignment()
             task_assignment.user_id = user_id
             task_assignment.task_name = task_name
             db.session.add(task_assignment)
             db.session.commit()
 
-        tasks = [StoryController._task_name_to_dict(task_name) for task_name in StoryController.story_points[story_point]["tasks"]]
+        tasks = [StoryController.task_name_to_dict(task_name) for task_name in task_names]
         FirebaseInteraction.update_tasks(user_id, tasks)
 
+    @staticmethod
     def next_story_point(user_id, last_reply):
         """Updates db stored story point for given user"""
         user = User.query.get(user_id)
@@ -51,7 +55,7 @@ class StoryController():
         else:
             # Make sure reply is a valid reply
             story_point = StoryController._reply_text_to_storypoint(user.current_story_point,
-                                                                   last_reply)
+                                                                    last_reply)
 
             user.current_story_point = story_point
             StoryController.assign_tasks(story_point, user_id)
@@ -59,21 +63,25 @@ class StoryController():
             db.session.add(user)
             db.session.commit()
 
+    @staticmethod
     def _reply_text_to_storypoint(current_story_point, reply_text):
         reply_dict = StoryController.story_points[current_story_point]["paths"]
         return reply_dict[reply_text]
 
+    @staticmethod
     def _tasks_for_storypoint(story_point):
         tasks = []
         for task_name in story_point["tasks"]:
-            tasks.append(StoryController._task_name_to_dict(task_name))
+            tasks.append(StoryController.task_name_to_dict(task_name))
         return tasks
 
-    def _task_name_to_dict(task_name):
+    @staticmethod
+    def task_name_to_dict(task_name):
         task = StoryController.tasks[task_name]
         task.update([("name", task_name)])
         return task
 
+    @staticmethod
     def incomplete_tasks(user_id):
         """Returns a list of incomplete tasks of a certain user"""
         user = User.query.get(user_id)
@@ -82,13 +90,16 @@ class StoryController():
 
         return [task.task_name for task in user.task_assigments if not task.finished]
 
+    @staticmethod
     def personalize_messages(messages, user_id):
+        """"Fills placeholders in messages with user related data"""
         user = db_single_element_query(User, {"user_id": user_id}, "user")
         user_data = {
             "user_name": user.first_name,
         }
         return [message.format(**user_data) for message in messages]
 
+    @staticmethod
     def incomplete_message(user_id):
         """Returns the message of the first incomplete tasks of a certain user"""
         try:
@@ -97,10 +108,13 @@ class StoryController():
         except IndexError:
             return ["Not incomplete tasks"]
 
+    @staticmethod
     def task_validation_method(task_name):
+        """Gets the python validation method symbol for a sepcific task"""
         validation_method = StoryController.tasks[task_name]["validation_method"]
         return getattr(app.story, validation_method, None)
 
+    @staticmethod
     def current_bot_messages(user_id, reply):
         """Returns the current messages to be sent by the bot"""
         user = User.query.get(user_id)
@@ -114,7 +128,8 @@ class StoryController():
         if not StoryController.valid_reply(user_id, reply):
             # Bot will answer nothing to invalid replies
             return jsonify([]), 200
-        elif StoryController.incomplete_tasks(user.user_id):
+
+        if StoryController.incomplete_tasks(user.user_id):
             # There are incomplete tasks
             messages = StoryController.incomplete_message(user.user_id)
         else:
@@ -125,9 +140,12 @@ class StoryController():
             messages = StoryController.story_points[user.current_story_point]["description"]
         return jsonify(StoryController.personalize_messages(messages, user_id)), 200
 
+    @staticmethod
     def valid_reply(user_id, reply):
+        """Whether a reply a user gave is possible based on his current storypoint"""
         return reply in StoryController.current_user_replies(user_id)
 
+    @staticmethod
     def current_user_replies(user_id):
         """Returns possible reply options available to the user_id in the current story state"""
         user = User.query.get(user_id)
@@ -149,7 +167,7 @@ def validate_references():
     """Makes sure all storypoints and tasks referenced in story.json are defined in story.json"""
     missing = {"points": set(),
                "tasks": set(),
-    }
+               }
 
     story = None
     with open(Config.STORY_FILE, "r") as story_file:
@@ -166,7 +184,7 @@ def validate_references():
     for story_point in story["story_points"].keys():
         destinations = story["story_points"][story_point]["paths"].values()
         referenced_story_points.extend(destinations)
-    
+
     for referenced_story_point in referenced_story_points:
         if referenced_story_point not in existing_story_points:
             missing["points"].add(referenced_story_point)
@@ -184,21 +202,21 @@ def validate_references():
         if referenced_task not in existing_tasks:
             missing["tasks"].add(referenced_task)
 
-    if len(missing["points"]):
+    if missing["points"]:
         raise KeyError("There are referenced, but unkown storypoints: {}".format(missing["points"]))
 
-    if len(missing["points"]):
+    if missing["points"]:
         raise KeyError("There are referenced, but unkown tasks: {}".format(missing["tasks"]))
 
     print("All references in story.json found!")
 
 def validate_lookups():
-    """Makes sure all task validation and placeholder methods referenced in story.json 
-    are implemented in story.py""" 
+    """Makes sure all task validation and placeholder methods referenced in story.json
+    are implemented in story.py"""
 
     missing = {"task_validation_lookup": set(),
                "placeholder_lookup": set(),
-    }
+              }
 
     story = None
     with open(Config.STORY_FILE, "r") as story_file:
@@ -217,8 +235,12 @@ def validate_lookups():
         except AttributeError:
             missing["task_validation_lookup"].add(referenced_validation_method)
 
-    if len(missing["task_validation_lookup"]):
-        raise KeyError("There are referenced, but unkown task validation methods: {}".format(missing["task_validation_lookup"]))
+    if missing["task_validation_lookup"]:
+        raise KeyError(
+            "There are referenced, but unkown task validation methods: {}".format(
+                missing["task_validation_lookup"]
+            )
+        )
 
     print("All validtion method lookups found!")
     # Assert placeholder methods are in lookup table

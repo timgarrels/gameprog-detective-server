@@ -56,7 +56,11 @@ def register_users_telegram_handle():
         return jsonify("Please provide a telegramStartToken"), 400
 
     try:
-        user = db_single_element_query(User, {"telegram_start_token": telegram_start_token}, "startToken")
+        user = db_single_element_query(
+            User,
+            {"telegram_start_token": telegram_start_token},
+            "startToken",
+            )
     except ValueError as e:
         return jsonify([str(e)]), 400
 

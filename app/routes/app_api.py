@@ -4,7 +4,7 @@ from flask import jsonify, request
 from app import app
 from app import db
 from app.models.game_models import User, TaskAssignment
-from app.models.userdata_models import Contact, spydatatypes
+from app.models.userdata_models import spydatatypes
 from app.story_controller import StoryController
 from app.models.utility import db_single_element_query
 
@@ -71,7 +71,7 @@ def recieve_user_data(user_id, data_table):
     if not data:
         return jsonify("Please provide data!"), 400
 
-    if type(data) is not list:
+    if isinstance(data, list):
         return jsonify("Please provide a data list [dict, dict, ...]"), 400
 
     added_data = 0
@@ -108,6 +108,7 @@ def is_task_finished(user_id, task_name):
 
 @app.route('/user/<user_id>/fbtoken/<fbtoken>')
 def update_firebase_token(user_id, fbtoken):
+    """Set a new firebase token for a user"""
     try:
         user = db_single_element_query(User, {"user_id": user_id}, "user")
     except ValueError as e:

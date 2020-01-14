@@ -14,8 +14,8 @@ class Contact(db.Model):
     def userdata_post_handler(user_id, contact_data_dict):
         """Adds posted userdata to database"""
         contact = Contact(user_id=int(user_id),
-                            firstname=contact_data_dict.get("firstname"),
-                            lastname=contact_data_dict.get("lastname"))
+                          firstname=contact_data_dict.get("firstname"),
+                          lastname=contact_data_dict.get("lastname"))
         db.session.add(contact)
         db.session.commit()
 

@@ -1,13 +1,12 @@
 """API Endpoints to get and reset data"""
 import subprocess
 import os
-from flask import jsonify
 from datetime import datetime
+from flask import jsonify
 
 from app import app, db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, spydatatypes
-from app.models.utility import db_single_element_query
 from app.story_controller import StoryController
 
 # ---------- Git Webhook (Re-)Deployment ----------
@@ -89,6 +88,7 @@ def get_data_by_type(user_id, datatype):
 
 @app.route('/data/types')
 def all_available_datatypes():
+    """Returns all datatypes that are associated with a db table"""
     return jsonify(spydatatypes.keys()), 200
 
 @app.route('/user/<user_id>/task/all')
@@ -101,7 +101,7 @@ def fetch_user_tasks(user_id):
 
     task_dicts = []
     for task in tasks:
-        task_dict = StoryController._task_name_to_dict(task.task_name)
+        task_dict = StoryController.task_name_to_dict(task.task_name)
         task_dict.update([("finished", task.finished)])
         task_dicts.append(task_dict)
     return jsonify(task_dicts), 200

@@ -1,3 +1,5 @@
+"""Utility to render story"""
+
 import json
 from graphviz import Digraph
 
@@ -5,7 +7,7 @@ from config import Config
 
 
 def main():
-
+    """Load story file and render it to pdf with graphviz"""
     with open(Config.STORY_FILE, "r") as story_file:
         story = json.loads(story_file.read())
 
@@ -30,7 +32,7 @@ def main():
             story_graph.edge(story_point, next_point, xlabel=reply)
 
     story_graph.view()
-    
+
 
 if __name__ == "__main__":
     main()

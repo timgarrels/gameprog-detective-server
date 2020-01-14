@@ -1,13 +1,15 @@
+import json
+from flask import jsonify
+import requests
+
 from app.models.utility import db_single_element_query
 from app.models.game_models import User
 from config import Config
 
-import requests
-import json
-
-
 class FirebaseInteraction():
+    """Encapsulates all firebase API calls that are needed to update app state"""
 
+    @staticmethod
     def execute_call(relative_url, user_id, data):
         """Builds the full and token-authorized firebase url
         and posts teh given data object as json"""
@@ -23,7 +25,7 @@ class FirebaseInteraction():
         )
         return resp
 
-
+    @staticmethod
     def update_tasks(user_id, tasks):
         """Sends the whole task list of a user to the app"""
         endpoint = "/newTasks"
