@@ -52,6 +52,7 @@ def reset_user(user_id):
         if user:
             user.telegram_handle = None
             user.current_story_point = None
+            user.firebase_token = None
             db.session.add(user)
 
             for assignment in TaskAssignment.query.filter_by(user_id=user.user_id):
