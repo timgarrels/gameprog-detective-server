@@ -106,13 +106,17 @@ class StoryController():
         user = User.query.get(user_id)
         if not user:
             return jsonify(["You are not even real!"]), 200
-        elif not user.telegram_handle:
+        if not user.telegram_handle:
             return jsonify(["I dont know you!"]), 200
+        if not reply:
+            return jsonify(["You are already in game! Please provide a reply"]), 200
+
+        if not StoryController.valid_reply(user_id, reply):
+            # Bot will answer nothing to invalid replies
+            return jsonify([]), 200
         elif StoryController.incomplete_tasks(user.user_id):
             # There are incomplete tasks
             messages = StoryController.incomplete_message(user.user_id)
-        elif not reply:
-            return jsonify(["You are already in game! Please provide a reply"]), 200
         else:
             try:
                 StoryController.next_story_point(user.user_id, reply)
@@ -120,6 +124,9 @@ class StoryController():
                 return jsonify([str(error)]), 400
             messages = StoryController.story_points[user.current_story_point]["description"]
         return jsonify(StoryController.personalize_messages(messages, user_id)), 200
+
+    def valid_reply(user_id, reply):
+        return reply in StoryController.current_user_replies(user_id)
 
     def current_user_replies(user_id):
         """Returns possible reply options available to the user_id in the current story state"""
@@ -131,8 +138,7 @@ class StoryController():
 
         story_point = StoryController.story_points[user.current_story_point]
         replies = list(story_point["paths"].keys())
-        return jsonify(replies), 200
-
+        return replies
 
 def validate_story():
     """Makes sure story.json is consistent"""

@@ -37,7 +37,7 @@ def get_reply_options_for_user():
         return jsonify([str(e)]), 400
 
     replies = StoryController.current_user_replies(user.user_id)
-    return replies
+    return jsonify(replies), 200
 
 @app.route('/user/register')
 def register_users_telegram_handle():
