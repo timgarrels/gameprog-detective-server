@@ -74,7 +74,6 @@ def fetch_user_data_by_type(user_id, data_type):
 def recieve_user_data(user_id, data_type):
     """Common data dump point. Applies various handlers to put provided
     data into the db"""
-    # TODO: Validate user_id
     try:
         data_handler = Spydatatype.handler_association.get(data_type)
     except KeyError:
@@ -100,6 +99,12 @@ def recieve_user_data(user_id, data_type):
 
     if type(data) is not list:
         return jsonify("Please provide a data list [dict, dict, ...]"), 400
+
+    try:
+        # Assert user exists
+        db_single_element_query(User, {"user_id": user_id}, "user")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
 
     added_data = 0
     for data_dict in data:
@@ -146,14 +151,3 @@ def update_firebase_token(user_id, fbtoken):
     db.session.add(user)
     db.session.commit()
     return jsonify("Updated token!"), 200
-
-
-@app.route('/user/<user_id>/clues')
-def get_clues(user_id):
-    """Return all clues available to a user"""
-    # TODO: Mock up and only nice to have, maybe deprecated
-    return jsonify([{
-        "personalized": True,
-        "text": "Hello World",
-        "name": "bla"
-        }])
