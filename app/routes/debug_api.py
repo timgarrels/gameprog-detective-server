@@ -7,6 +7,7 @@ from datetime import datetime
 from app import app, db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, RequestedDatatype, Spydatatype
+from app.models.personalization_model import Personalization
 from app.models.utility import db_single_element_query, as_dict
 
 # ---------- Git Webhook (Re-)Deployment ----------
@@ -58,12 +59,16 @@ def reset_user(user_id):
 
             for requested_datatype in RequestedDatatype.query.filter_by(user_id=user.user_id):
                 db.session.delete(requested_datatype)
+            
+            user_personalization = Personalization.query.get(int(user_id))
+            db.session.delete(user_personalization)
 
             db.session.commit()
 
             return jsonify("User was reset"), 200
         else:
             return jsonify("No such user"), 400
+        
     except ValueError:
         # Invalid ID Type
         return jsonify("Invalid userId"), 400

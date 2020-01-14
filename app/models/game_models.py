@@ -1,15 +1,13 @@
 """Server ORM"""
 from app import db
 from app.models import utility
-from app.story import placeholder_lookup
-
 
 class User(db.Model):
     """Models a user that plays our game"""
     __tablename__ = "user"
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     telegram_handle = db.Column(db.String(64), nullable=True, unique=True)
-    first_name = db.Column(db.String(64), nullable=True, unique=False)
+    firstname = db.Column(db.String(64), nullable=True, unique=False)
     telegram_start_token = db.Column(db.String(64), nullable=False, unique=False,
                                      default=utility.create_telegram_start_token)
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
@@ -29,8 +27,3 @@ class TaskAssignment(db.Model):
 
     def __repr__(self):
         return "<TaskAssignment user:{} task:{}".format(self.user_id, self.task_id)
-
-attr_dict = dict.fromkeys(placeholder_lookup.keys(), db.Column(db.String(64), nullable=True, unique=False))
-attr_dict['__tablename__'] = 'placeholders'
-attr_dict['user_id'] = db.Column(db.Integer, primary_key=True)
-Placeholders = type("Placeholders", (db.Model,), attr_dict)

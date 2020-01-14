@@ -1,17 +1,16 @@
 """Game Story Implementation: Import and Pogress"""
 import json
+import re
 
 from app import db
-from app.models.game_models import User, TaskAssignment, Placeholders
-from app.models.utility import db_single_element_query
-from app.story import task_validation_lookup, placeholder_lookup
+from app.models.game_models import User, TaskAssignment
+from app.models.personalization_model import Personalization
+from app.models.utility import db_single_element_query, as_dict
+from app.story import task_validation_lookup, placeholder_assigner
 from config import Config
 from flask import jsonify
 
-<<<<<<< HEAD
-=======
 # TODO: split in parts
->>>>>>> master
 class StoryController():
     """Method collection to handle story progression"""
 
@@ -80,12 +79,16 @@ class StoryController():
         return [task.task_name for task in user.task_assigments if not task.completed]
 
     def personalize_messages(messages, user_id):
-        user = db_single_element_query(User, {"user_id": user_id}, "user")
-        user_placeholders = db_single_element_query(Placeholders, {"user_id": user_id}, "placeholders")
-        user_data = {
-            "user_name": user.first_name,
-        }
-        return [message.format(**user_data) for message in messages]
+        user_personalization = db_single_element_query(Personalization, {"user_id": user_id}, "personalization")
+
+        # set used, but still undefined placeholders
+        for placeholder in re.findall(r"{(.*?)}", ''.join(messages)):
+            if getattr(user_personalization, placeholder) is None:
+                setattr(user_personalization, placeholder, placeholder_assigner[placeholder](user_id))
+        db.session.add(user_personalization)
+        db.session.commit()
+        
+        return [message.format_map(as_dict(user_personalization)) for message in messages]
 
     def incomplete_message(user_id):
         """Returns the message of the first incomplete tasks of a certain user"""
@@ -189,12 +192,12 @@ def validate_lookups():
     are implemented in story.py""" 
     # Assert referenced methods are implemented
     try:
-        from app.story import task_validation_lookup, placeholder_lookup
+        from app.story import task_validation_lookup, placeholder_assigner
     except NameError as e:
         exit("Not all references defined: {}".format(e))
 
     missing = {"task_validation_lookup": set(),
-               "placeholder_lookup": set(),
+               "placeholder_assigner": set(),
     }
 
     story = None

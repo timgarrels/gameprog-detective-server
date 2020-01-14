@@ -3,6 +3,7 @@ from flask import request, jsonify
 
 from app import app, db
 from app.models.game_models import User
+from app.models.personalization_model import Personalization
 from app.story_controller import StoryController
 from app.models.utility import db_single_element_query
 
@@ -45,12 +46,12 @@ def register_users_telegram_handle():
     Last handshake action
     Requires a valid auth token"""
     telegram_handle = request.args.get("telegramHandle", None)
-    user_first_name = request.args.get("userFirstName", None)
+    user_firstname = request.args.get("userFirstName", None)
     telegram_start_token = request.args.get("telegramStartToken", None)
 
     if not telegram_handle:
         return jsonify("Please provide a telegramHandle"), 400
-    if not user_first_name:
+    if not user_firstname:
         return jsonify("Please provide a userFirstName"), 400
     if not telegram_start_token:
         return jsonify("Please provide a telegramStartToken"), 400
@@ -72,8 +73,13 @@ def register_users_telegram_handle():
         return jsonify("This telegramHandle is already in use by another user"), 400
 
     user.telegram_handle = telegram_handle
-    user.first_name = user_first_name
+    user.firstname = user_firstname
     db.session.add(user)
+
+    user_personalization = Personalization()
+    user_personalization.user_id = user.user_id
+    db.session.add(user_personalization)
+
     db.session.commit()
     return jsonify("Successfull register"), 200
 
