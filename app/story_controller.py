@@ -143,7 +143,7 @@ class StoryController():
     @staticmethod
     def valid_reply(user_id, reply):
         """Whether a reply a user gave is possible based on his current storypoint"""
-        return reply in StoryController.current_user_replies(user_id)
+        return reply in StoryController.current_user_replies(user_id) or "/start" in reply
 
     @staticmethod
     def current_user_replies(user_id):
@@ -153,6 +153,8 @@ class StoryController():
             raise ValueError("No such user")
         if not user.telegram_handle:
             raise ValueError("No registerd telgram handle")
+        if not user.current_story_point:
+            return []
 
         story_point = StoryController.story_points[user.current_story_point]
         replies = list(story_point["paths"].keys())
