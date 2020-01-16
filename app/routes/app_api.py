@@ -71,7 +71,7 @@ def recieve_user_data(user_id, data_table):
     if not data:
         return jsonify("Please provide data!"), 400
 
-    if isinstance(data, list):
+    if not isinstance(data, list):
         return jsonify("Please provide a data list [dict, dict, ...]"), 400
 
     added_data = 0
