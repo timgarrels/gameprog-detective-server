@@ -34,6 +34,7 @@ def as_dict(table_entry, camel_case=False):
             return attr_dict
 
 def db_single_element_query(table, arg_dict, element_name):
+    """Queries :table: with :arg_dict: as filter"""
     try:
         element = table.query.filter_by(**arg_dict).first()
     except ValueError:

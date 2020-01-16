@@ -10,7 +10,7 @@ Im Rahmen dieses Seminars soll anhand von Spielprototypen demonstriert werden, w
 Der Spieler nimmt die Rolle eines Kriminaldetektivs ein. Er ermittelt in einem Mordfall. Er verfügt eine Software, die ihm verschiedene menschliche Quellen vermittelt. Mit diesen Quellen kommuniziert er über ein Chatprogramm. Er kann Fragen stellen, Antworten geben und muss Aktionen unternehmen um einerseits seinen Fall zu lösen, andererseits aber auch die Sicherheit der Quelle selbst und das Vertrauen der Quelle in ihn zu wahren.
 
 ## Requirements
-- Ein Smartphone (TODO: Android Version?)
+- Ein Smartphone (Minimale Android Version 23)
 - Eine Telegram-Account
 
 ## Softwarekomponenten

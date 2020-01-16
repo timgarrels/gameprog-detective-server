@@ -1,19 +1,21 @@
 """API Endpoints to get and reset data"""
 import subprocess
 import os
-from flask import jsonify
 from datetime import datetime
+from flask import jsonify
 
 from app import app, db
 from app.models.game_models import User, TaskAssignment
-from app.models.userdata_models import Contact, RequestedDatatype, Spydatatype
+from app.models.userdata_models import Contact, spydatatypes
 from app.models.personalization_model import Personalization
-from app.models.utility import db_single_element_query, as_dict
+from app.models.utility import as_dict
+from app.story_controller import StoryController
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update')
 def redeploy():
-    """Hook to redeploy prod server via github webhook
+    """ WARNING: This will delete the prod db!
+    Hook to redeploy prod server via github webhook
     Performs a git pull and a restart of server"""
     FNULL = open(os.devnull, 'w')
     try:
@@ -24,6 +26,8 @@ def redeploy():
         # Log the pull
         with open('logs/last_pull', 'w+') as pull_log:
             pull_log.write(str(datetime.now()))
+        # Reset the db
+        subprocess.Popen(['./manage.sh', 'reset_db'], stdout=FNULL)
         # Restart the server
         subprocess.Popen(['./manage.sh', 'restart'], stdout=FNULL)
     except Exception as exception:
@@ -52,17 +56,14 @@ def reset_user(user_id):
         if user:
             user.telegram_handle = None
             user.current_story_point = None
+            user.firebase_token = None
             db.session.add(user)
 
             for assignment in TaskAssignment.query.filter_by(user_id=user.user_id):
                 db.session.delete(assignment)
 
-            for requested_datatype in RequestedDatatype.query.filter_by(user_id=user.user_id):
-                db.session.delete(requested_datatype)
-            
             user_personalization = Personalization.query.get(int(user_id))
             db.session.delete(user_personalization)
-
             db.session.commit()
 
             return jsonify("User was reset"), 200
@@ -92,29 +93,20 @@ def get_data_by_type(user_id, datatype):
 
 @app.route('/data/types')
 def all_available_datatypes():
-    return jsonify([spydatatype.name for spydatatype in Spydatatype.query.all()]), 200
+    """Returns all datatypes that are associated with a db table"""
+    return jsonify(spydatatypes.keys()), 200
 
-@app.route('/user/<user_id>/data/<datatype>/request')
-def request_datatype(user_id, datatype):
+@app.route('/user/<user_id>/task/all')
+def fetch_user_tasks(user_id):
+    """Return all tasks (finished and unfinished) assigned to a user"""
     try:
-        user = db_single_element_query(User, {"user_id": user_id}, "user")
-    except ValueError as e:
-        return jsonify(str(e)), 400
+        tasks = TaskAssignment.query.filter_by(user_id=user_id)
+    except ValueError:
+        return jsonify("Invalid userId"), 400
 
-    try:
-        spydatatype = db_single_element_query(Spydatatype, {"name": datatype}, "datatype")
-    except ValueError as e:
-        return jsonify(str(e)), 400
-
-    requested_data_type = RequestedDatatype(user_id=user.user_id, spydatatype_id=spydatatype.spydatatype_id)
-    db.session.add(requested_data_type)
-    db.session.commit()
-
-    return jsonify(as_dict(requested_data_type, camel_case=True)), 200
-
-
-# Create task
-
-# Finish task
-
-# Check
+    task_dicts = []
+    for task in tasks:
+        task_dict = StoryController.task_name_to_dict(task.task_name)
+        task_dict.update([("finished", task.finished)])
+        task_dicts.append(task_dict)
+    return jsonify(task_dicts), 200

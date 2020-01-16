@@ -38,7 +38,7 @@ def get_reply_options_for_user():
         return jsonify([str(e)]), 400
 
     replies = StoryController.current_user_replies(user.user_id)
-    return replies
+    return jsonify(replies), 200
 
 @app.route('/user/register')
 def register_users_telegram_handle():
@@ -57,7 +57,11 @@ def register_users_telegram_handle():
         return jsonify("Please provide a telegramStartToken"), 400
 
     try:
-        user = db_single_element_query(User, {"telegram_start_token": telegram_start_token}, "startToken")
+        user = db_single_element_query(
+            User,
+            {"telegram_start_token": telegram_start_token},
+            "startToken",
+            )
     except ValueError as e:
         return jsonify([str(e)]), 400
 

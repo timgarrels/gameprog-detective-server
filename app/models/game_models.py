@@ -11,19 +11,19 @@ class User(db.Model):
     telegram_start_token = db.Column(db.String(64), nullable=False, unique=False,
                                      default=utility.create_telegram_start_token)
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
-    requested_data_types = db.relationship("RequestedDatatype")
+    firebase_token = db.Column(db.String(64), nullable=True, unique=True)
     task_assigments = db.relationship("TaskAssignment")
 
     def __repr__(self):
         return "<User {}.{}>".format(self.user_id, self.telegram_handle)
 
 class TaskAssignment(db.Model):
-    """Models an assigned (and maybe already completed) task to a user"""
+    """Models an assigned (and maybe already finished) task to a user"""
     __tablename__ = "task_assignment"
     task_assignment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     task_name = db.Column(db.String(64))
-    completed = db.Column(db.Boolean, default=False)
+    finished = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return "<TaskAssignment user:{} task:{}".format(self.user_id, self.task_id)
