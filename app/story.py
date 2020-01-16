@@ -22,17 +22,16 @@ task_validation_lookup = {"go_to_hpi_validator": go_to_hpi_validator,
 }
 
 # Placeholder Method Implementation
-def assign_user_name(user_id):
+def get_user_name(user_id):
     return db_single_element_query(User, {"user_id": user_id}, "user").firstname
 
-def assign_random_contact(user_id):
+def get_random_contact(user_id):
     contacts = list(Contact.query.filter_by(user_id=user_id))
     if len(contacts) == 0:
         return "Kevin"
     return random.choice(contacts).firstname
 
-# Placeholder Lookup Table
-placeholder_assigner = {
-    "user_name": assign_user_name,
-    "mafia_boss": assign_random_contact,
+placeholder_getter = {
+    "user_name": get_user_name,
+    "mafia_boss": get_random_contact,
 }

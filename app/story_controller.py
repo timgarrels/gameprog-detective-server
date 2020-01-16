@@ -6,7 +6,7 @@ from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.personalization_model import Personalization
 from app.models.utility import db_single_element_query, as_dict
-from app.story import task_validation_lookup, placeholder_assigner
+from app.story import task_validation_lookup, placeholder_getter
 from config import Config
 from flask import jsonify
 
@@ -84,7 +84,7 @@ class StoryController():
         # set used, but still undefined placeholders
         for placeholder in re.findall(r"{(.*?)}", ''.join(messages)):
             if getattr(user_personalization, placeholder) is None:
-                setattr(user_personalization, placeholder, placeholder_assigner[placeholder](user_id))
+                setattr(user_personalization, placeholder, placeholder_getter[placeholder](user_id))
         db.session.add(user_personalization)
         db.session.commit()
         
@@ -192,12 +192,12 @@ def validate_lookups():
     are implemented in story.py""" 
     # Assert referenced methods are implemented
     try:
-        from app.story import task_validation_lookup, placeholder_assigner
+        from app.story import task_validation_lookup, placeholder_getter
     except NameError as e:
         exit("Not all references defined: {}".format(e))
 
     missing = {"task_validation_lookup": set(),
-               "placeholder_assigner": set(),
+               "placeholder_getter": set(),
     }
 
     story = None
