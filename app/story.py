@@ -1,6 +1,5 @@
 """Lookup Table for functions and placeholders referenced in story.json"""
 import random
-from app import db, app
 from app.models.game_models import User
 from app.models.userdata_models import Contact
 from app.models.utility import db_single_element_query
