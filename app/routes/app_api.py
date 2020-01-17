@@ -19,7 +19,7 @@ def create_user():
     db.session.commit()
     return jsonify({"userId": user.user_id,
                     "registerURL": "telegram.me/{botname}?start={token}".format(
-                        botname=Config.BOT_NAME, token=user.telegram_start_token)})
+                        botname=Config.BOT_NAME, token=user.token)})
 
 @app.route('/users/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):

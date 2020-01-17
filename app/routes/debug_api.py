@@ -55,7 +55,7 @@ def reset_user(user_id):
     try:
         user = User.query.get(int(user_id))
         if user:
-            user.telegram_handle = None
+            user.handle = None
             user.current_story_point = None
             user.firebase_token = None
             db.session.add(user)
@@ -75,10 +75,10 @@ def reset_user(user_id):
 @app.route('/users')
 def all_users():
     """Lists all created users"""
-    if request.args.get("bot_handle"):
+    if request.args.get("handle"):
         try:
-            user = db_single_element_query(User, {"telegram_handle": request.args.get("bot_handle")}, "User")
-            return jsoniy(user.as_dict()), 200
+            user = db_single_element_query(User, {"handle": request.args.get("handle")}, "User")
+            return jsonify(user.as_dict()), 200
         except ValueError as e:
             return jsonify(str(e)), 400
 

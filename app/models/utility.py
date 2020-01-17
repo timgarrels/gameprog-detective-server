@@ -1,7 +1,7 @@
 import random
 import string
 
-def create_telegram_start_token():
+def create_token():
     """Returns a random 64-len string"""
     alphabet = []
     alphabet.extend(string.ascii_letters)
