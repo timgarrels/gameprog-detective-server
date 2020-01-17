@@ -80,19 +80,3 @@ def register_users_telegram_handle():
     db.session.add(user)
     db.session.commit()
     return jsonify("Successfull register"), 200
-
-# TODO: This should be in debug_api.py
-# But bot.py is currently using this endpoint to check whether he should react to a \start command
-@app.route('/users/byTelegramHandle')
-def get_user_by_telegram_handle():
-    """User Lookup by telegram handle"""
-    telegram_handle = request.args.get("telegramHandle")
-    if not telegram_handle:
-        return jsonify("Please provide a telegramHandle"), 400
-
-    try:
-        user = db_single_element_query(User, {"telegram_handle": telegram_handle}, "user")
-    except ValueError as e:
-        return jsonify([str(e)]), 400
-
-    return jsonify(user.as_dict()), 200

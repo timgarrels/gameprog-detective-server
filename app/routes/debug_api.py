@@ -2,11 +2,14 @@
 import subprocess
 import os
 from datetime import datetime
-from flask import jsonify
+from flask import request, jsonify
+from sqlalchemy.exc import InvalidRequestError
 
 from app import app, db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, spydatatypes
+from app.models.utility import db_single_element_query
+
 from app.story_controller import StoryController
 
 # ---------- Git Webhook (Re-)Deployment ----------
@@ -72,8 +75,14 @@ def reset_user(user_id):
 @app.route('/users')
 def all_users():
     """Lists all created users"""
-    users = User.query.with_entities(User.user_id).all()
-    return jsonify({"userIds": [user_id[0] for user_id in users]}), 200
+    if request.args.get("bot_handle"):
+        try:
+            user = db_single_element_query(User, {"telegram_handle": request.args.get("bot_handle")}, "User")
+            return jsoniy(user.as_dict()), 200
+        except ValueError as e:
+            return jsonify(str(e)), 400
+
+    return jsonify([user.as_dict() for user in User.query.all()]), 200
 
 @app.route('/users/<user_id>/data/<datatype>')
 def get_data_by_type(user_id, datatype):
