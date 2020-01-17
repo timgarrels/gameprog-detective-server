@@ -10,7 +10,7 @@ from app.models.utility import db_single_element_query
 @app.route('/users/answersForUserAndReply')
 def get_answers_for_user_and_reply():
     """Return answers the bot can give dependent on a user and his choice of reply"""
-    telegram_user = request.args.get("telegramUser")
+    telegram_user = request.args.get("bot_handle")
     if not telegram_user:
         return jsonify(["Please provide a username"]), 400
     reply = request.args.get("reply")
@@ -27,7 +27,7 @@ def get_answers_for_user_and_reply():
 @app.route('/users/replyOptionsForUser')
 def get_reply_options_for_user():
     """Return reply options for user dependent on current story point"""
-    telegram_user = request.args.get("telegramUser")
+    telegram_user = request.args.get("bot_handle")
     if not telegram_user:
         return jsonify("Please provide a username"), 400
 
@@ -44,9 +44,9 @@ def register_users_telegram_handle():
     """Registeres provided telegramHandle for a user.
     Last handshake action
     Requires a valid auth token"""
-    telegram_handle = request.args.get("telegramHandle", None)
-    user_first_name = request.args.get("userFirstName", None)
-    telegram_start_token = request.args.get("telegramStartToken", None)
+    telegram_handle = request.args.get("bot_handle", None)
+    user_first_name = request.args.get("firstname", None)
+    telegram_start_token = request.args.get("token", None)
 
     if not telegram_handle:
         return jsonify("Please provide a telegramHandle"), 400
