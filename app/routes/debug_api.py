@@ -33,7 +33,7 @@ def redeploy():
     return jsonify("Successfull Redeploy"), 200
 
 # ---------- Display/Edit User Info ----------
-@app.route('/user/<user_id>')
+@app.route('/users/<user_id>')
 def get_user(user_id):
     """Returns a user dict"""
     try:
@@ -46,7 +46,7 @@ def get_user(user_id):
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
 
-@app.route('/user/<user_id>/reset')
+@app.route('/users/<user_id>/reset')
 def reset_user(user_id):
     """Resets users to 'before register' state"""
     try:
@@ -69,13 +69,13 @@ def reset_user(user_id):
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
 
-@app.route('/user/all')
+@app.route('/users/all')
 def all_users():
     """Lists all created users"""
     users = User.query.with_entities(User.user_id).all()
     return jsonify({"userIds": [user_id[0] for user_id in users]}), 200
 
-@app.route('/user/<user_id>/data/<datatype>')
+@app.route('/users/<user_id>/data/<datatype>')
 def get_data_by_type(user_id, datatype):
     """Tries to fetch a specific datattype from the db"""
     datatype_to_db_col = {"contacts": Contact}
@@ -86,12 +86,12 @@ def get_data_by_type(user_id, datatype):
     return jsonify("not implemented yet"), 400
 
 
-@app.route('/data/types')
+@app.route('/datatypes')
 def all_available_datatypes():
     """Returns all datatypes that are associated with a db table"""
     return jsonify(spydatatypes.keys()), 200
 
-@app.route('/user/<user_id>/task/all')
+@app.route('/users/<user_id>/tasks/all')
 def fetch_user_tasks(user_id):
     """Return all tasks (finished and unfinished) assigned to a user"""
     try:

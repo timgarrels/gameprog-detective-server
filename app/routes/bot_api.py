@@ -7,7 +7,7 @@ from app.story_controller import StoryController
 from app.models.utility import db_single_element_query
 
 
-@app.route('/user/answersForUserAndReply')
+@app.route('/users/answersForUserAndReply')
 def get_answers_for_user_and_reply():
     """Return answers the bot can give dependent on a user and his choice of reply"""
     telegram_user = request.args.get("telegramUser")
@@ -24,7 +24,7 @@ def get_answers_for_user_and_reply():
     answers = StoryController.current_bot_messages(user.user_id, reply)
     return answers
 
-@app.route('/user/replyOptionsForUser')
+@app.route('/users/replyOptionsForUser')
 def get_reply_options_for_user():
     """Return reply options for user dependent on current story point"""
     telegram_user = request.args.get("telegramUser")
@@ -39,7 +39,7 @@ def get_reply_options_for_user():
     replies = StoryController.current_user_replies(user.user_id)
     return jsonify(replies), 200
 
-@app.route('/user/register')
+@app.route('/users/register')
 def register_users_telegram_handle():
     """Registeres provided telegramHandle for a user.
     Last handshake action
@@ -83,7 +83,7 @@ def register_users_telegram_handle():
 
 # TODO: This should be in debug_api.py
 # But bot.py is currently using this endpoint to check whether he should react to a \start command
-@app.route('/user/byTelegramHandle')
+@app.route('/users/byTelegramHandle')
 def get_user_by_telegram_handle():
     """User Lookup by telegram handle"""
     telegram_handle = request.args.get("telegramHandle")
