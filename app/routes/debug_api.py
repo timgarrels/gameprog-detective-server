@@ -69,7 +69,7 @@ def reset_user(user_id):
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
 
-@app.route('/users/all')
+@app.route('/users')
 def all_users():
     """Lists all created users"""
     users = User.query.with_entities(User.user_id).all()
@@ -91,7 +91,7 @@ def all_available_datatypes():
     """Returns all datatypes that are associated with a db table"""
     return jsonify(spydatatypes.keys()), 200
 
-@app.route('/users/<user_id>/tasks/all')
+@app.route('/users/<user_id>/tasks')
 def fetch_user_tasks(user_id):
     """Return all tasks (finished and unfinished) assigned to a user"""
     try:
