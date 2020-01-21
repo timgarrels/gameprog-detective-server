@@ -8,76 +8,63 @@ from app.story_controller import StoryController
 from app.models.utility import db_single_element_query, db_entry_to_dict
 
 
-@app.route('/user/answersForUserAndReply')
-def get_answers_for_user_and_reply():
-    """Return answers the bot can give dependent on a user and his choice of reply"""
-    telegram_user = request.args.get("telegramUser")
-    if not telegram_user:
-        return jsonify(["Please provide a username"]), 400
+@app.route('/users/<user_id>/story/proceed')
+def try_to_proceed_story(user_id):
+    """Tries to react to a provided reply by proceeding the story
+    Returns bot-answers in any case"""
     reply = request.args.get("reply")
-
-    try:
-        user = db_single_element_query(User, {"telegram_handle": telegram_user}, "user")
-    except ValueError as e:
-        return jsonify([str(e)]), 400
+    if not reply:
+        return jsonify(["Please provide a reply"]), 400
 
     # Return answers
-    answers = StoryController.current_bot_messages(user.user_id, reply)
+    answers = StoryController.current_bot_messages(user_id, reply)
     return answers
 
-@app.route('/user/replyOptionsForUser')
-def get_reply_options_for_user():
-    """Return reply options for user dependent on current story point"""
-    telegram_user = request.args.get("telegramUser")
-    if not telegram_user:
-        return jsonify("Please provide a username"), 400
-
-    try:
-        user = db_single_element_query(User, {"telegram_handle": telegram_user}, "user")
-    except ValueError as e:
-        return jsonify([str(e)]), 400
-
-    replies = StoryController.current_user_replies(user.user_id)
+@app.route('/users/<user_id>/story/user-replies')
+def get_user_replies(user_id):
+    """Return reply options for user dependent on the current story point"""
+    replies = StoryController.current_user_replies(user_id)
     return jsonify(replies), 200
 
-@app.route('/user/register')
-def register_users_telegram_handle():
-    """Registeres provided telegramHandle for a user.
+@app.route('/users/register')
+def register_users_handle():
+    """Registeres provided chat handle for a user.
     Last handshake action
     Requires a valid auth token"""
-    telegram_handle = request.args.get("telegramHandle", None)
-    user_firstname = request.args.get("userFirstName", None)
-    telegram_start_token = request.args.get("telegramStartToken", None)
+    handle = request.args.get("handle", None)
+    firstname = request.args.get("firstname", None)
+    token = request.args.get("token", None)
 
-    if not telegram_handle:
-        return jsonify("Please provide a telegramHandle"), 400
-    if not user_firstname:
-        return jsonify("Please provide a userFirstName"), 400
-    if not telegram_start_token:
-        return jsonify("Please provide a telegramStartToken"), 400
+    if not handle:
+        return jsonify("Please provide a handle"), 400
+    if not firstname:
+        return jsonify("Please provide a firstname"), 400
+    if not token:
+        return jsonify("Please provide a token"), 400
 
     try:
         user = db_single_element_query(
             User,
-            {"telegram_start_token": telegram_start_token},
-            "startToken",
+            {"token": token},
+            "token",
             )
     except ValueError as e:
         return jsonify([str(e)]), 400
 
-    if user.telegram_handle:
-        return jsonify("Telegram already registerd for this user"), 400
+    if user.handle:
+        return jsonify("Chat already registerd for this user"), 400
 
     try:
-        users_with_same_handle = User.query.filter_by(telegram_handle=telegram_handle).first()
+        user_with_same_handle = User.query.filter_by(handle=handle).first()
     except ValueError:
-        return jsonify("Invalid telegramHandle"), 400
+        return jsonify("Invalid handle"), 400
 
-    if users_with_same_handle:
-        return jsonify("This telegramHandle is already in use by another user"), 400
+    if user_with_same_handle:
+        return jsonify("This hanlde is already in use by another user"), 400
 
-    user.telegram_handle = telegram_handle
-    user.firstname = user_firstname
+    user.handle = handle
+    user.firstname = firstname
+    user.current_story_point = StoryController.initial_start_point
     db.session.add(user)
 
     user_personalization = Personalization()
@@ -86,19 +73,3 @@ def register_users_telegram_handle():
 
     db.session.commit()
     return jsonify("Successfull register"), 200
-
-# TODO: This should be in debug_api.py
-# But bot.py is currently using this endpoint to check whether he should react to a \start command
-@app.route('/user/byTelegramHandle')
-def get_user_by_telegram_handle():
-    """User Lookup by telegram handle"""
-    telegram_handle = request.args.get("telegramHandle")
-    if not telegram_handle:
-        return jsonify("Please provide a telegramHandle"), 400
-
-    try:
-        user = db_single_element_query(User, {"telegram_handle": telegram_handle}, "user")
-    except ValueError as e:
-        return jsonify([str(e)]), 400
-
-    return jsonify(db_entry_to_dict(user, camel_case=True)), 200

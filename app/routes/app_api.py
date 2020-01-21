@@ -11,7 +11,7 @@ from app.models.utility import db_single_element_query, db_entry_to_dict
 from config import Config
 
 
-@app.route('/user/create')
+@app.route('/users/create')
 def create_user():
     """Creates a new user and replies his id and register url"""
     user = User()
@@ -19,9 +19,9 @@ def create_user():
     db.session.commit()
     return jsonify({"userId": user.user_id,
                     "registerURL": "telegram.me/{botname}?start={token}".format(
-                        botname=Config.BOT_NAME, token=user.telegram_start_token)})
+                        botname=Config.BOT_NAME, token=user.token)})
 
-@app.route('/user/<user_id>/data/<data_type>', methods=['GET', 'POST'])
+@app.route('/users/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):
     """Either returns all existing data (GET) or adds new data (POST)"""
 
@@ -82,7 +82,7 @@ def recieve_user_data(user_id, data_table):
             return jsonify("Data could not be added: {}".format(error)), 400
     return jsonify("Added {} new entries to db".format(added_data)), 200
 
-@app.route('/user/<user_id>/task/<task_name>/finished')
+@app.route('/users/<user_id>/tasks/<task_name>/finished')
 def is_task_finished(user_id, task_name):
     """Check whether a task is finished by a user"""
     try:
@@ -105,7 +105,7 @@ def is_task_finished(user_id, task_name):
 
     return jsonify(finished), 200
 
-@app.route('/user/<user_id>/fbtoken/<fbtoken>')
+@app.route('/users/<user_id>/fbtoken/<fbtoken>')
 def update_firebase_token(user_id, fbtoken):
     """Set a new firebase token for a user"""
     try:

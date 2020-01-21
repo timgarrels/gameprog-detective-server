@@ -6,16 +6,16 @@ class User(db.Model):
     """Models a user that plays our game"""
     __tablename__ = "user"
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    telegram_handle = db.Column(db.String(64), nullable=True, unique=True)
+    handle = db.Column(db.String(64), nullable=True, unique=True)
     firstname = db.Column(db.String(64), nullable=True, unique=False)
-    telegram_start_token = db.Column(db.String(64), nullable=False, unique=False,
-                                     default=utility.create_telegram_start_token)
+    token = db.Column(db.String(64), nullable=False, unique=False,
+                                     default=utility.create_token)
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
     firebase_token = db.Column(db.String(64), nullable=True, unique=True)
     task_assigments = db.relationship("TaskAssignment")
 
     def __repr__(self):
-        return "<User {}.{}>".format(self.user_id, self.telegram_handle)
+        return "<User {}.{}>".format(self.user_id, self.handle)
 
 class TaskAssignment(db.Model):
     """Models an assigned (and maybe already finished) task to a user"""
