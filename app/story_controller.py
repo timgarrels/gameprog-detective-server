@@ -115,7 +115,7 @@ class StoryController():
         for placeholder in re.findall(r"{(.*?)}", ''.join(messages)):
             if getattr(user_personalization, placeholder) is None:
                 setattr(user_personalization, placeholder, placeholder_getters[placeholder](user_id))
-                db_changed = True
+                personalization_changed = True
         if personalization_changed:
             db.session.add(user_personalization)
             db.session.commit()
