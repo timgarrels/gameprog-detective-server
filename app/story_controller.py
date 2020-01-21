@@ -22,6 +22,20 @@ class StoryController():
     story_points = story["story_points"]
     tasks = story["tasks"]
 
+    # TODO: A artificial stroypoint could be avoided if the bot would handle /start differently
+    # Add a artifical initial storypoint
+    # Which leads to the start storypoint in story.json
+    # This abstracts our engine of the users sight of story.json
+    # This initial storypoint is proceeded by /start
+    initial_start_point = "GP_INITIAL_STARTPOINT"
+    story_points[initial_start_point] = {
+        "description": [],
+        "paths": {
+            "/start": start_point
+        },
+        "tasks": []
+    }
+
     @staticmethod
     def assign_tasks(story_point, user_id):
         """Assigns all tasks of a story point to a user
@@ -43,25 +57,24 @@ class StoryController():
         user = User.query.get(user_id)
         if not user:
             raise ValueError("No such user")
-        if not user.telegram_handle:
+        if not user.handle:
             raise ValueError("User has no handle")
 
-        if not user.current_story_point:
-            # Start of Game
-            user.current_story_point = StoryController.start_point
-            db.session.add(user)
-            db.session.commit()
-            StoryController.assign_tasks(StoryController.start_point, user_id)
-        else:
-            # Make sure reply is a valid reply
-            story_point = StoryController._reply_text_to_storypoint(user.current_story_point,
-                                                                    last_reply)
+        # Make sure reply is a valid reply
+        if last_reply not in StoryController.possible_replies(user.current_story_point):
+            raise KeyError("Invalid reply to proceed from {}".format(user.current_story_point))
 
-            user.current_story_point = story_point
-            StoryController.assign_tasks(story_point, user_id)
+        story_point = StoryController._reply_text_to_storypoint(user.current_story_point,
+                                                                last_reply)
+        user.current_story_point = story_point
+        StoryController.assign_tasks(story_point, user_id)
 
-            db.session.add(user)
-            db.session.commit()
+        db.session.add(user)
+        db.session.commit()
+
+    @staticmethod
+    def possible_replies(story_point):
+        return StoryController.story_points[story_point]["paths"].keys()
 
     @staticmethod
     def _reply_text_to_storypoint(current_story_point, reply_text):
@@ -95,7 +108,7 @@ class StoryController():
         """"Fills placeholders in messages with user related data"""
         user = db_single_element_query(User, {"user_id": user_id}, "user")
         user_data = {
-            "user_name": user.first_name,
+            "user_name": user.firstname,
         }
         return [message.format(**user_data) for message in messages]
 
@@ -114,13 +127,16 @@ class StoryController():
         validation_method = StoryController.tasks[task_name]["validation_method"]
         return getattr(app.story, validation_method, None)
 
+    # TODO: This currently holds too much logic
+    # TODO: It decides what to do based on reply
+    # TODO: Maybe we can extract that logic?
     @staticmethod
     def current_bot_messages(user_id, reply):
         """Returns the current messages to be sent by the bot"""
         user = User.query.get(user_id)
         if not user:
             return jsonify(["You are not even real!"]), 200
-        if not user.telegram_handle:
+        if not user.handle:
             return jsonify(["I dont know you!"]), 200
         if not reply:
             return jsonify(["You are already in game! Please provide a reply"]), 200
@@ -151,7 +167,7 @@ class StoryController():
         user = User.query.get(user_id)
         if not user:
             raise ValueError("No such user")
-        if not user.telegram_handle:
+        if not user.handle:
             raise ValueError("No registerd telgram handle")
         if not user.current_story_point:
             return []
