@@ -6,7 +6,7 @@ from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import spydatatypes
 from app.story_controller import StoryController
-from app.models.utility import db_single_element_query
+from app.models.utility import db_single_element_query, db_entry_to_dict
 
 from config import Config
 
@@ -43,13 +43,12 @@ def user_data_by_type(user_id, data_type):
 def fetch_user_data_by_type(user_id, data_table):
     """Returns all existing user data of a specified type"""
 
-    formatted_data = [entry.as_dict() for entry in data_table.query.filter_by(user_id=user_id)]
+    formatted_data = [db_entry_to_dict(entry, camel_case=True) for entry in data_table.query.filter_by(user_id=user_id)]
     return jsonify(formatted_data), 200
 
 def recieve_user_data(user_id, data_table):
     """Common data dump point. Applies various handlers to put provided
     data into the db"""
-
     try:
         data_handler = data_table.userdata_post_handler
     except AttributeError:

@@ -3,8 +3,9 @@ from flask import request, jsonify
 
 from app import app, db
 from app.models.game_models import User
+from app.models.personalization_model import Personalization
 from app.story_controller import StoryController
-from app.models.utility import db_single_element_query
+from app.models.utility import db_single_element_query, db_entry_to_dict
 
 
 @app.route('/users/<user_id>/story/proceed')
@@ -65,5 +66,10 @@ def register_users_handle():
     user.firstname = firstname
     user.current_story_point = StoryController.initial_start_point
     db.session.add(user)
+
+    user_personalization = Personalization()
+    user_personalization.user_id = user.user_id
+    db.session.add(user_personalization)
+
     db.session.commit()
     return jsonify("Successfull register"), 200
