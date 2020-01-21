@@ -8,7 +8,7 @@ from app import app, db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, spydatatypes
 from app.models.personalization_model import Personalization
-from app.models.utility import as_dict
+from app.models.utility import db_entry_to_dict
 from app.story_controller import StoryController
 
 # ---------- Git Webhook (Re-)Deployment ----------
@@ -41,7 +41,7 @@ def get_user(user_id):
     try:
         user = User.query.get(int(user_id))
         if user:
-            return jsonify(as_dict(user, camel_case=True)), 200
+            return jsonify(db_entry_to_dict(user, camel_case=True)), 200
         else:
             return jsonify("No such user"), 400
     except ValueError:
@@ -87,7 +87,7 @@ def get_data_by_type(user_id, datatype):
 
     if datatype_to_db_col.get(datatype, None):
         contacts = datatype_to_db_col[datatype].query.filter_by(user_id=int(user_id)).all()
-        return jsonify([as_dict(contact, camel_case=True) for contact in contacts]), 200
+        return jsonify([db_entry_to_dict(contact, camel_case=True) for contact in contacts]), 200
     return jsonify("not implemented yet"), 400
 
 

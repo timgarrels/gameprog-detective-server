@@ -30,7 +30,7 @@ def get_random_contact(user_id):
         return "Kevin"
     return random.choice(contacts).firstname
 
-placeholder_getter = {
+placeholder_getters = {
     "user_name": get_user_name,
     "mafia_boss": get_random_contact,
 }

@@ -5,7 +5,7 @@ from app import app, db
 from app.models.game_models import User
 from app.models.personalization_model import Personalization
 from app.story_controller import StoryController
-from app.models.utility import db_single_element_query, as_dict
+from app.models.utility import db_single_element_query, db_entry_to_dict
 
 
 @app.route('/user/answersForUserAndReply')
@@ -101,4 +101,4 @@ def get_user_by_telegram_handle():
     except ValueError as e:
         return jsonify([str(e)]), 400
 
-    return jsonify(as_dict(user, camel_case=True)), 200
+    return jsonify(db_entry_to_dict(user, camel_case=True)), 200

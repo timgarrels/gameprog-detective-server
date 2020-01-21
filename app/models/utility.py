@@ -25,7 +25,7 @@ def snake_to_camel_case(name):
         del name[idx]
     return ''.join(name)
 
-def as_dict(table_entry, camel_case=False):
+def db_entry_to_dict(table_entry, camel_case=False):
         """As sqlalchemy table entry cant be parsed to json we build a custom converter"""
         attr_dict = {c.name: getattr(table_entry, c.name) for c in table_entry.__table__.columns}
         if camel_case:

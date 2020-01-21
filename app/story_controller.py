@@ -6,9 +6,9 @@ from flask import jsonify
 from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.personalization_model import Personalization
-from app.models.utility import db_single_element_query, as_dict
+from app.models.utility import db_single_element_query, db_entry_to_dict
 import app.story
-from app.story import placeholder_getter
+from app.story import placeholder_getters
 from app.firebase_interaction import FirebaseInteraction
 from config import Config
 
@@ -98,13 +98,16 @@ class StoryController():
         user_personalization = db_single_element_query(Personalization, {"user_id": user_id}, "personalization")
 
         # set used, but still undefined placeholders
+        personalization_changed = False
         for placeholder in re.findall(r"{(.*?)}", ''.join(messages)):
             if getattr(user_personalization, placeholder) is None:
-                setattr(user_personalization, placeholder, placeholder_getter[placeholder](user_id))
-        db.session.add(user_personalization)
-        db.session.commit()
+                setattr(user_personalization, placeholder, placeholder_getters[placeholder](user_id))
+                db_changed = True
+        if personalization_changed:
+            db.session.add(user_personalization)
+            db.session.commit()
         
-        return [message.format_map(as_dict(user_personalization)) for message in messages]
+        return [message.format_map(db_entry_to_dict(user_personalization)) for message in messages]
 
     @staticmethod
     def incomplete_message(user_id):
@@ -223,34 +226,44 @@ def validate_lookups():
     """Makes sure all task validation and placeholder methods referenced in story.json
     are implemented in story.py"""
 
-    missing = {"task_validation_lookup": set(),
-               "placeholder_getter": set(),
-              }
-
     story = None
     with open(Config.STORY_FILE, "r") as story_file:
         story = json.loads(story_file.read())
 
     # Assert validation methods are in lookup table
-    referenced_validation_methods = []
+    missing_validation_methods = set()
 
-    for task in story["tasks"].keys():
-        validation_method = story["tasks"][task]["validation_method"]
-        referenced_validation_methods.append(validation_method)
+    for task in story["tasks"].values():
+        referenced_validation_method = task["validation_method"]
+        if referenced_validation_method not in missing_validation_methods:
+            try:
+                getattr(app.story, referenced_validation_method)
+            except AttributeError:
+                missing_validation_methods.add(referenced_validation_method)
 
-    for referenced_validation_method in referenced_validation_methods:
-        try:
-            getattr(app.story, referenced_validation_method)
-        except AttributeError:
-            missing["task_validation_lookup"].add(referenced_validation_method)
-
-    if missing["task_validation_lookup"]:
+    if missing_validation_methods:
         raise KeyError(
             "There are referenced, but unkown task validation methods: {}".format(
-                missing["task_validation_lookup"]
+                missing_validation_methods
             )
         )
 
     print("All validtion method lookups found!")
+
     # Assert placeholder methods are in lookup table
-    # TODO: What can conatin a placeholder
+    missing_placeholders = set()
+
+    for story_point in story["tasks"].values():
+        for referenced_placeholder in re.findall(r"{(.*?)}", ''.join(story_point["description"])):
+            if referenced_placeholder not in missing_placeholders:
+                try:
+                    getattr(app.story, placeholder_getters["referenced_placeholder"])
+                except (KeyError, AttributeError):
+                    missing_placeholders.add(referenced_placeholder)
+
+    if missing_placeholders:
+        raise KeyError(
+            "There are referenced, but unkown placholders: {}".format(
+                missing_placeholders
+            )
+        )
