@@ -5,7 +5,7 @@ from flask import jsonify
 from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.utility import db_single_element_query
-import app.story
+import app.story.story as story_code
 from app.firebase_interaction import FirebaseInteraction
 from config import Config
 
@@ -125,7 +125,7 @@ class StoryController():
     def task_validation_method(task_name):
         """Gets the python validation method symbol for a sepcific task"""
         validation_method = StoryController.tasks[task_name]["validation_method"]
-        return getattr(app.story, validation_method, None)
+        return getattr(story_code, validation_method, None)
 
     # TODO: This currently holds too much logic
     # TODO: It decides what to do based on reply
@@ -249,7 +249,7 @@ def validate_lookups():
 
     for referenced_validation_method in referenced_validation_methods:
         try:
-            getattr(app.story, referenced_validation_method)
+            getattr(story_code, referenced_validation_method)
         except AttributeError:
             missing["task_validation_lookup"].add(referenced_validation_method)
 

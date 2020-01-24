@@ -3,7 +3,7 @@ from flask import request, jsonify
 
 from app import app, db
 from app.models.game_models import User
-from app.story_controller import StoryController
+from app.story.story_controller import StoryController
 from app.models.utility import db_single_element_query
 
 
