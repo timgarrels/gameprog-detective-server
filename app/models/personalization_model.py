@@ -1,5 +1,5 @@
 from app import db
-from app.story import placeholder_getters
+from app.story.story import placeholder_getters
 
 attr_dict = {placeholder: db.Column(db.String(64), nullable=True, unique=False) for placeholder in placeholder_getters.keys()}
 attr_dict['__tablename__'] = 'personalization'

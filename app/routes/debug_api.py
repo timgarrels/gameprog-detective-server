@@ -10,7 +10,7 @@ from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, spydatatypes
 from app.models.personalization_model import Personalization
 from app.models.utility import db_entry_to_dict, db_single_element_query
-from app.story_controller import StoryController
+from app.story.story_controller import StoryController
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update')

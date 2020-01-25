@@ -36,4 +36,4 @@ class Config():
         sys.exit("Bot Name could not be parsed from telegram api.\
 Maybe the bot token is out of date?")
 
-    STORY_FILE = os.path.join(basedir, "app/story.json")
+    STORY_FILE = os.path.join(basedir, "app/story/story.json")

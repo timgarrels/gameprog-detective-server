@@ -7,8 +7,7 @@ from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.personalization_model import Personalization
 from app.models.utility import db_single_element_query, db_entry_to_dict
-import app.story
-from app.story import placeholder_getters
+import app.story.story as story_code
 from app.firebase_interaction import FirebaseInteraction
 from config import Config
 
@@ -114,7 +113,7 @@ class StoryController():
         personalization_changed = False
         for placeholder in re.findall(r"{(.*?)}", ''.join(messages)):
             if getattr(user_personalization, placeholder) is None:
-                setattr(user_personalization, placeholder, placeholder_getters[placeholder](user_id))
+                setattr(user_personalization, placeholder, story_code.placeholder_getters[placeholder](user_id))
                 personalization_changed = True
         if personalization_changed:
             db.session.add(user_personalization)
@@ -135,7 +134,7 @@ class StoryController():
     def task_validation_method(task_name):
         """Gets the python validation method symbol for a sepcific task"""
         validation_method = StoryController.tasks[task_name]["validation_method"]
-        return getattr(app.story, validation_method, None)
+        return getattr(story_code, validation_method, None)
 
     # TODO: This currently holds too much logic
     # TODO: It decides what to do based on reply
@@ -253,7 +252,7 @@ def validate_lookups():
         referenced_validation_method = task["validation_method"]
         if referenced_validation_method not in missing_validation_methods:
             try:
-                getattr(app.story, referenced_validation_method)
+                getattr(story_code, referenced_validation_method)
             except AttributeError:
                 missing_validation_methods.add(referenced_validation_method)
 
@@ -271,11 +270,8 @@ def validate_lookups():
 
     for story_point in story["tasks"].values():
         for referenced_placeholder in re.findall(r"{(.*?)}", ''.join(story_point["description"])):
-            if referenced_placeholder not in missing_placeholders:
-                try:
-                    getattr(app.story, placeholder_getters["referenced_placeholder"])
-                except (KeyError, AttributeError):
-                    missing_placeholders.add(referenced_placeholder)
+            if not story_code.placeholder_getters.get(referenced_placeholder):
+                missing_placeholders.add(referenced_placeholder)
 
     if missing_placeholders:
         raise KeyError(
