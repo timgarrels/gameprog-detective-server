@@ -14,6 +14,7 @@ class User(db.Model):
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
     firebase_token = db.Column(db.String(64), nullable=True, unique=True)
     task_assigments = db.relationship("TaskAssignment")
+    contacts = db.relationship("Contact")
 
     def as_dict(self):
         """As sqlalchemy obj cant be parsed to json we build a custom converter"""
