@@ -64,9 +64,10 @@ def reset_user(user_id):
                 db.session.delete(assignment)
 
             user_personalization = Personalization.query.get(int(user_id))
-            db.session.delete(user_personalization)
+            if user_personalization:
+                db.session.delete(user_personalization)
+                
             db.session.commit()
-
             return jsonify("User was reset"), 200
         else:
             return jsonify("No such user"), 400
