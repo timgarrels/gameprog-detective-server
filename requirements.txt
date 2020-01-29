@@ -4,3 +4,4 @@ flask-migrate
 sqlalchemy
 requests
 graphviz
+geopy
