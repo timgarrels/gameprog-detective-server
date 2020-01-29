@@ -54,27 +54,15 @@ def recieve_user_data(user_id, data_table):
     except AttributeError:
         return jsonify("Not userdata_post_handler for this datatype!"), 400
 
-    json_data = request.get_json()
-    if not json_data:
+    data_array = request.get_json()
+    if not data_array:
         return jsonify("Please provide json data!"), 400
 
-    data_origin = json_data.get("origin", None)
-    data = json_data.get("data", [])
-
-    if not data_origin:
-        return jsonify("Please specify the data <origin>"), 400
-
-    if data_origin not in ["app", "bot"]:
-        return jsonify("I only take data <origin>ating from app or bot"), 400
-
-    if not data:
-        return jsonify("Please provide data!"), 400
-
-    if not isinstance(data, list):
+    if not isinstance(data_array, list):
         return jsonify("Please provide a data list [dict, dict, ...]"), 400
 
     added_data = 0
-    for data_dict in data:
+    for data_dict in data_array:
         try:
             data_handler(user_id, data_dict)
             added_data += 1
