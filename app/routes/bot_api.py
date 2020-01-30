@@ -2,7 +2,7 @@
 from flask import request, jsonify
 
 from app import app, db
-from app.story.exceptions import *
+from app.story.exceptions import UserReplyInvalid, IncompletedTaskActive
 from app.models.exceptions import DatabaseError
 from app.models.game_models import User
 from app.models.personalization_model import Personalization

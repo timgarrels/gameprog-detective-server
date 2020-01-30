@@ -4,8 +4,8 @@ import re
 from flask import jsonify
 
 from app import db
-from app.story.exceptions import *
-from app.models.exceptions import *
+from app.story.exceptions import UserReplyInvalid, IncompletedTaskActive
+from app.models.exceptions import UserNotFoundError, UserNotRegisteredError, DatabaseError
 from app.models.game_models import User, TaskAssignment
 from app.models.personalization_model import Personalization
 from app.models.utility import db_single_element_query, db_entry_to_dict
@@ -79,6 +79,7 @@ class StoryController():
 
     @staticmethod
     def task_name_to_dict(task_name):
+        """returns the task dictionary for a task name"""
         task = StoryController.tasks[task_name]
         task.update([("name", task_name)])
         return task
@@ -118,10 +119,12 @@ class StoryController():
 
     @staticmethod
     def get_possible_replies(story_point):
+        """returns the possible user replies for a story point"""
         return list(StoryController.story_points[story_point]["paths"].keys())
 
     @staticmethod
     def get_bot_messages(story_point):
+        """returns the bot messages for a story point"""
         return StoryController.story_points[story_point]["description"]
 
     @staticmethod
@@ -150,6 +153,7 @@ class StoryController():
     # --- utility ---
     @staticmethod
     def _get_user(user_id):
+        """returns the user DB entry for a user id"""
         user = User.query.get(user_id)
         if not user:
             raise UserNotFoundError(f"user id {user_id} not in database")

@@ -1,5 +1,5 @@
 class DatabaseError(Exception):
-    """Raised, when the queried user information is incomplete or not present"""
+    """General Database Error (missing or incomplete entries)"""
     pass
 
 class UserNotFoundError(DatabaseError):
