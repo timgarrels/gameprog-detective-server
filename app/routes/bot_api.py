@@ -86,7 +86,6 @@ def register_users_handle():
 
     user.handle = handle
     user.firstname = firstname
-    user.current_story_point = StoryController.get_initial_story_point()
     db.session.add(user)
 
     user_personalization = Personalization()
@@ -94,4 +93,7 @@ def register_users_handle():
     db.session.add(user_personalization)
 
     db.session.commit()
+
+    StoryController.start_story(user_id)
+
     return jsonify("Successfull register"), 200

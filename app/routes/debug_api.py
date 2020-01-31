@@ -6,6 +6,7 @@ from flask import request, jsonify
 from sqlalchemy.exc import InvalidRequestError
 
 from app import app, db
+from app.models.exceptions import DatabaseError
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, spydatatypes
 from app.models.personalization_model import Personalization
@@ -75,6 +76,14 @@ def reset_user(user_id):
     except ValueError:
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
+
+@app.route('/users/<user_id>/story/reset')
+def reset_story(user_id):
+    try:
+        StoryController.start_story(user_id)
+    except DatabaseError as e:
+        return jsonify(e.args[0])
+    return jsonify("story was reset")
 
 @app.route('/users')
 def all_users():

@@ -26,9 +26,10 @@ class StoryController():
 
     # --- story logic ---
     @staticmethod
-    def get_initial_story_point():
-        """Returns the first story point of the story"""
-        return StoryController.story["start_point"]
+    def start_story(user_id):
+        """sets the users current story point to the story start"""
+        start_point = StoryController.story["start_point"]
+        StoryController.set_current_story_point(user_id, start_point)
 
     @staticmethod
     def get_current_story_point(user_id):
@@ -41,12 +42,13 @@ class StoryController():
 
     @staticmethod
     def set_current_story_point(user_id, story_point_name):
-        """Sets the current story point for a given user"""
+        """Sets the current story point for a given user and activates associated tasks"""
         user = StoryController._get_user(user_id)
         user.current_story_point = story_point_name
-
         db.session.add(user)
         db.session.commit()
+
+        StoryController.assign_tasks(user_id, story_point_name)
 
     @staticmethod
     def proceed_story(user_id, reply):
@@ -59,7 +61,6 @@ class StoryController():
         current_story_point = StoryController.get_current_story_point(user_id)
         next_story_point = StoryController.story_points[current_story_point]["paths"][reply]
         StoryController.set_current_story_point(user_id, next_story_point)
-        StoryController.assign_tasks(user_id, next_story_point)
 
     # --- tasks ---
     @staticmethod
