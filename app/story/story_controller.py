@@ -28,6 +28,7 @@ class StoryController():
     @staticmethod
     def start_story(user_id):
         """sets the users current story point to the story start"""
+        StoryController.reset_tasks(user_id)
         start_point = StoryController.story["start_point"]
         StoryController.set_current_story_point(user_id, start_point)
 
@@ -77,6 +78,12 @@ class StoryController():
 
         tasks = [StoryController.task_name_to_dict(task_name) for task_name in task_names]
         FirebaseInteraction.update_tasks(user_id, tasks)
+
+    @staticmethod
+    def reset_tasks(user_id):
+        for assignment in TaskAssignment.query.filter_by(user_id=user_id):
+            db.session.delete(assignment)
+        db.session.commit()
 
     @staticmethod
     def task_name_to_dict(task_name):

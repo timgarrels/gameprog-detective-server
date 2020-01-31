@@ -94,6 +94,6 @@ def register_users_handle():
 
     db.session.commit()
 
-    StoryController.start_story(user_id)
+    StoryController.start_story(user.user_id)
 
     return jsonify("Successfull register"), 200
