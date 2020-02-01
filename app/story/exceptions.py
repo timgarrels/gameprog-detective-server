@@ -5,7 +5,3 @@ class StoryException(Exception):
 class UserReplyInvalid(StoryException):
     """Raised when a given user reply is not valid for the current story point"""
     pass
-
-class IncompletedTaskActive(StoryException):
-    """Raised when the story cannot be progressed because of an incompleted task"""
-    pass

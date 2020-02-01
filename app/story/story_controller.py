@@ -4,7 +4,7 @@ import re
 from flask import jsonify
 
 from app import db
-from app.story.exceptions import UserReplyInvalid, IncompletedTaskActive
+from app.story.exceptions import UserReplyInvalid
 from app.models.exceptions import UserNotFoundError, UserNotRegisteredError, DatabaseError
 from app.models.game_models import User, TaskAssignment
 from app.models.personalization_model import Personalization
@@ -53,15 +53,20 @@ class StoryController():
 
     @staticmethod
     def proceed_story(user_id, reply):
-        """Updates db stored story point for given user"""
+        """Updates story point for given user and returns new bot messages and user replies"""
         if not StoryController.is_valid_reply(user_id, reply):
             raise UserReplyInvalid(f"'{reply}' is not a valid reply' for the current story point")
-        if StoryController.get_incomplete_tasks(user_id):
-            raise IncompletedTaskActive(f"user {user_id} has incompleted tasks")
-        
-        current_story_point = StoryController.get_current_story_point(user_id)
-        next_story_point = StoryController.story_points[current_story_point]["paths"][reply]
-        StoryController.set_current_story_point(user_id, next_story_point)
+
+        incomplete_tasks = StoryController.get_incomplete_tasks(user_id)
+        if incomplete_tasks:
+            messages = StoryController.tasks[incomplete_tasks[0]]["incomplete_message"]
+        else:
+            current_story_point = StoryController.get_current_story_point(user_id)
+            next_story_point = StoryController.story_points[current_story_point]["paths"][reply]
+            StoryController.set_current_story_point(user_id, next_story_point)
+            messages = get_story_point_description(next_story_point)
+
+        return StoryController.personalize_messages(messages, user_id)
 
     # --- tasks ---
     @staticmethod
@@ -81,6 +86,7 @@ class StoryController():
 
     @staticmethod
     def reset_tasks(user_id):
+        """removes all tasks for a user"""
         for assignment in TaskAssignment.query.filter_by(user_id=user_id):
             db.session.delete(assignment)
         db.session.commit()
@@ -96,7 +102,6 @@ class StoryController():
     def get_incomplete_tasks(user_id):
         """Returns a list of incomplete tasks of a certain user"""
         user = StoryController._get_user(user_id)
-
         return [task.task_name for task in user.task_assigments if not task.finished]
 
     @staticmethod
@@ -126,25 +131,19 @@ class StoryController():
         return [message.format_map(db_entry_to_dict(user_personalization)) for message in messages]
 
     @staticmethod
+    def get_story_point_description(story_point):
+        """returns the description for a given story point"""
+        return StoryController.story_points[story_point]["description"]
+
+    @staticmethod
     def get_possible_replies(story_point):
         """returns the possible user replies for a story point"""
         return list(StoryController.story_points[story_point]["paths"].keys())
 
     @staticmethod
-    def get_bot_messages(story_point):
-        """returns the bot messages for a story point"""
-        return StoryController.story_points[story_point]["description"]
-
-    @staticmethod
-    def get_current_bot_messages(user_id):
-        """Returns the current messages to be sent by the bot"""        
+    def get_current_story_point_description(user_id):
         story_point = StoryController.get_current_story_point(user_id)
-        
-        incomplete_tasks = StoryController.get_incomplete_tasks(user_id)
-        if incomplete_tasks:
-            return StoryController.tasks[incomplete_tasks[0]]["incomplete_message"]
-
-        messages = StoryController.get_bot_messages(story_point)
+        messages = StoryController.get_story_point_description(story_point)
         return StoryController.personalize_messages(messages, user_id)
 
     @staticmethod
