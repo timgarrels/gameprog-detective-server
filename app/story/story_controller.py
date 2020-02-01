@@ -142,6 +142,7 @@ class StoryController():
 
     @staticmethod
     def get_current_story_point_description(user_id):
+        """returns the personalized current story description for a user"""
         story_point = StoryController.get_current_story_point(user_id)
         messages = StoryController.get_story_point_description(story_point)
         return StoryController.personalize_messages(messages, user_id)
