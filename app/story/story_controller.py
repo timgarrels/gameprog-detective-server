@@ -4,6 +4,8 @@ import re
 from flask import jsonify
 
 from app import db
+from app.story.exceptions import UserReplyInvalid
+from app.models.exceptions import UserNotFoundError, UserNotRegisteredError, DatabaseError
 from app.models.game_models import User, TaskAssignment
 from app.models.personalization_model import Personalization
 from app.models.utility import db_single_element_query, db_entry_to_dict
@@ -19,29 +21,59 @@ class StoryController():
     with open(Config.STORY_FILE, "r") as story_file:
         story = json.loads(story_file.read())
 
-    start_point = story["start_point"]
     story_points = story["story_points"]
     tasks = story["tasks"]
 
-    # TODO: A artificial stroypoint could be avoided if the bot would handle /start differently
-    # Add a artifical initial storypoint
-    # Which leads to the start storypoint in story.json
-    # This abstracts our engine of the users sight of story.json
-    # This initial storypoint is proceeded by /start
-    initial_start_point = "GP_INITIAL_STARTPOINT"
-    story_points[initial_start_point] = {
-        "description": [],
-        "paths": {
-            "/start": start_point
-        },
-        "tasks": []
-    }
+    # --- story logic ---
+    @staticmethod
+    def start_story(user_id):
+        """sets the users current story point to the story start"""
+        StoryController.reset_tasks(user_id)
+        start_point = StoryController.story["start_point"]
+        StoryController.set_current_story_point(user_id, start_point)
 
     @staticmethod
-    def assign_tasks(story_point, user_id):
+    def get_current_story_point(user_id):
+        """Returns the current story point for a given user"""
+        user = StoryController._get_user(user_id)
+        if not user.current_story_point:
+            raise DatabaseError(f"user {user_id} has no set story point")
+
+        return user.current_story_point
+
+    @staticmethod
+    def set_current_story_point(user_id, story_point_name):
+        """Sets the current story point for a given user and activates associated tasks"""
+        user = StoryController._get_user(user_id)
+        user.current_story_point = story_point_name
+        db.session.add(user)
+        db.session.commit()
+
+        StoryController.assign_tasks(user_id, story_point_name)
+
+    @staticmethod
+    def proceed_story(user_id, reply):
+        """Updates story point for given user and returns new bot messages and user replies"""
+        if not StoryController.is_valid_reply(user_id, reply):
+            raise UserReplyInvalid(f"'{reply}' is not a valid reply' for the current story point")
+
+        incomplete_tasks = StoryController.get_incomplete_tasks(user_id)
+        if incomplete_tasks:
+            messages = StoryController.tasks[incomplete_tasks[0]]["incomplete_message"]
+        else:
+            current_story_point = StoryController.get_current_story_point(user_id)
+            next_story_point = StoryController.story_points[current_story_point]["paths"][reply]
+            StoryController.set_current_story_point(user_id, next_story_point)
+            messages = get_story_point_description(next_story_point)
+
+        return StoryController.personalize_messages(messages, user_id)
+
+    # --- tasks ---
+    @staticmethod
+    def assign_tasks(user_id, story_point_name):
         """Assigns all tasks of a story point to a user
         Triggers app update with new tasks"""
-        task_names = StoryController.story_points[story_point]["tasks"]
+        task_names = StoryController.story_points[story_point_name]["tasks"]
         for task_name in task_names:
             task_assignment = TaskAssignment()
             task_assignment.user_id = user_id
@@ -53,61 +85,38 @@ class StoryController():
         FirebaseInteraction.update_tasks(user_id, tasks)
 
     @staticmethod
-    def next_story_point(user_id, last_reply):
-        """Updates db stored story point for given user"""
-        user = User.query.get(user_id)
-        if not user:
-            raise ValueError("No such user")
-        if not user.handle:
-            raise ValueError("User has no handle")
-
-        # Make sure reply is a valid reply
-        if last_reply not in StoryController.possible_replies(user.current_story_point):
-            raise KeyError("Invalid reply to proceed from {}".format(user.current_story_point))
-
-        story_point = StoryController._reply_text_to_storypoint(user.current_story_point,
-                                                                last_reply)
-        user.current_story_point = story_point
-        StoryController.assign_tasks(story_point, user_id)
-
-        db.session.add(user)
+    def reset_tasks(user_id):
+        """removes all tasks for a user"""
+        for assignment in TaskAssignment.query.filter_by(user_id=user_id):
+            db.session.delete(assignment)
         db.session.commit()
 
     @staticmethod
-    def possible_replies(story_point):
-        return StoryController.story_points[story_point]["paths"].keys()
-
-    @staticmethod
-    def _reply_text_to_storypoint(current_story_point, reply_text):
-        reply_dict = StoryController.story_points[current_story_point]["paths"]
-        return reply_dict[reply_text]
-
-    @staticmethod
-    def _tasks_for_storypoint(story_point):
-        tasks = []
-        for task_name in story_point["tasks"]:
-            tasks.append(StoryController.task_name_to_dict(task_name))
-        return tasks
-
-    @staticmethod
     def task_name_to_dict(task_name):
+        """returns the task dictionary for a task name"""
         task = StoryController.tasks[task_name]
         task.update([("name", task_name)])
         return task
 
     @staticmethod
-    def incomplete_tasks(user_id):
+    def get_incomplete_tasks(user_id):
         """Returns a list of incomplete tasks of a certain user"""
-        user = User.query.get(user_id)
-        if not user:
-            raise ValueError("No such user")
-
+        user = StoryController._get_user(user_id)
         return [task.task_name for task in user.task_assigments if not task.finished]
 
     @staticmethod
+    def task_validation_method(task_name):
+        """Gets the python validation method symbol for a sepcific task"""
+        validation_method = StoryController.tasks[task_name]["validation_method"]
+        return getattr(story_code, validation_method, None)
+
+    # --- messages ---
+    @staticmethod
     def personalize_messages(messages, user_id):
-        """"Fills placeholders in messages with user related data"""
-        user_personalization = db_single_element_query(Personalization, {"user_id": user_id}, "personalization")
+        """Fills placeholders in messages with user related data"""
+        user_personalization = Personalization.query.get(user_id)
+        if not user_personalization:
+            raise DatabaseError(f"there is no personalization entry for user {user_id}")
 
         # set used, but still undefined placeholders
         personalization_changed = False
@@ -122,68 +131,44 @@ class StoryController():
         return [message.format_map(db_entry_to_dict(user_personalization)) for message in messages]
 
     @staticmethod
-    def incomplete_message(user_id):
-        """Returns the message of the first incomplete tasks of a certain user"""
-        try:
-            incomplete_task = StoryController.incomplete_tasks(user_id)[0]
-            return StoryController.tasks[incomplete_task]["incomplete_message"]
-        except IndexError:
-            return ["Not incomplete tasks"]
+    def get_story_point_description(story_point):
+        """returns the description for a given story point"""
+        return StoryController.story_points[story_point]["description"]
 
     @staticmethod
-    def task_validation_method(task_name):
-        """Gets the python validation method symbol for a sepcific task"""
-        validation_method = StoryController.tasks[task_name]["validation_method"]
-        return getattr(story_code, validation_method, None)
-
-    # TODO: This currently holds too much logic
-    # TODO: It decides what to do based on reply
-    # TODO: Maybe we can extract that logic?
-    @staticmethod
-    def current_bot_messages(user_id, reply):
-        """Returns the current messages to be sent by the bot"""
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify(["You are not even real!"]), 200
-        if not user.handle:
-            return jsonify(["I dont know you!"]), 200
-        if not reply:
-            return jsonify(["You are already in game! Please provide a reply"]), 200
-
-        if not StoryController.valid_reply(user_id, reply):
-            # Bot will answer nothing to invalid replies
-            return jsonify([]), 200
-
-        if StoryController.incomplete_tasks(user.user_id):
-            # There are incomplete tasks
-            messages = StoryController.incomplete_message(user.user_id)
-        else:
-            try:
-                StoryController.next_story_point(user.user_id, reply)
-            except ValueError as error:
-                return jsonify([str(error)]), 400
-            messages = StoryController.story_points[user.current_story_point]["description"]
-        return jsonify(StoryController.personalize_messages(messages, user_id)), 200
+    def get_possible_replies(story_point):
+        """returns the possible user replies for a story point"""
+        return list(StoryController.story_points[story_point]["paths"].keys())
 
     @staticmethod
-    def valid_reply(user_id, reply):
-        """Whether a reply a user gave is possible based on his current storypoint"""
-        return reply in StoryController.current_user_replies(user_id) or "/start" in reply
+    def get_current_story_point_description(user_id):
+        """returns the personalized current story description for a user"""
+        story_point = StoryController.get_current_story_point(user_id)
+        messages = StoryController.get_story_point_description(story_point)
+        return StoryController.personalize_messages(messages, user_id)
 
     @staticmethod
-    def current_user_replies(user_id):
+    def get_current_user_replies(user_id):
         """Returns possible reply options available to the user_id in the current story state"""
+        story_point = StoryController.get_current_story_point(user_id)
+        return StoryController.get_possible_replies(story_point)
+    
+    @staticmethod
+    def is_valid_reply(user_id, reply):
+        """Whether a reply a user gave is possible based on his current storypoint"""
+        return reply in StoryController.get_current_user_replies(user_id)
+
+    # --- utility ---
+    @staticmethod
+    def _get_user(user_id):
+        """returns the user DB entry for a user id"""
         user = User.query.get(user_id)
         if not user:
-            raise ValueError("No such user")
+            raise UserNotFoundError(f"user id {user_id} not in database")
         if not user.handle:
-            raise ValueError("No registerd telgram handle")
-        if not user.current_story_point:
-            return []
-
-        story_point = StoryController.story_points[user.current_story_point]
-        replies = list(story_point["paths"].keys())
-        return replies
+            raise UserNotRegisteredError(f"user {user_id} has not registered yet")
+        
+        return user
 
 def validate_story():
     """Makes sure story.json is consistent"""
