@@ -53,11 +53,6 @@ class Contact(db.Model):
         db.session.add(contact)
         db.session.commit()
 
-    def as_dict(self):
-        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return utility.dict_keys_to_camel_case(
-            {c.name: getattr(self, c.name) for c in self.__table__.columns})
-
     def __repr__(self):
         return "<Contact {}.{} {}>".format(self.contact_id, self.firstname, self.lastname)
 

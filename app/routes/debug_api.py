@@ -6,10 +6,11 @@ from flask import request, jsonify
 from sqlalchemy.exc import InvalidRequestError
 
 from app import app, db
+from app.models.exceptions import DatabaseError
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, spydatatypes
-from app.models.utility import db_single_element_query
-
+from app.models.personalization_model import Personalization
+from app.models.utility import db_entry_to_dict, db_single_element_query
 from app.story.story_controller import StoryController
 
 # ---------- Git Webhook (Re-)Deployment ----------
@@ -42,7 +43,7 @@ def get_user(user_id):
     try:
         user = User.query.get(int(user_id))
         if user:
-            return jsonify(user.as_dict()), 200
+            return jsonify(db_entry_to_dict(user, camel_case=True)), 200
         else:
             return jsonify("No such user"), 400
     except ValueError:
@@ -60,17 +61,28 @@ def reset_user(user_id):
             user.firebase_token = None
             db.session.add(user)
 
-            for assignment in TaskAssignment.query.filter_by(user_id=user.user_id):
-                db.session.delete(assignment)
-
+            user_personalization = Personalization.query.get(user.user_id)
+            if user_personalization:
+                db.session.delete(user_personalization)
             db.session.commit()
+
+            StoryController.reset_tasks(user.user_id)
 
             return jsonify("User was reset"), 200
         else:
             return jsonify("No such user"), 400
+        
     except ValueError:
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
+
+@app.route('/users/<user_id>/story/reset')
+def reset_story(user_id):
+    try:
+        StoryController.start_story(user_id)
+    except DatabaseError as e:
+        return jsonify(e.args[0])
+    return jsonify("story was reset")
 
 @app.route('/users')
 def all_users():
@@ -78,11 +90,11 @@ def all_users():
     if request.args.get("handle"):
         try:
             user = db_single_element_query(User, {"handle": request.args.get("handle")}, "User")
-            return jsonify(user.as_dict()), 200
+            return jsonify(db_entry_to_dict(user, camel_case=True)), 200
         except ValueError as e:
             return jsonify(str(e)), 400
 
-    return jsonify([user.as_dict() for user in User.query.all()]), 200
+    return jsonify([db_entry_to_dict(user, camel_case=True) for user in User.query.all()]), 200
 
 @app.route('/users/<user_id>/data/<datatype>')
 def get_data_by_type(user_id, datatype):
@@ -91,7 +103,7 @@ def get_data_by_type(user_id, datatype):
 
     if datatype_to_db_col.get(datatype, None):
         contacts = datatype_to_db_col[datatype].query.filter_by(user_id=int(user_id)).all()
-        return jsonify([contact.as_dict() for contact in contacts]), 200
+        return jsonify([db_entry_to_dict(contact, camel_case=True) for contact in contacts]), 200
     return jsonify("not implemented yet"), 400
 
 

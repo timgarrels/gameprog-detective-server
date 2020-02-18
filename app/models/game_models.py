@@ -2,7 +2,6 @@
 from app import db
 from app.models import utility
 
-
 class User(db.Model):
     """Models a user that plays our game"""
     __tablename__ = "user"
@@ -17,11 +16,6 @@ class User(db.Model):
     contacts = db.relationship("Contact")
     locations = db.relationship("Location")
     calendar_events = db.relationship("CalendarEvent")
-
-    def as_dict(self):
-        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return utility.dict_keys_to_camel_case(
-            {c.name: getattr(self, c.name) for c in self.__table__.columns})
 
     def __repr__(self):
         return "<User {}.{}>".format(self.user_id, self.handle)

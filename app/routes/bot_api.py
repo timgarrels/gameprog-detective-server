@@ -2,28 +2,59 @@
 from flask import request, jsonify
 
 from app import app, db
+from app.story.exceptions import UserReplyInvalid
+from app.models.exceptions import DatabaseError
 from app.models.game_models import User
+from app.models.personalization_model import Personalization
 from app.story.story_controller import StoryController
-from app.models.utility import db_single_element_query
+from app.models.utility import db_single_element_query, db_entry_to_dict
 
+
+@app.route('/users/<user_id>/story/current-story-point')
+def get_current_story_point(user_id):
+    """Returns a users current story point"""
+    try:
+        return jsonify(StoryController.get_current_story_point(user_id))
+    except DatabaseError as e:
+        return jsonify(e.args[0])
+
+@app.route('/users/<user_id>/story/current-story-point/description')
+def get_current_story_point_description(user_id):
+    """Provides description for the users current story point"""
+    try:
+        return jsonify(StoryController.get_current_story_point_description(user_id)), 200
+    except DatabaseError as e:
+        return jsonify(f"Error: {e.args[0]}"), 400
 
 @app.route('/users/<user_id>/story/proceed')
 def try_to_proceed_story(user_id):
-    """Tries to react to a provided reply by proceeding the story
-    Returns bot-answers in any case"""
+    """Tries to react to a provided reply by proceeding the story.
+    Returns the new bot messages"""
     reply = request.args.get("reply")
     if not reply:
-        return jsonify(["Please provide a reply"]), 400
+        return jsonify("Error: please provide a reply"), 400
+    
+    try:
+        messages = StoryController.proceed_story(user_id, reply)
+        valid_reply = True
+    except UserReplyInvalid:
+        messages = []
+        valid_reply = False
+    except DatabaseError as e:
+        return jsonify(f"Error: {e.args[0]}"), 400
 
-    # Return answers
-    answers = StoryController.current_bot_messages(user_id, reply)
-    return answers
+    return jsonify({
+        "validReply": valid_reply,
+        "newMessages": messages,
+    }), 200
 
-@app.route('/users/<user_id>/story/user-replies')
+@app.route('/users/<user_id>/story/current-story-point/user-replies')
 def get_user_replies(user_id):
     """Return reply options for user dependent on the current story point"""
-    replies = StoryController.current_user_replies(user_id)
-    return jsonify(replies), 200
+    try:
+        return jsonify(StoryController.get_current_user_replies(user_id)), 200
+    except DatabaseError as e:
+        return jsonify(f"Error: {e.args[0]}"), 400
 
 @app.route('/users/register')
 def register_users_handle():
@@ -63,7 +94,14 @@ def register_users_handle():
 
     user.handle = handle
     user.firstname = firstname
-    user.current_story_point = StoryController.initial_start_point
     db.session.add(user)
+
+    user_personalization = Personalization()
+    user_personalization.user_id = user.user_id
+    db.session.add(user_personalization)
+
     db.session.commit()
+
+    StoryController.start_story(user.user_id)
+
     return jsonify("Successfull register"), 200
