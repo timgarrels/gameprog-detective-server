@@ -57,6 +57,7 @@ def reset_user(user_id):
         user = User.query.get(int(user_id))
         if user:
             user.handle = None
+            user.firstname = None
             user.current_story_point = None
             user.firebase_token = None
             db.session.add(user)
