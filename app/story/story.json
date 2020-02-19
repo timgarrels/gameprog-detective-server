@@ -4,79 +4,63 @@
     "story_points": {
         "start": {
             "description": [
-                "Hello {user_name}! Welcome to the HPI",
-                "Lets get you enrolled!"
+                "Beförderung, neuer Ausweis"
             ],
             "paths": {
-                "Talk to Prof. Meinel": "Meinels Office",
-                "Talk to HPI students": "Mensa",
-                "Talk to IfI students": "IfI"
+                "Ich bin bereit!": "first_contract"
+            },
+            "tasks": []
+        },
+        "first_contract": {
+            "description": [
+                "Am Hbf wurden Schlüssel gestohlen",
+                "Vielleicht weiß der Hausmeister was"
+            ],
+            "paths": {
+                "Ich werde ihn fragen": "interview"
+            },
+            "tasks": []
+        },
+        "interview": {
+            "description": [
+                "Wunderbar, ich erwarte Ihren Bericht"
+            ],
+            "paths": {
+                "Ich habe ihnen den Bericht geschickt": "cameras"
             },
             "tasks": [
-                "Go to HPI"
+                "interview_caretaker"
             ]
         },
-        "Meinels Office": {
+        "cameras": {
             "description": [
-                "You are infront of Prof. Meinels Office",
-                "Lets knock!"
+                "Sehr gut, {user_name}, Ich habe Ihren Bericht erhalten.",
+                "Schade, dass der Hausmeister nichts gesehen hat - aber vielleicht sollten Sie seinen Tipp mit den Überwachungskameras an Gleis 7 befolgen"
             ],
-            "paths": {
-                "Knock": "Meinels Office",
-                "Go back": "start"
-            },
-            "tasks": []
-        },
-        "Mensa": {
-            "description": [
-                "You stand in the full mensa",
-                "There are hundredts of chairs and thousands of students",
-                "You cant spot any HPI student",
-                "You will need to call one!"
-            ],
-            "paths": {
-                "Call a HPI student": "Call HPI Student"
-            },
             "tasks": [
-                "HPI Student Contact Data"
+                "investigate_cameras"
             ]
-        },
-        "IfI": {
-            "description": [
-                "You go to the Ifi",
-                "You lose"
-            ],
-            "paths": {},
-            "tasks": []
-        },
-        "Call HPI Student": {
-            "description": [
-                "You call and finally meet some HPI students",
-                "They help you out",
-                "You are now enrolled",
-                "You win!"
-            ],
-            "paths": {},
-            "tasks": []
         }
     },
 
     "tasks": {
-        "Go to HPI": {
-            "description": "Get to the Griebnitzsee!",
+        "interview_caretaker": {
+            "description": "Gehe zum Hauptbahnhof, um den Hausmeister zu befragen",
             "datatype": "location",
+            "fulfill_button_text": "befragen und Bericht abschicken",
             "incomplete_message": [
-                "You cant do that while not at Griebnitzsee!"
+                "Ich habe noch keinen Bericht erhalten..."
             ],
-            "validation_method": "go_to_hpi_validator"
+            "validation_method": "go_to_hbf_validator"
         },
-        "HPI Student Contact Data": {
-            "description": "Get contact data of at least one HPI student",
-            "datatype": "contact",
+        "investigate_cameras": {
+            "description": "Gehe zu Gleis 7 und mache ein Foto von den Kameras",
+            "datatype": "picture",
+            "fulfill_button_text": "Foto schicken",
             "incomplete_message": [
-                "You cant call anybody without contact data!"
+                "Bitte schicken Sie mir ein Foto der Kameras, sobald Sie sie untersucht haben."
             ],
-            "validation_method": "hpi_student_contact_data_validator"
+            "validation_method": "take_photo_from_camera"
         }
     }
 }
