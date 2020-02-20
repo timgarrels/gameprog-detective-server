@@ -80,11 +80,6 @@ class TextMessage(db.Model):
     address = db.Column(db.String(64), nullable=False)
     inbound = db.Column(db.Boolean, default=False)
 
-    def as_dict(self):
-        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return utility.dict_keys_to_camel_case(
-            {c.name: getattr(self, c.name) for c in self.__table__.columns})
-
     def __repr__(self):
         return "<Textmessage {}.{}: {}>".format(self.textmessage_id, self.time_stamp, self.body)
 
@@ -97,11 +92,6 @@ class PhoneNumber(db.Model):
     contact_id = db.Column(db.Integer, db.ForeignKey("contact.contact_id"))
 
     number = db.Column(db.String(64), nullable=False)
-
-    def as_dict(self):
-        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return utility.dict_keys_to_camel_case(
-            {c.name: getattr(self, c.name) for c in self.__table__.columns})
 
     def __repr__(self):
         return "<PhoneNumber {}.{} {}>".format(self.phonenumber_id, self.contact_id, self.number)
@@ -131,11 +121,6 @@ class Location(db.Model):
         db.session.add(location)
         db.session.commit()
 
-    def as_dict(self):
-        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return utility.dict_keys_to_camel_case(
-            {c.name: getattr(self, c.name) for c in self.__table__.columns})
-
     def __repr__(self):
         return "<Location {}.{} {}/{}>".format(self.location_id, self.time_stamp, self.latitude, self.longitude)
 
@@ -163,11 +148,6 @@ class CalendarEvent(db.Model):
         )
         db.session.add(event)
         db.session.commit()
-
-    def as_dict(self):
-        """As sqlalchemy obj cant be parsed to json we build a custom converter"""
-        return utility.dict_keys_to_camel_case(
-            {c.name: getattr(self, c.name) for c in self.__table__.columns})
 
     def __repr__(self):
         return "<CalendarEvent {}: {}>".format(self.calendar_id, self.title)
