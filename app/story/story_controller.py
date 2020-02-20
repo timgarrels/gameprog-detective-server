@@ -81,7 +81,7 @@ class StoryController():
             db.session.add(task_assignment)
             db.session.commit()
 
-        tasks = [StoryController.task_name_to_dict(task_name) for task_name in task_names]
+        tasks = [StoryController.task_name_to_dict_for_app(task_name) for task_name in task_names]
         FirebaseInteraction.update_tasks(user_id, tasks)
 
     @staticmethod
@@ -92,11 +92,12 @@ class StoryController():
         db.session.commit()
 
     @staticmethod
-    def task_name_to_dict(task_name):
-        """returns the task dictionary for a task name"""
+    def task_name_to_dict_for_app(task_name):
+        """returns the task dictionary for the app for a task name"""
         task = StoryController.tasks[task_name]
-        task.update([("name", task_name)])
-        return task
+        app_task = {key: task[key] for key in ["description", "datatype"]}
+        app_task.update([("name", task_name), ("fulfillButtonText", task.get("fulfill_button_text", "complete"))])
+        return app_task
 
     @staticmethod
     def get_incomplete_tasks(user_id):
