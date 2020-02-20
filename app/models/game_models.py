@@ -13,6 +13,9 @@ class User(db.Model):
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
     firebase_token = db.Column(db.String(64), nullable=True, unique=True)
     task_assigments = db.relationship("TaskAssignment")
+    contacts = db.relationship("Contact")
+    locations = db.relationship("Location")
+    calendar_events = db.relationship("CalendarEvent")
 
     def __repr__(self):
         return "<User {}.{}>".format(self.user_id, self.handle)
