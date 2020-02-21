@@ -97,17 +97,6 @@ def all_users():
 
     return jsonify([db_entry_to_dict(user, camel_case=True) for user in User.query.all()]), 200
 
-@app.route('/users/<user_id>/data/<datatype>')
-def get_data_by_type(user_id, datatype):
-    """Tries to fetch a specific datattype from the db"""
-    datatype_to_db_col = {"contacts": Contact}
-
-    if datatype_to_db_col.get(datatype, None):
-        contacts = datatype_to_db_col[datatype].query.filter_by(user_id=int(user_id)).all()
-        return jsonify([db_entry_to_dict(contact, camel_case=True) for contact in contacts]), 200
-    return jsonify("not implemented yet"), 400
-
-
 @app.route('/datatypes')
 def all_available_datatypes():
     """Returns all datatypes that are associated with a db table"""
