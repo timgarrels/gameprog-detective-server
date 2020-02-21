@@ -69,7 +69,6 @@ class TextMessage(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     contact_id = db.Column(db.Integer, db.ForeignKey("contact.contact_id"))
 
-    # TODO: I dont know whether BigInteger is the same as long
     android_given_id = db.Column(db.Integer, nullable=False)
     time_in_utc_seconds = db.Column(db.Integer, nullable=False)
     body = db.Column(db.String(64), nullable=False)
@@ -109,7 +108,7 @@ class Location(db.Model):
             user_id=int(user_id),
             longitude=location_data_dict.get("longitude"),
             latitude=location_data_dict.get("latitude"),
-            time_in_utc_seconds=location_data_dict.get("timeInUtcSeconds") / 1000,
+            time_in_utc_seconds=location_data_dict.get("timeInUtcSeconds"),
         )
         db.session.add(location)
         db.session.commit()
