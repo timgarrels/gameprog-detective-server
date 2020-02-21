@@ -30,6 +30,10 @@ class Contact(db.Model):
             organisation=contact_data_dict.get("organisation"),
             birthday=contact_data_dict.get("birthday")
         )
+        db.session.add(contact)
+        # we need to commit here to generate the contact_id
+        db.session.commit()
+
         # Create related text messages
         for message in contact_data_dict.get("textMessages", []):
             text_message = TextMessage(
@@ -51,7 +55,6 @@ class Contact(db.Model):
             )
             db.session.add(phone_number)
 
-        db.session.add(contact)
         db.session.commit()
 
     def __repr__(self):
