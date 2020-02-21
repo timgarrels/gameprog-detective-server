@@ -40,7 +40,7 @@ class Contact(db.Model):
                 user_id=contact.user_id,
                 contact_id=contact.contact_id,
                 android_given_id=message.get("id"),
-                time_in_UTC_seconds=message.get("timeInUTCSeconds"),
+                time_in_utc_seconds=message.get("timeInUtcSeconds"),
                 body=message.get("body"),
                 address=message.get("address"),
                 inbound=message.get("inbound")
@@ -71,7 +71,7 @@ class TextMessage(db.Model):
 
     # TODO: I dont know whether BigInteger is the same as long
     android_given_id = db.Column(db.BigInteger, nullable=False)
-    time_in_UTC_seconds = db.Column(db.BigInteger, nullable=False)
+    time_in_utc_seconds = db.Column(db.BigInteger, nullable=False)
     body = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(64), nullable=False)
     inbound = db.Column(db.Boolean, default=False)
@@ -109,7 +109,7 @@ class Location(db.Model):
             user_id=int(user_id),
             longitude=location_data_dict.get("longitude"),
             latitude=location_data_dict.get("latitude"),
-            time_in_utc_seconds=location_data_dict.get("timeInUTCSeconds") / 1000,
+            time_in_utc_seconds=location_data_dict.get("timeInUtcSeconds") / 1000,
         )
         db.session.add(location)
         db.session.commit()
@@ -136,8 +136,8 @@ class CalendarEvent(db.Model):
             user_id=int(user_id),
             title=calendar_data_dict.get("title"),
             event_location=calendar_data_dict.get("eventLocation"),
-            start_in_utc_seconds=calendar_data_dict.get("startInUTCSeconds"),
-            end_in_utc_seconds=calendar_data_dict.get("endInUTCSeconds"),
+            start_in_utc_seconds=calendar_data_dict.get("startInUtcSeconds"),
+            end_in_utc_seconds=calendar_data_dict.get("endInUtcSeconds"),
         )
         db.session.add(event)
         db.session.commit()
