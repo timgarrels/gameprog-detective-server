@@ -1,5 +1,6 @@
 """API Endpoints used by the app"""
 from flask import jsonify, request
+from sqlalchemy.exc import IntegrityError
 
 from app import app
 from app import db
@@ -66,7 +67,7 @@ def recieve_user_data(user_id, data_table):
         try:
             data_handler(user_id, data_dict)
             added_data += 1
-        except KeyError as error:
+        except (KeyError, IntegrityError) as error:
             return jsonify("Data could not be added: {}".format(error)), 400
     return jsonify("Added {} new entries to db".format(added_data)), 200
 
