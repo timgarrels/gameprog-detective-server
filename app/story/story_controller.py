@@ -64,7 +64,7 @@ class StoryController():
             current_story_point = StoryController.get_current_story_point(user_id)
             next_story_point = StoryController.story_points[current_story_point]["paths"][reply]
             StoryController.set_current_story_point(user_id, next_story_point)
-            messages = get_story_point_description(next_story_point)
+            messages = StoryController.get_story_point_description(next_story_point)
 
         return StoryController.personalize_messages(messages, user_id)
 
