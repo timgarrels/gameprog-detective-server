@@ -70,8 +70,8 @@ class TextMessage(db.Model):
     contact_id = db.Column(db.Integer, db.ForeignKey("contact.contact_id"))
 
     # TODO: I dont know whether BigInteger is the same as long
-    android_given_id = db.Column(db.BigInteger, nullable=False)
-    time_in_utc_seconds = db.Column(db.BigInteger, nullable=False)
+    android_given_id = db.Column(db.Integer, nullable=False)
+    time_in_utc_seconds = db.Column(db.Integer, nullable=False)
     body = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(64), nullable=False)
     inbound = db.Column(db.Boolean, default=False)
@@ -100,7 +100,7 @@ class Location(db.Model):
 
     longitude = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
-    time_in_utc_seconds = db.Column(db.BigInteger, nullable=False)
+    time_in_utc_seconds = db.Column(db.Integer, nullable=False)
 
     @staticmethod
     def userdata_post_handler(user_id, location_data_dict):
@@ -125,8 +125,8 @@ class CalendarEvent(db.Model):
 
     title = db.Column(db.String(64), nullable=False)
     event_location = db.Column(db.String(64), nullable=True)
-    start_in_utc_seconds = db.Column(db.BigInteger, nullable=False)
-    end_in_utc_seconds = db.Column(db.BigInteger, nullable=False)
+    start_in_utc_seconds = db.Column(db.Integer, nullable=False)
+    end_in_utc_seconds = db.Column(db.Integer, nullable=False)
 
     @staticmethod
     def userdata_post_handler(user_id, calendar_data_dict):
