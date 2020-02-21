@@ -19,10 +19,15 @@ def geo_at_street(lat, lon, street):
                 return True
     return False
 
-places = {"hpi": {
-    "coords": (52.394061, 13.131768),
-    "radius": 230,
+places = {
+    "hpi": {
+        "coords": (52.394061, 13.131768),
+        "radius": 230,
     },
+    "potsdam_hbf": {
+        "coords": (52.391735, 13.066694),
+        "radius": 150,
+    }
 }
 def geo_close_to_place(lat, lon, place):
     """Checks whether coords are in predefined radius to predefined place"""
