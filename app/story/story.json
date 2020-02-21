@@ -37,9 +37,22 @@
                 "Sehr gut, {user_name}, Ich habe Ihren Bericht erhalten.",
                 "Schade, dass der Hausmeister nichts gesehen hat - aber vielleicht sollten Sie seinen Tipp mit den Überwachungskameras an Gleis 7 befolgen"
             ],
+            "paths": {
+                "Ich habe Ihnen ein Foto geschickt": "end"
+            },
             "tasks": [
                 "investigate_cameras"
             ]
+        },
+        "end": {
+            "description": [
+                "Du hast das Ende der Story erreicht",
+                "Du kannst sie nun neustarten"
+            ],
+            "paths": {
+                "Story Neustart": "start"
+            },
+            "tasks": []
         }
     },
 
@@ -60,7 +73,7 @@
             "incomplete_message": [
                 "Bitte schicken Sie mir ein Foto der Kameras, sobald Sie sie untersucht haben."
             ],
-            "validation_method": "take_photo_from_camera"
+            "validation_method": "take_photo_from_cameras_validator"
         }
     }
 }

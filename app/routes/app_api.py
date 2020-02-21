@@ -85,7 +85,7 @@ def is_task_finished(user_id, task_name):
 
     validation_method = StoryController.task_validation_method(task_name)
     if not validation_method:
-        return jsonify("No such task {}".format(task_name)), 400
+        return jsonify("No validation method found for {}".format(task_name)), 400
 
     finished = validation_method(user_id)
     task.finished = finished

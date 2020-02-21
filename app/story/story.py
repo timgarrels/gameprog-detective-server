@@ -15,6 +15,9 @@ def go_to_hbf_validator(user_id):
 
     return any(geo_close_to_place(location.latitude, location.longitude, "potsdam_hbf") for location in recent_locations)
 
+def take_photo_from_cameras_validator(user_id):
+    return True
+
 # Placeholder Method Implementation
 def get_user_name(user_id):
     return db_single_element_query(User, {"user_id": user_id}, "user").firstname
