@@ -121,9 +121,4 @@ def fetch_user_tasks(user_id):
     except ValueError:
         return jsonify("Invalid userId"), 400
 
-    task_dicts = []
-    for task in tasks:
-        task_dict = StoryController.task_name_to_dict(task.task_name)
-        task_dict.update([("finished", task.finished)])
-        task_dicts.append(task_dict)
-    return jsonify(task_dicts), 200
+    return jsonify([db_entry_to_dict(task, camel_case=True) for task in tasks]), 200
