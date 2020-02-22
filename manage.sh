@@ -8,7 +8,7 @@ if [ "$command" == "install" ]; then
         mkdir -p logs
     fi
 
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
     ./manage.sh reset_db
 elif [ "$command" == "start" ]; then
     echo "Starting server..."
