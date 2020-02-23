@@ -1,5 +1,4 @@
 # set your environment variables here
 # -----
 # export GP_TELEGRAM_BOT_TOKEN=
-# export GP_SERVER_URL=
 # export GP_FIREBASE_URL=
