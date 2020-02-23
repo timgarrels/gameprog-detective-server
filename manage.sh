@@ -7,10 +7,26 @@ if [ "$command" == "install" ]; then
         echo "Creating logs directory"
         mkdir -p logs
     fi
-
+    if [ ! -d .venv ]; then
+        echo "Creating virual environment"
+        python3 -m venv .venv
+    fi
+    source .venv/bin/activate
     pip3 install -r requirements.txt
     ./manage.sh reset_db
 elif [ "$command" == "start" ]; then
+    if ps -p `cat logs/server_pid` > /dev/null; then
+        echo "server already running"
+        exit
+    fi
+    if [ -d .venv ]; then
+        source .venv/bin/activate
+    else
+        echo "please first install the server"
+        exit
+    fi
+    # load environment variables form file if present
+    [ -f env_vars.sh ] && source env_vars.sh
     echo "Starting server..."
     echo "----------" >> logs/server_log
     flask run --host 0.0.0.0 --port 8080 >> logs/server_log 2>&1 &
@@ -23,10 +39,17 @@ elif [ "$command" == "kill" ]; then
     else
         echo "Server not running"
     fi
+
 elif [ "$command" == "restart" ]; then
     ./manage.sh kill
     ./manage.sh start
 elif [ "$command" == "reset_db" ]; then
+    if [ -d .venv ]; then
+        source .venv/bin/activate
+    else
+        echo "please first install the server"
+        exit
+    fi
     if [ -f app/app.db ]; then
         echo "Removing old db"
         rm app/app.db
@@ -36,6 +59,7 @@ elif [ "$command" == "reset_db" ]; then
         rm -rf migrations/
     fi
     echo "Create new db"
+    [ -f env_vars.sh ] && source env_vars.sh
     flask db init
     flask db migrate
     flask db upgrade
