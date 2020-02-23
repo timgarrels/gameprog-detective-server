@@ -4,6 +4,9 @@
 # Custom LogFiles
 logs/
 
+# environment variables
+env_vars
+
 # Graphviz Output
 *.gv
 *.gv.pdf
