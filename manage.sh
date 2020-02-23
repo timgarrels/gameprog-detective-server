@@ -26,7 +26,7 @@ elif [ "$command" == "start" ]; then
         exit
     fi
     # load environment variables form file if present
-    [ -f env_vars.sh ] && source env_vars.sh
+    [ -f env_vars ] && source env_vars
     echo "Starting server..."
     echo "----------" >> logs/server_log
     flask run --host 0.0.0.0 --port 8080 >> logs/server_log 2>&1 &
@@ -59,7 +59,7 @@ elif [ "$command" == "reset_db" ]; then
         rm -rf migrations/
     fi
     echo "Create new db"
-    [ -f env_vars.sh ] && source env_vars.sh
+    [ -f env_vars ] && source env_vars
     flask db init
     flask db migrate
     flask db upgrade
