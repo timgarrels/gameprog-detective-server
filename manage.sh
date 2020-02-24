@@ -2,6 +2,9 @@
 
 command=$1
 
+# switch to parent folder of this script
+cd $(dirname $0)
+
 if [ "$command" == "install" ]; then
     if [ ! -d logs ]; then
         echo "Creating logs directory"
