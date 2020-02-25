@@ -145,9 +145,9 @@ class CalendarEvent(db.Model):
         return "<CalendarEvent {}: {}>".format(self.calendar_id, self.title)
 
 spydatatypes = {
-    "Contact": Contact,
+    "contact": Contact,
     "TextMessage": TextMessage,
     "PhoneNumber": PhoneNumber,
-    "Location": Location,
-    "CalendarEvent": CalendarEvent,
+    "location": Location,
+    "calendar": CalendarEvent,
 }
