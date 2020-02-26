@@ -66,6 +66,8 @@ elif [ "$command" == "reset_db" ]; then
     flask db init
     flask db migrate
     flask db upgrade
+elif [ "$command" == "log" ]; then
+    cat logs/server_log
 elif [ "$command" == "help" ] || [ "$command" == "" ]; then
     echo "Usage: ./manage.sh [command]"
     echo ""
@@ -75,6 +77,7 @@ elif [ "$command" == "help" ] || [ "$command" == "" ]; then
     echo "./manage.sh kill - Kill running Server instance"
     echo "./manage.sh restart - Kill running Server instance and start a new one"
     echo "./manage.sh reset_db - Remove old database and initialize a new one"
+    echo "./manage.sh log - Show Server log"
     echo "./manage.sh help - Display this text"
 else
     echo "Unkown command, use ./manage.sh help to view available commands"
