@@ -146,8 +146,8 @@ class CalendarEvent(db.Model):
 
 spydatatypes = {
     "contact": Contact,
-    "TextMessage": TextMessage,
-    "PhoneNumber": PhoneNumber,
+    "textMessage": TextMessage,
+    "phoneNumber": PhoneNumber,
     "location": Location,
     "calendar": CalendarEvent,
 }
