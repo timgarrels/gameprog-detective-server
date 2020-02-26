@@ -11,7 +11,7 @@ from app.story.utility import geo_close_to_place
 def go_to_hbf_validator(user_id):
     location_valid_duration = timedelta(minutes=1)
     lower_time_barrier = (datetime.utcnow() - location_valid_duration).timestamp()
-    recent_locations = Location.query.filter(Location.time_in_utc_seconds >= lower_time_barrier).all()
+    recent_locations = Location.query.filter_by(user_id=user_id).filter(Location.time_in_utc_seconds >= lower_time_barrier).all()
 
     return any(geo_close_to_place(location.latitude, location.longitude, "potsdam_hbf") for location in recent_locations)
 
