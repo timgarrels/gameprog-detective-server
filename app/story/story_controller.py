@@ -62,7 +62,8 @@ class StoryController():
             messages = StoryController.tasks[incomplete_tasks[0]]["incomplete_message"]
         else:
             current_story_point = StoryController.get_current_story_point(user_id)
-            next_story_point = StoryController.story_points[current_story_point]["paths"][reply]
+            personalized_paths = StoryController.personalize_paths(StoryController.story_points[current_story_point]["paths"], user_id)
+            next_story_point = personalized_paths[reply]
             StoryController.set_current_story_point(user_id, next_story_point)
             messages = StoryController.get_story_point_description(next_story_point)
 
@@ -113,8 +114,8 @@ class StoryController():
 
     # --- messages ---
     @staticmethod
-    def personalize_messages(messages, user_id):
-        """Fills placeholders in messages with user related data"""
+    def get_user_personalization(messages, user_id):
+        """creates a dict with all placeholders found in messages"""
         user_personalization = Personalization.query.get(user_id)
         if not user_personalization:
             raise DatabaseError(f"there is no personalization entry for user {user_id}")
@@ -129,7 +130,19 @@ class StoryController():
             db.session.add(user_personalization)
             db.session.commit()
         
-        return [message.format_map(db_entry_to_dict(user_personalization)) for message in messages]
+        return db_entry_to_dict(user_personalization)
+
+    @staticmethod
+    def personalize_messages(messages, user_id):
+        """Fills placeholders in messages with user related data"""
+        user_personalization = StoryController.get_user_personalization(messages, user_id)
+        return [message.format_map(user_personalization) for message in messages]
+
+    @staticmethod
+    def personalize_paths(paths, user_id):
+        """Fills placeholders in a paths dict with user related data"""
+        user_personalization = StoryController.get_user_personalization(paths.keys(), user_id)
+        return {k.format_map(user_personalization): v for k, v in paths.items()}
 
     @staticmethod
     def get_story_point_description(story_point):
@@ -152,7 +165,8 @@ class StoryController():
     def get_current_user_replies(user_id):
         """Returns possible reply options available to the user_id in the current story state"""
         story_point = StoryController.get_current_story_point(user_id)
-        return StoryController.get_possible_replies(story_point)
+        replies = StoryController.get_possible_replies(story_point)
+        return StoryController.personalize_messages(replies, user_id)
     
     @staticmethod
     def is_valid_reply(user_id, reply):
