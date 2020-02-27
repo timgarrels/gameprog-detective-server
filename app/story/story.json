@@ -4,7 +4,8 @@
     "story_points": {
         "start": {
             "description": [
-                "Beförderung, neuer Ausweis"
+                "Herzlichen Glückwunsch, {user_name}! Sie wurden soeben zum Kommissar befördert!",
+                "Sie erhalten in Kürze ihren neuen Dienstausweis - doch ich habe jetzt schon einen neuen Fall für Sie"
             ],
             "paths": {
                 "Ich bin bereit!": "first_contract"
@@ -13,8 +14,10 @@
         },
         "first_contract": {
             "description": [
-                "Am Hbf wurden Schlüssel gestohlen",
-                "Vielleicht weiß der Hausmeister was"
+                "Nichts anderes habe ich von Ihnen erwartet, Kommissar {user_name}",
+                "Hier ist die Situation: Am Potsdamer Hauptbahnhof wurden Schlüssel für die Wagons gestohlen",
+                "Ich habe momentan leider auch nicht mehr Informationen, aber vielleicht kann der Hausmeister Ihnen weiterhelfen",
+                "Er ist normalerweise zwischen 6:00 und 23:00 am Hauptbahnhof anzutreffen"
             ],
             "paths": {
                 "Ich werde ihn fragen": "interview"
@@ -38,27 +41,120 @@
                 "Schade, dass der Hausmeister nichts gesehen hat - aber vielleicht sollten Sie seinen Tipp mit den Überwachungskameras an Gleis 7 befolgen"
             ],
             "paths": {
-                "Ich habe Ihnen ein Foto geschickt": "end"
+                "Ich habe Ihnen ein Foto geschickt": "hacking"
             },
             "tasks": [
                 "investigate_cameras"
             ]
         },
-        "end": {
+        "hacking": {
             "description": [
-                "Du hast das Ende der Story erreicht",
-                "Du kannst sie nun neustarten"
+                "Sehr gut!",
+                "Mein Cyber-Analyst {cyber_analyst} am HPI kann jetzt die Kameras hacken",
+                "Bitte machen Sie einen Termin aus, um die Ergebnisse der Analyse zu besprechen"
             ],
             "paths": {
-                "Story Neustart": "start"
+                "Ist erledigt!": "analysis_evaluation"
             },
+            "tasks": [
+                "make_analyst_appointment"
+            ]
+        },
+        "analysis_evaluation": {
+            "description": [
+                "Super, {user_name}! Aber Sie müssen wahrscheinlich doch gar nicht so lange warten",
+                "{cyber_analyst} hat mir eben mitgeteilt, dass Sie auch direkt vorbeikommen können (jeden Tag zwischen 9:00 und 18:00)",
+                "Gehen Sie doch so bald wie möglich zum HPI und besprechen die Ergebnisse"
+            ],
+            "paths": {
+                "Ich habe mit ihm geredet": "analysis_result"
+            },
+            "tasks": [
+                "talk_to_analyst"
+            ]
+        },
+        "analysis_result": {
+            "description": [
+                "Und, was haben Sie herausgefunden?"
+            ],
+            "paths": {
+                "Wir konnten die Person identifizieren, die die Schlüssel gestohlen hat. Es handelt sich um {suspect}.": "observe_or_arrest"
+            },
+            "tasks": []
+        },
+        "observe_or_arrest": {
+            "description": [
+                "Das sind wunderbare Neuigkeiten, ich bin stolz auf Sie!",
+                "Was denken Sie, sollten wir die Verdächtige Person zunächst beobachten, oder direkt verhaften?"
+            ],
+            "paths": {
+                "Sofort verhaften, der Fall ist klar wir sollten keine Zeit verlieren": "arrest_suspect",
+                "Wir sollten nicht voreilig handeln, ich würde sie gerne noch etwas beobachten": "observe_suspect"
+            },
+            "tasks": []
+        },
+        "arrest_suspect": {
+            "description": [
+                "Wie sie meinen",
+                "Unsere Datenbank sagt, dass {suspect} normalerweise um 16:00 nach Hause kommt und wohnhaft in der Dianastraße 16 ist",
+                "Sagen Sie Bescheid, wenn Sie etwas herausgefunden haben"
+            ],
+            "paths": {
+                "Ich bin jetzt vor Ort": "arrest_suspect.suspect_dead"
+            },
+            "tasks": ["arrest_suspect"]
+        },
+        "arrest_suspect.suspect_dead": {
+            "description": [
+                "Und?"
+            ],
+            "paths": {
+                "Es ist noch niemand gekommen... aber - ich kann durchs Fenster gucken und - ich sehe eine Leiche!": "end"
+            },
+            "tasks": []
+        },
+        "observe_suspect": {
+            "description": [
+                "Eine gute Entscheidung.",
+                "Unsere Datenbank sagt, dass {suspect} regelmäßig im Pub á la Pub ist",
+                "Der Pub macht um 20Uhr auf und schließt um 1Uhr Nachts - seien sie dort und beobachten Sie so gut wie möglich"
+            ],
+            "paths": {
+                "Noch ist niemand gekommen...": "observe_suspect.shots"
+            },
+            "tasks": ["observe_suspect"]
+        },
+        "observe_suspect.shots": {
+            "description": [
+                "Beobachten sie weiter..."
+            ],
+            "paths": {
+                "Oh mein Gott! Es gab Schüsse!": "observe_suspect.suspect_dead"
+            },
+            "tasks": []
+        },
+        "observe_suspect.suspect_dead": {
+            "description": [
+                "Verdammt! Können Sie mehr sehen?"
+            ],
+            "paths": {
+                "Ja... {suspect} ist tot.": "end"
+            },
+            "tasks": []
+        },
+        "end": {
+            "description": [
+                "Hergott! Es sieht so aus als wäre das nur ein kleiner Fisch in einem viel gößeren Fall gewesen...",
+                "Kommissar {user_name}, es sieht so aus als haben wir es hier mit der Mafia zu tun - ich kann ihnen nur Glück wünschen..."
+            ],
+            "paths": {},
             "tasks": []
         }
     },
 
     "tasks": {
         "interview_caretaker": {
-            "description": "Gehe zum Hauptbahnhof, um den Hausmeister zu befragen",
+            "description": "Gehe zwischen 6:00 und 23:00 zum Hauptbahnhof, um den Hausmeister zu befragen",
             "datatype": "location",
             "fulfill_button_text": "befragen und Bericht abschicken",
             "incomplete_message": [
@@ -71,9 +167,47 @@
             "datatype": "picture",
             "fulfill_button_text": "Foto schicken",
             "incomplete_message": [
-                "Bitte schicken Sie mir ein Foto der Kameras, sobald Sie sie untersucht haben."
+                "Ich habe noch kein Foto erhalten"
             ],
             "validation_method": "take_photo_from_cameras_validator"
+        },
+        "make_analyst_appointment": {
+            "description": "Mache einen Termin mit dem Cyber-Analysten aus",
+            "datatype": "calendar",
+            "fulfill_button_text": "Termin ausmachen",
+            "incomplete_message": [
+                "Ich sehe noch keinen neuen Termin in ihrem Kalender..."
+            ],
+            "validation_method": "make_analyst_appointment_validator"
+        },
+        "talk_to_analyst": {
+            "description": "Gehe zwischen 9:00 und 18:00 zum Cyber-Analysten am HPI",
+            "datatype": "location",
+            "fulfill_button_text": "mit dem Analystem reden",
+            "incomplete_message": [
+                "Mein Analyst hat mir noch nicht über ein Gespräch mit Ihnen berichtet...",
+                "Bitte lügen Sie mich nicht an"
+            ],
+            "validation_method": "go_to_hpi_validator"
+        },
+        "arrest_suspect": {
+            "description": "Sei um 16:00 bei der Dianastraße 16, um die verdächtige Person zu verhaften",
+            "datatype": "location",
+            "fulfill_button_text": "Ausschau halten...",
+            "incomplete_message": [
+                "Sie sollten mittlerweile gelernt haben, dass sie mich nicht anlügen können",
+                "Ich hoffe, Sie sind sich bewusst, dass sie damit ihre Position gefährden"
+            ],
+            "validation_method": "arrest_suspect_validator"
+        },
+        "observe_suspect": {
+            "description": "Warte zwischen 20:00 und 1:00 für mindestens 10 minuten beim Pub á la Pub und beobachte das Geschehen",
+            "datatype": "wait",
+            "fulfill_button_text": "Beobachten abschließen",
+            "incomplete_message": [
+                "Sie haben noch nicht genug beobachtet!"
+            ],
+            "validation_method": "observe_suspect_validator"
         }
     }
 }
