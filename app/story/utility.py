@@ -29,7 +29,15 @@ places = {
     "potsdam_hbf": {
         "coords": (52.391735, 13.066694),
         "radius": 150,
-    }
+    },
+    "suspect_home": {
+        "coords": (52.387768, 13.125900),
+        "radius": 30,
+    },
+    "pub_a_la_pub": {
+        "coords": (52.395616, 13.056481),
+        "radius": 20,
+    },
 }
 def geo_close_to_place(lat, lon, place):
     """Checks whether coords are in predefined radius to predefined place"""
