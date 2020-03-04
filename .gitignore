@@ -4,6 +4,9 @@
 # Custom LogFiles
 logs/
 
+# hacked sessions
+hacked_sessions/
+
 # environment variables
 env_vars
 
