@@ -97,7 +97,11 @@ class StoryController():
         """returns the task dictionary for the app for a task name"""
         task = StoryController.tasks[task_name]
         app_task = {key: task[key] for key in ["description", "datatype"]}
-        app_task.update([("name", task_name), ("fulfillButtonText", task.get("fulfill_button_text", "complete"))])
+        app_task.update([
+            ("name", task_name),
+            ("fulfillButtonText", task.get("fulfill_button_text", "complete")),
+            ("permissionExplanation", task.get("permission_explanation", "Zur Überprüfung des Tasks brauchen wir die folgende Berechtigung"))
+        ])
         return app_task
 
     @staticmethod
