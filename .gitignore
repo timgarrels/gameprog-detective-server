@@ -5,7 +5,7 @@
 logs/
 
 # hacked sessions
-hacked_sessions/
+*.session
 
 # environment variables
 env_vars

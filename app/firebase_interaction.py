@@ -10,7 +10,7 @@ class FirebaseInteraction():
     """Encapsulates all firebase API calls that are needed to update app state"""
 
     @staticmethod
-    def execute_call(relative_url, user_id, data):
+    def execute_call(relative_url, user_id, data=None):
         """Builds the full and token-authorized firebase url
         and posts teh given data object as json"""
         try:
@@ -21,7 +21,7 @@ class FirebaseInteraction():
         resp = requests.post(
             url=Config.FIREBASE_URL + relative_url + "?token={}".format(user.firebase_token),
             headers={'Content-type': 'application/json', 'Accept': 'text/plain'},
-            data=json.dumps(data)
+            data=json.dumps(data) if data else None
         )
         return resp
 
