@@ -75,6 +75,9 @@ class StoryController():
         """Assigns all tasks of a story point to a user
         Triggers app update with new tasks"""
         task_names = StoryController.story_points[story_point_name]["tasks"]
+        if not task_names:
+            return
+        
         for task_name in task_names:
             task_assignment = TaskAssignment()
             task_assignment.user_id = user_id
