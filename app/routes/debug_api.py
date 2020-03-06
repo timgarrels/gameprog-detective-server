@@ -6,6 +6,7 @@ from flask import request, jsonify
 from sqlalchemy.exc import InvalidRequestError
 
 from app import app, db
+from app.story.exceptions import StoryPointInvalid
 from app.models.exceptions import DatabaseError
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import Contact, spydatatypes
@@ -77,6 +78,24 @@ def reset_user(user_id):
     except ValueError:
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
+
+@app.route('/users/<user_id>/story/current-story-point', methods=['GET', 'POST'])
+def current_story_point(user_id):
+    """Returns a users current story point"""
+    try:
+        if request.method == 'GET':
+            return jsonify(StoryController.get_current_story_point(user_id))
+        if request.method == 'POST':
+            new_story_point = request.args.get("set")
+            if not new_story_point:
+                return jsonify("please provide a valid story point in the set parameter")
+            try:
+                StoryController.set_current_story_point(user_id, new_story_point, reset_tasks=True)
+            except StoryPointInvalid as e:
+                return jsonify(e.args[0])
+            return jsonify(f"current story point set to {new_story_point}")
+    except DatabaseError as e:
+        return jsonify(e.args[0])
 
 @app.route('/users/<user_id>/story/reset')
 def reset_story(user_id):

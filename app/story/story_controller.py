@@ -4,7 +4,7 @@ import re
 from flask import jsonify
 
 from app import db
-from app.story.exceptions import UserReplyInvalid
+from app.story.exceptions import UserReplyInvalid, StoryPointInvalid
 from app.models.exceptions import UserNotFoundError, UserNotRegisteredError, DatabaseError
 from app.models.game_models import User, TaskAssignment
 from app.models.personalization_model import Personalization
@@ -42,8 +42,12 @@ class StoryController():
         return user.current_story_point
 
     @staticmethod
-    def set_current_story_point(user_id, story_point_name):
+    def set_current_story_point(user_id, story_point_name, reset_tasks=False):
         """Sets the current story point for a given user and activates associated tasks"""
+        if story_point_name not in StoryController.story_points.keys():
+            raise StoryPointInvalid(f"story point {story_point_name} does not exist")
+        if reset_tasks:
+            StoryController.reset_tasks(user_id)
         user = StoryController._get_user(user_id)
         user.current_story_point = story_point_name
         db.session.add(user)
