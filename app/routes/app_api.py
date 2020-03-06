@@ -83,16 +83,16 @@ def is_task_finished(user_id, task_name):
     if not task:
         return jsonify("No such task!"), 400
 
-    validation_method = StoryController.task_validation_method(task_name)
-    if not validation_method:
-        return jsonify("No validation method found for {}".format(task_name)), 400
+    if not task.finished:
+        validation_method = StoryController.task_validation_method(task_name)
+        if not validation_method:
+            return jsonify("No validation method found for {}".format(task_name)), 400
 
-    finished = validation_method(user_id)
-    task.finished = finished
-    db.session.add(task)
-    db.session.commit()
+        task.finished = validation_method(user_id)
+        db.session.add(task)
+        db.session.commit()
 
-    return jsonify(finished), 200
+    return jsonify(task.finished), 200
 
 @app.route('/users/<user_id>/fbtoken/<fbtoken>')
 def update_firebase_token(user_id, fbtoken):
