@@ -10,14 +10,6 @@ from app.story.story_controller import StoryController
 from app.models.utility import db_single_element_query, db_entry_to_dict
 
 
-@app.route('/users/<user_id>/story/current-story-point')
-def get_current_story_point(user_id):
-    """Returns a users current story point"""
-    try:
-        return jsonify(StoryController.get_current_story_point(user_id))
-    except DatabaseError as e:
-        return jsonify(e.args[0])
-
 @app.route('/users/<user_id>/story/current-story-point/description')
 def get_current_story_point_description(user_id):
     """Provides description for the users current story point"""
