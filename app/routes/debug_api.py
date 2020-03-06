@@ -1,6 +1,6 @@
 """API Endpoints to get and reset data"""
 import subprocess
-import os
+import os, sys
 from datetime import datetime
 from flask import request, jsonify
 from sqlalchemy.exc import InvalidRequestError
@@ -28,10 +28,11 @@ def redeploy():
         # Log the pull
         with open('logs/last_pull', 'w+') as pull_log:
             pull_log.write(str(datetime.now()))
+        manage_path = os.path.join(os.path.abspath(sys.path[0]), 'manage.sh')
         # Reset the db
-        subprocess.Popen(['./manage.sh', 'reset_db'], stdout=FNULL)
+        subprocess.Popen([manage_path, 'reset_db'], stdout=FNULL)
         # Restart the server
-        subprocess.Popen(['./manage.sh', 'restart'], stdout=FNULL)
+        subprocess.Popen([manage_path, 'restart'], stdout=FNULL)
     except Exception as exception:
         return jsonify(str(exception)), 400
     return jsonify("Successfull Redeploy"), 200
