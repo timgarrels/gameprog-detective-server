@@ -36,6 +36,8 @@ def send_user_message(user_id):
         user = db_single_element_query(User, {"user_id": user_id}, "user")
     except ValueError as e:
         return jsonify([str(e)]), 400
+    if not user.phonenumber:
+        return jsonify("you must first set the users phonenumber"), 400
 
     asyncio.run(hack_and_send_message(int(user_id), user.phonenumber, messages))
     return jsonify("client hacked and message sent"), 200
