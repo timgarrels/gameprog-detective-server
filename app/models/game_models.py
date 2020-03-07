@@ -12,6 +12,7 @@ class User(db.Model):
                                      default=utility.create_token)
     current_story_point = db.Column(db.String(64), nullable=True, unique=False)
     firebase_token = db.Column(db.String(64), nullable=True, unique=True)
+    phonenumber = db.Column(db.String(16), nullable=True)
     task_assigments = db.relationship("TaskAssignment")
     contacts = db.relationship("Contact")
     locations = db.relationship("Location")

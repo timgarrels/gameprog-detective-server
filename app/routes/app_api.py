@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from app import app
 from app import db
 from app.models.game_models import User, TaskAssignment
-from app.models.userdata_models import spydatatypes
+from app.models.userdata_models import spydatatypes, AccessCode
 from app.story.story_controller import StoryController
 from app.models.utility import db_single_element_query, db_entry_to_dict
 
@@ -106,3 +106,34 @@ def update_firebase_token(user_id, fbtoken):
     db.session.add(user)
     db.session.commit()
     return jsonify("Updated token!"), 200
+
+@app.route('/users/<user_id>/phonenumber/<phone>', methods=['POST'])
+def update_phonenumber(user_id, phone):
+    """Set a new phone number for a user"""
+    try:
+        user = db_single_element_query(User, {"user_id": user_id}, "user")
+    except ValueError as e:
+        return jsonify([str(e)]), 400
+
+    user.phonenumber = phone
+    db.session.add(user)
+    db.session.commit()
+    return jsonify("Updated phonenumber!"), 200
+
+@app.route('/users/<user_id>/telegram-code/<code>', methods=['POST'])
+def receive_access_code(user_id, code):
+    try:
+        access_code = AccessCode.query.get(int(user_id))
+        if access_code:
+            access_code.code = code
+        else:
+            access_code = AccessCode(
+                user_id=int(user_id),
+                code=code
+            )
+    except ValueError:
+        return jsonify("Invalid userId"), 400
+
+    db.session.add(access_code)
+    db.session.commit()
+    return jsonify("Received Telegram Code!"), 200
