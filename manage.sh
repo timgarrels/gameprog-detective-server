@@ -12,10 +12,11 @@ if [ "$command" == "install" ]; then
     fi
     if [ ! -d .venv ]; then
         echo "Creating virual environment"
-        python3 -m venv .venv
+        python3.8 -m venv .venv
     fi
     source .venv/bin/activate
-    pip3 install -r requirements.txt
+    pip install --upgrade pip
+    pip install -r requirements.txt
     ./manage.sh reset_db
 elif [ "$command" == "start" ]; then
     if ps -p `cat logs/server_pid` > /dev/null; then
