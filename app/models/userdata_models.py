@@ -122,10 +122,10 @@ class CalendarEvent(db.Model):
     calendar_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
 
-    title = db.Column(db.String(64), nullable=False)
+    title = db.Column(db.String(64), nullable=True)
     event_location = db.Column(db.String(64), nullable=True)
-    start_in_utc_seconds = db.Column(db.Integer, nullable=False)
-    end_in_utc_seconds = db.Column(db.Integer, nullable=False)
+    start_in_utc_seconds = db.Column(db.Integer, nullable=True)
+    end_in_utc_seconds = db.Column(db.Integer, nullable=True)
 
     @staticmethod
     def userdata_post_handler(user_id, calendar_data_dict):
