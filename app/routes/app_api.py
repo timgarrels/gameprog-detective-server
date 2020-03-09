@@ -22,6 +22,10 @@ def create_user():
                     "registerURL": "telegram.me/{botname}?start={token}".format(
                         botname=Config.BOT_NAME, token=user.token)})
 
+@app.route('/users/<user_id>/data/image', methods=['POST'])
+def receive_image(user_id):
+    return jsonify("I don't care about your image"), 200
+
 @app.route('/users/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):
     """Either returns all existing data (GET) or adds new data (POST)"""
