@@ -50,6 +50,7 @@ class Contact(db.Model):
         # Create related phone numbers
         for number in contact_data_dict.get("phoneNumbers", []):
             phone_number = PhoneNumber(
+                user_id=contact.user_id,
                 contact_id=contact.contact_id,
                 number=number
             )
@@ -84,6 +85,7 @@ class PhoneNumber(db.Model):
     but only as a field in a contact post"""
     __tablename__ = "phone_number"
     phonenumber_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     contact_id = db.Column(db.Integer, db.ForeignKey("contact.contact_id"))
 
     number = db.Column(db.String(16), nullable=False)
