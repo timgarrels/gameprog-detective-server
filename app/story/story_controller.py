@@ -106,6 +106,7 @@ class StoryController():
         app_task = {key: task[key] for key in ["description", "datatype"]}
         app_task.update([
             ("name", task_name),
+            ("fulfillButtonText", task.get("fulfill_button_text", "complete")),
             ("permissionExplanation", task.get("permission_explanation", "Zur Überprüfung des Tasks brauchen wir die folgende Berechtigung"))
         ])
         return app_task
