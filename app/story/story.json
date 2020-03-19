@@ -156,7 +156,6 @@
         "interview_caretaker": {
             "description": "Gehe zwischen 6:00 und 23:00 zum Hauptbahnhof, um den Hausmeister zu befragen",
             "datatype": "location",
-            "fulfill_button_text": "befragen und Bericht abschicken",
             "permission_explanation": "Um zu prüfen, dass du tatsächlich am Hauptbahnhof bist, benötigt die App Zugriff auf deinen Standort",
             "incomplete_message": [
                 "Ich habe noch keinen Bericht erhalten..."
@@ -166,7 +165,6 @@
         "investigate_cameras": {
             "description": "Gehe zu Gleis 7 und mache ein Foto von den Kameras",
             "datatype": "picture",
-            "fulfill_button_text": "Foto schicken",
             "permission_explanation": "Um ein Foto zu machen, benötigt die App zurgriff auf deine Kamera",
             "incomplete_message": [
                 "Ich habe noch kein Foto erhalten"
@@ -176,7 +174,6 @@
         "make_analyst_appointment": {
             "description": "Mache einen Termin mit dem Cyber-Analysten aus",
             "datatype": "calendar",
-            "fulfill_button_text": "Termin ausmachen",
             "permission_explanation": "Um einen passenden Temin zu finden, benötigt die App Zugriff auf deinen Kalender",
             "incomplete_message": [
                 "Ich sehe noch keinen neuen Termin in ihrem Kalender..."
@@ -186,7 +183,6 @@
         "talk_to_analyst": {
             "description": "Gehe zwischen 9:00 und 18:00 zum Cyber-Analysten am HPI",
             "datatype": "location",
-            "fulfill_button_text": "mit dem Analystem reden",
             "permission_explanation": "Um zu prüfen, dass du am HPI bist, benötigt die App Zugriff auf deinen Standort",
             "incomplete_message": [
                 "Mein Analyst hat mir noch nicht über ein Gespräch mit Ihnen berichtet...",
@@ -197,7 +193,6 @@
         "arrest_suspect": {
             "description": "Sei um 16:00 bei der Dianastraße 16, um die verdächtige Person zu verhaften",
             "datatype": "location",
-            "fulfill_button_text": "Ausschau halten...",
             "incomplete_message": [
                 "Sie sollten mittlerweile gelernt haben, dass sie mich nicht anlügen können",
                 "Ich hoffe, Sie sind sich bewusst, dass sie damit ihre Position gefährden"
@@ -207,7 +202,6 @@
         "observe_suspect": {
             "description": "Warte zwischen 20:00 und 1:00 für mindestens 10 minuten beim Pub á la Pub und beobachte das Geschehen",
             "datatype": "wait",
-            "fulfill_button_text": "Beobachten abschließen",
             "incomplete_message": [
                 "Sie haben noch nicht genug beobachtet!"
             ],
