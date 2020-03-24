@@ -45,14 +45,8 @@ source .venv/bin/activate
 - Use `./manage.sh start` to start the server
 - For more commands use `./manage.sh help`
 
-## Arbeitsetappen
-Um die ersten Schritte für unser Projekt zu machen implementieren wir den Handshake App -> Server -> Bot -> Server um den neuen User auf dem Server zu registrieren und die App Daten mit dem Telegramaccount assoziieren zu können. 
-![TOP0](/docs/top0.jpeg)
-Anschließend möchten wir bereits einen Geschichtsprototypen haben: Der Bot soll eine lineare Geschichte erzählen können, die mithilfe von Buttons gesteuert werden kann. Diese Geschichte soll hardgecoded personalisiert werden können. Diese Personalisierung soll durch die erste Abhörfunktion der App realisiert werden: Das Stehlen von Kontakdaten. Des Weiteren soll die Apps entdeckte Clues speichern und anzeigen zu können.
-![TOP1](/docs/top1.jpeg)
-
 ## FAQ
-- *Warum benutzen wir Telegram und simulieren die Quellenkommunikation nicht auch in der App?*  
+- *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
 Da Telegram das Hauptkommunikationsmittel am HPI ist, hoffen wir durch das Integrieren dieser Plattform die Grenzen zwischen dem Programm und echten Personen zu verwischen (indem der Botaccount zwischen echten Kontakten auftaucht, die Nachrichten von echten Menschen und die des Bots in einer Push-Notification stehen, usw.). Außerdem spart uns diese Entscheidung die Arbeit an einem Chatprogramm, welche für einen Prototypen nicht notwendig ist.
 - *Warum heißt der Bot "AndyAbbot"?  
 Weil Telegram Bots auf "bot" enden müssen, und wir einen möglichst menschlichen Eindruck vermitteln wollen, um eine höhere Bindung aufzubauen. "Andy" ist einfach ein häufiger Name und außerdem eine Alliteration
