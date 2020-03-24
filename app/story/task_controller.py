@@ -3,7 +3,7 @@ import app.story.story as story_code
 from app import db
 from app.firebase_interaction import FirebaseInteraction
 from app.models.game_models import TaskAssignment
-from app.models.utility import get_user
+from app.models.game_models import User
 from app.story.story import tasks
 
 
@@ -43,7 +43,7 @@ def task_name_to_dict_for_app(task_name):
 
 def get_incomplete_tasks(user_id):
     """Returns a list of incomplete tasks of a certain user"""
-    user = get_user(user_id)
+    user = User.get_user(user_id)
     return [task.task_name for task in user.task_assigments if not task.finished]
 
 def task_validation_method(task_name):

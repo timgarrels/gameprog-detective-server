@@ -2,11 +2,11 @@
 import re
 
 import app.story.story as story_code
-import personalizer
-import task_controller
+import app.story.personalizer as personalizer
+import app.story.task_controller as task_controller
 from app import db
 from app.models.exceptions import DatabaseError
-from app.models.utility import get_user
+from app.models.game_models import User
 from app.story.exceptions import StoryPointInvalid, UserReplyInvalid
 from app.story.story import story, story_points, tasks
 
@@ -24,7 +24,7 @@ class StoryController():
     @staticmethod
     def get_current_story_point(user_id):
         """Returns the current story point for a given user"""
-        user = get_user(user_id)
+        user = User.get_user(user_id)
         if not user.current_story_point:
             raise DatabaseError(f"user {user_id} has no set story point")
 
@@ -37,7 +37,7 @@ class StoryController():
             raise StoryPointInvalid(f"story point {story_point_name} does not exist")
         if reset_tasks:
             task_controller.reset_tasks(user_id)
-        user = get_user(user_id)
+        user = User.get_user(user_id)
         user.current_story_point = story_point_name
         db.session.add(user)
         db.session.commit()
