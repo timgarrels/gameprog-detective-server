@@ -4,7 +4,7 @@ Ein Projekt im Rahmen des Game Programming Seminars am HPI im Wintersemester 201
 Dieses Readme beschreibt das gesamte Projekt und enthält außerdem die Beschreibung und Installationsanleitung der Serverkomponente (siehe 'Server').  
 Dieses Repo enthält einerseits den Code der Serverkomponente (siehe 'Server') und außerdem das [Wiki](https://github.com/EatingBacon/gameprog-detective-server/wiki) unseres Projekts.
 
-## Introduction
+## Einführung
 Im Rahmen dieses Seminars soll anhand von Spielprototypen demonstriert werden, wie Technologien missbraucht werden können. Wir versuchen in diesem Prototypen weitreichende Berechtigungen auf dem Smartphone des Spielers zu erlangen, um die gespielte Krimigeschichte adaptiv auf den Spieler anzupassen. Außerdem möchten wir die Grenze zwischen dem Spiel und der Realität des Spielers verwischen. Letztendlich möchten wir genug emotionale Bindung des Spielers erzeugen, um ihn zu Aktionen im echten Leben zu bewegen, wie z.B. Besuchen von (ungewöhnlichen) Orten, Aufstehen zu ungewöhnlichen Zeiten, das freiwillige Liefern von weitern Bild/Ton/Standortdaten.
 
 ## Storyline
@@ -45,6 +45,22 @@ source .venv/bin/activate
 - Use `./manage.sh install` to install and setup the server
 - Use `./manage.sh start` to start the server
 - For more commands use `./manage.sh help`
+
+#### Architektur-Überblick
+Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet verschiedene API-Endpunkte (`/app/routes`). Außerdem wird eine Datenbank verwaltet. Deren ORM wird in `/app/models` implementiert. Der Story-Inhalt und der Story-verwaltende Code liegt unter `/app/story`.  
+Diese Komponente wird hauptsächlich über das `manage.sh`-Script bedient:
+```
+Usage: ./manage.sh [command]
+
+Available commands:
+./manage.sh install - Install and Setup Server
+./manage.sh start - Start new Server instance
+./manage.sh kill - Kill running Server instance
+./manage.sh restart - Kill running Server instance and start a new one
+./manage.sh reset_db - Remove old database and initialize a new one
+./manage.sh log - Show Server log
+./manage.sh help - Display this text
+```
 
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
