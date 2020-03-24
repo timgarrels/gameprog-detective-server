@@ -14,6 +14,7 @@ from app.models.userdata_models import Contact, spydatatypes
 from app.models.personalization_model import Personalization
 from app.models.utility import db_entry_to_dict, db_single_element_query
 from app.story.story_controller import StoryController
+from app.story.task_controller import reset_tasks
 from app.telegram_highjack.hacked_client import HackedClient
 from app.firebase_interaction import FirebaseInteraction
 
@@ -105,7 +106,7 @@ def reset_user(user_id):
                 db.session.delete(user_personalization)
             db.session.commit()
 
-            StoryController.reset_tasks(user.user_id)
+            reset_tasks(user.user_id)
 
             return jsonify("User was reset"), 200
         else:

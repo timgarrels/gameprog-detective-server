@@ -1,6 +1,9 @@
 """Lookup Table for functions and placeholders referenced in story.json"""
 import random
 from datetime import time, timedelta
+import json
+
+from config import Config
 from app.models.game_models import User
 from app.models.userdata_models import Contact
 from app.models.utility import db_single_element_query
@@ -43,3 +46,10 @@ placeholder_getters = {
     "cyber_analyst": get_random_contact,
     "suspect": get_random_contact,
 }
+
+story = None
+with open(Config.STORY_FILE, "r") as story_file:
+    story = json.loads(story_file.read())
+
+story_points = story["story_points"]
+tasks = story["tasks"]

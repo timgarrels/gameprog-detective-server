@@ -1,6 +1,9 @@
 import random
 import string
 
+from exceptions import UserNotFoundError, UserNotRegisteredError
+from game_models import User
+
 def create_token():
     """Returns a random 64-len string"""
     alphabet = []
@@ -44,3 +47,13 @@ def db_single_element_query(table, arg_dict, element_name):
         raise ValueError("No such {}".format(element_name))
 
     return element
+
+def get_user(user_id):
+    """returns the user DB entry for a user id"""
+    user = User.query.get(user_id)
+    if not user:
+        raise UserNotFoundError(f"user id {user_id} not in database")
+    if not user.handle:
+        raise UserNotRegisteredError(f"user {user_id} has not registered yet")
+
+    return user
