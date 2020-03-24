@@ -16,7 +16,7 @@ Der Spieler übernimmt die Rolle eines frisch beförderten Kommissars. Er erhäl
 ## Softwarekomponenten
 Die Software besteht aus 3 Hauptkomponenten, der datensammelnden App (im Folgenden "App" genannt), dem Chatbot (im Folgenden "Bot" genannt) und dem orchestrierendem Server (im Folgenden "Server" genannt).
 
-![First Architecture Draft](/docs/basic_architecture.jpeg)
+![Game Architecture](/docs/gameprog_architecture.png)
 
 ### App
 Diese App ist der Hauptdatensammler des Spiels. Da wir über die Telegram-API nur an sehr begrenzte Daten kommen, versuchen wir mit dieser App an Berechtigungen auf dem Smartphone des Spielers zu erlangen. Die aus solchen Berechtigungen resultierenden Daten können wir dann über das Internet teilen und anhand dieser Daten das Verhalten des Bots anpassen.  
