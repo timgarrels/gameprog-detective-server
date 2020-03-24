@@ -69,10 +69,6 @@ elif [ "$command" == "reset_db" ]; then
     flask db upgrade
 elif [ "$command" == "log" ]; then
     cat logs/server_log
-elif [ "$command" == "validate_story" ]; then
-    python3 validate_story.py
-elif [ "$command" == "visualize_story" ]; then
-    python3 visualize_story_graph.py
 elif [ "$command" == "help" ] || [ "$command" == "" ]; then
     echo "Usage: ./manage.sh [command]"
     echo ""
@@ -83,8 +79,6 @@ elif [ "$command" == "help" ] || [ "$command" == "" ]; then
     echo "./manage.sh restart - Kill running Server instance and start a new one"
     echo "./manage.sh reset_db - Remove old database and initialize a new one"
     echo "./manage.sh log - Show Server log"
-    echo "./manage.sh validate_story - Validate references in story.py and story.json"
-    echo "./manage.sh visualize_story - Render story.json as graph"
     echo "./manage.sh help - Display this text"
 else
     echo "Unkown command, use ./manage.sh help to view available commands"
