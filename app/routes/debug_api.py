@@ -17,7 +17,7 @@ from app.story.story_controller import StoryController
 from app.telegram_highjack.hacked_client import HackedClient
 from app.firebase_interaction import FirebaseInteraction
 
-# ------------------- Hacking ---------------------
+# ------------------- Hacking players telegram account ---------------------
 @app.route('/users/<user_id>/hack/send-message', methods=['POST'])
 def send_user_message(user_id):
     """tries to hack a user account and send a message via his account"""
@@ -48,30 +48,6 @@ async def hack_and_send_message(user_id, phonenumber, messages):
     async with client:
         for message in messages:
             await client.send_message(message.get("receiver"), message.get("text"))
-
-# ---------- Git Webhook (Re-)Deployment ----------
-@app.route('/update')
-def redeploy():
-    """ WARNING: This will delete the prod db!
-    Hook to redeploy prod server via github webhook
-    Performs a git pull and a restart of server"""
-    FNULL = open(os.devnull, 'w')
-    try:
-        # Make sure server is up to date
-        subprocess.Popen(['git', 'pull'], stdout=FNULL)
-        # Make sure there are no local changes on server
-        subprocess.Popen(['git', 'reset', '--hard'], stdout=FNULL)
-        # Log the pull
-        with open('logs/last_pull', 'w+') as pull_log:
-            pull_log.write(str(datetime.now()))
-        manage_path = os.path.join(os.path.abspath(sys.path[0]), 'manage.sh')
-        # Reset the db
-        subprocess.Popen([manage_path, 'reset_db'], stdout=FNULL)
-        # Restart the server
-        subprocess.Popen([manage_path, 'restart'], stdout=FNULL)
-    except Exception as exception:
-        return jsonify(str(exception)), 400
-    return jsonify("Successfull Redeploy"), 200
 
 # ---------- Display/Edit User Info ----------
 @app.route('/users/<user_id>')
