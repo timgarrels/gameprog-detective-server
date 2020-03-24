@@ -7,26 +7,25 @@ Dieses Readme beschreibt das gesamte Projekt und enthält außerdem die Beschrei
 Im Rahmen dieses Seminars soll anhand von Spielprototypen demonstriert werden, wie Technologien missbraucht werden können. Wir versuchen in diesem Prototypen weitreichende Berechtigungen auf dem Smartphone des Spielers zu erlangen, um die gespielte Krimigeschichte adaptiv auf den Spieler anzupassen. Außerdem möchten wir die Grenze zwischen dem Spiel und der Realität des Spielers verwischen. Letztendlich möchten wir genug emotionale Bindung des Spielers erzeugen, um ihn zu Aktionen im echten Leben zu bewegen, wie z.B. Besuchen von (ungewöhnlichen) Orten, Aufstehen zu ungewöhnlichen Zeiten, das freiwillige Liefern von weitern Bild/Ton/Standortdaten.
 
 ## Storyline
-Der Spieler nimmt die Rolle eines Kriminaldetektivs ein. Er ermittelt in einem Mordfall. Er verfügt eine Software, die ihm verschiedene menschliche Quellen vermittelt. Mit diesen Quellen kommuniziert er über ein Chatprogramm. Er kann Fragen stellen, Antworten geben und muss Aktionen unternehmen um einerseits seinen Fall zu lösen, andererseits aber auch die Sicherheit der Quelle selbst und das Vertrauen der Quelle in ihn zu wahren.
+Der Spieler übernimmt die Rolle eines frisch beförderten Kommissars. Er erhält von seinem Vorgesetzten Hauptkommissar Anweisungen. Diese erfüllt er mithilfe der App, um sich in der Story voranzuspielen.
 
 ## Requirements
 - Ein Smartphone (Minimale Android Version 23)
 - Eine Telegram-Account
 
 ## Softwarekomponenten
-Die Software besteht aus 3 Hauptkomponenten, der quellenvermittelnden App (im Folgenden "App" genannt), dem quellensimulierenden Chatbot (im Folgenden "Bot" genannt) und dem orchestrierendem Server (im Folgenden "Server" genannt).
+Die Software besteht aus 3 Hauptkomponenten, der datensammelnden App (im Folgenden "App" genannt), dem Chatbot (im Folgenden "Bot" genannt) und dem orchestrierendem Server (im Folgenden "Server" genannt).
 
 ![First Architecture Draft](/docs/basic_architecture.jpeg)
 
 ### App
 Diese App ist der Hauptdatensammler des Spiels. Da wir über die Telegram-API nur an sehr begrenzte Daten kommen, versuchen wir mit dieser App an Berechtigungen auf dem Smartphone des Spielers zu erlangen. Die aus solchen Berechtigungen resultierenden Daten können wir dann über das Internet teilen und anhand dieser Daten das Verhalten des Bots anpassen.  
 Die App muss vom Spieler heruntergeladen werden, um den Telegram-Chat mit dem Bot zu starten (dabei wird ein Schlüssel übermittelt, damit die gesammelten Daten der App mit einem Telegram-User korreliert werden können). 
-Außerdem planen wir, über die App den "Sicherheitsstatus" und das "Vertrauenslevel" der Quelle anzuzeigen.
 
 [Link zum Repo der App](https://github.com/ADimeo/gameprog-detective-app)
 
 ### Bot
-Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über ihn wird die (adaptive) Spielgeschichte erzählt und die Aufgaben der Quelle an den Spieler kommuniziert.
+Der Telegram-Bot simuliert die Kommunikation des Hauptkommissars mit dem Spieler. Über ihn wird die (adaptive) Spielgeschichte erzählt und die Aufgaben des Hauptkommissars an den Spieler kommuniziert.
 
 [Link zum Repo des Bots](https://github.com/EatingBacon/gameprog-detective-bot)
 
@@ -34,6 +33,7 @@ Der Telegram-Bot simuliert die Kommunikation der Quelle mit dem Spieler. Über i
 Der Server bietet sowohl für die App als auch für den Bot die notwendigen API Endpunkte. Er erhält Daten von der App und speichert und analysiert diese. Er liefert dem Bot die Story, bereits personalisiert für den jeweiligen User. Dafür verwaltet der Server sowohl die Grundstory als auch die Userdaten (persönliche Daten und story-relevante Daten wie aktuellen Spielstand).
 
 Der Source-Code und Dokumentation des Servers ist in diesem Repo zu finden.
+
 #### Install and Start
 It is recommended to use a virtual environment
 ``` bash
