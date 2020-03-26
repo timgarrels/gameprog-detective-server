@@ -106,29 +106,24 @@ def validate_references():
                "tasks": set(),
                }
 
-    existing_story_points = story["story_points"].keys()
-
+    existing_story_points = story_points.keys()
     referenced_story_points = []
     # Start
     referenced_story_points.append(story["start_point"])
-    # Actual story points
-    referenced_story_points.extend(story["story_points"].keys())
     # Path Destinations
-    for story_point in story["story_points"].keys():
-        destinations = story["story_points"][story_point]["paths"].values()
+    for story_point in story_points.values():
+        destinations = story_point["paths"].values()
         referenced_story_points.extend(destinations)
 
     for referenced_story_point in referenced_story_points:
         if referenced_story_point not in existing_story_points:
             missing["points"].add(referenced_story_point)
 
-    existing_tasks = story["tasks"].keys()
+    existing_tasks = tasks.keys()
     referenced_tasks = []
-    # Actual tasks
-    referenced_tasks.extend(story["tasks"].keys())
     # Tasks in story points
-    for story_point in story["story_points"].keys():
-        referenced_tasks.extend(tasks)
+    for story_point in story_points.values():
+        referenced_tasks.extend(story_point["tasks"])
 
     for referenced_task in referenced_tasks:
         if referenced_task not in existing_tasks:
@@ -149,7 +144,7 @@ def validate_lookups():
     # Assert validation methods are in lookup table
     missing_validation_methods = set()
 
-    for task in story["tasks"].values():
+    for task in tasks.values():
         referenced_validation_method = task["validation_method"]
         if referenced_validation_method not in missing_validation_methods:
             try:
