@@ -36,34 +36,17 @@ Der Server bietet sowohl für die App als auch für den Bot die notwendigen API 
 Der Source-Code und Dokumentation des Servers ist in diesem Repo zu finden.
 
 #### Install and Start
-It is recommended to use a virtual environment
-``` bash
-virtualenv --python=python3 .venv
-source .venv/bin/activate
-```
-
-- Use `./manage.sh install` to install and setup the server
-- Use `./manage.sh start` to start the server
-- For more commands use `./manage.sh help`
+Voraussetzung ist ein installiertes python 3.8 package
+- `./manage.sh install` um den server zu installieren
+- `./manage.sh start` um den server zu starten
+- für weitere befehle `./manage.sh help` benutzen
 
 #### Architektur-Überblick
 Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet verschiedene API-Endpunkte (`/app/routes`). Außerdem wird eine Datenbank verwaltet. Deren ORM wird in `/app/models` implementiert. Der Story-Inhalt und der Story-verwaltende Code liegt unter `/app/story`.  
-Diese Komponente wird hauptsächlich über das `manage.sh`-Script bedient:
-```
-Usage: ./manage.sh [command]
-
-Available commands:
-./manage.sh install - Install and Setup Server
-./manage.sh start - Start new Server instance
-./manage.sh kill - Kill running Server instance
-./manage.sh restart - Kill running Server instance and start a new one
-./manage.sh reset_db - Remove old database and initialize a new one
-./manage.sh log - Show Server log
-./manage.sh help - Display this text
-```
 
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
 Da Telegram das Hauptkommunikationsmittel am HPI ist, hoffen wir durch das Integrieren dieser Plattform die Grenzen zwischen dem Programm und echten Personen zu verwischen (indem der Botaccount zwischen echten Kontakten auftaucht, die Nachrichten von echten Menschen und die des Bots in einer Push-Notification stehen, usw.). Außerdem spart uns diese Entscheidung die Arbeit an einem Chatprogramm, welche für einen Prototypen nicht notwendig ist.
 - *Warum heißt der Bot "AndyAbbot"?  
 Weil Telegram Bots auf "bot" enden müssen, und wir einen möglichst menschlichen Eindruck vermitteln wollen, um eine höhere Bindung aufzubauen. "Andy" ist einfach ein häufiger Name und außerdem eine Alliteration
+Wir haben uns später jedoch entschieden, den Namen des Bots zu "Kommisssar Rex" umzubenennen
