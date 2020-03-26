@@ -10,7 +10,7 @@ from app.story.story_controller import StoryController
 from app.models.utility import db_single_element_query, db_entry_to_dict
 
 
-@app.route('/users/<user_id>/story/current-story-point/description')
+@app.route('/users/<user_id>/story/current-story-point/description', methods=['GET'])
 def get_current_story_point_description(user_id):
     """Provides description for the users current story point"""
     try:
@@ -18,7 +18,7 @@ def get_current_story_point_description(user_id):
     except DatabaseError as e:
         return jsonify(f"Error: {e.args[0]}"), 400
 
-@app.route('/users/<user_id>/story/proceed')
+@app.route('/users/<user_id>/story/proceed', methods=['POST'])
 def try_to_proceed_story(user_id):
     """Tries to react to a provided reply by proceeding the story.
     Returns the new bot messages"""
@@ -40,7 +40,7 @@ def try_to_proceed_story(user_id):
         "newMessages": messages,
     }), 200
 
-@app.route('/users/<user_id>/story/current-story-point/user-replies')
+@app.route('/users/<user_id>/story/current-story-point/user-replies', methods=['GET'])
 def get_user_replies(user_id):
     """Return reply options for user dependent on the current story point"""
     try:
@@ -48,7 +48,7 @@ def get_user_replies(user_id):
     except DatabaseError as e:
         return jsonify(f"Error: {e.args[0]}"), 400
 
-@app.route('/users/register')
+@app.route('/users/register', methods=['PATCH'])
 def register_users_handle():
     """Registeres provided chat handle for a user.
     Last handshake action
