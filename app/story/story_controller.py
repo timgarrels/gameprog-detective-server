@@ -7,7 +7,7 @@ from app import db
 from app.models.exceptions import DatabaseError
 from app.models.game_models import User
 from app.story.exceptions import StoryPointInvalid, UserReplyInvalid
-from app.story.story import story_points, tasks
+from app.story.story import start_point, story_points, tasks
 
 
 class StoryController():
