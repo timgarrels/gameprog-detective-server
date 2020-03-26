@@ -18,19 +18,23 @@ if [ "$command" == "install" ]; then
     pip install --upgrade pip
     pip install -r requirements.txt
     ./manage.sh reset_db
-elif [ "$command" == "start" ]; then
+    exit
+fi
+
+# try to load venv
+if [ -d .venv ]; then
+    source .venv/bin/activate
+else
+    echo "please first install the server"
+    exit
+fi
+[ -f env_vars ] && source env_vars
+
+if [ "$command" == "start" ]; then
     if ps -p `cat logs/server_pid` > /dev/null; then
         echo "server already running"
         exit
     fi
-    if [ -d .venv ]; then
-        source .venv/bin/activate
-    else
-        echo "please first install the server"
-        exit
-    fi
-    # load environment variables form file if present
-    [ -f env_vars ] && source env_vars
     echo "Starting server..."
     echo "----------" >> logs/server_log
     flask run --host 0.0.0.0 --port 8080 >> logs/server_log 2>&1 &
@@ -48,12 +52,6 @@ elif [ "$command" == "restart" ]; then
     ./manage.sh kill
     ./manage.sh start
 elif [ "$command" == "reset_db" ]; then
-    if [ -d .venv ]; then
-        source .venv/bin/activate
-    else
-        echo "please first install the server"
-        exit
-    fi
     if [ -f app/app.db ]; then
         echo "Removing old db"
         rm app/app.db
@@ -63,16 +61,15 @@ elif [ "$command" == "reset_db" ]; then
         rm -rf migrations/
     fi
     echo "Create new db"
-    [ -f env_vars ] && source env_vars
     flask db init
     flask db migrate
     flask db upgrade
 elif [ "$command" == "log" ]; then
     cat logs/server_log
 elif [ "$command" == "validate_story" ]; then
-    python3 validate_story.py
+    python validate_story.py
 elif [ "$command" == "visualize_story" ]; then
-    python3 visualize_story_graph.py
+    python visualize_story_graph.py
 elif [ "$command" == "help" ] || [ "$command" == "" ]; then
     echo "Usage: ./manage.sh [command]"
     echo ""

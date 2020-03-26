@@ -1,6 +1,7 @@
 """Server ORM"""
 from app import db
 from app.models import utility
+from app.models.exceptions import UserNotFoundError, UserNotRegisteredError
 
 class User(db.Model):
     """Models a user that plays our game"""
@@ -17,6 +18,17 @@ class User(db.Model):
     contacts = db.relationship("Contact")
     locations = db.relationship("Location")
     calendar_events = db.relationship("CalendarEvent")
+
+    @staticmethod
+    def get_user(user_id):
+        """returns the user DB entry for a user id"""
+        user = User.query.get(user_id)
+        if not user:
+            raise UserNotFoundError(f"user id {user_id} not in database")
+        if not user.handle:
+            raise UserNotRegisteredError(f"user {user_id} has not registered yet")
+
+        return user
 
     def __repr__(self):
         return "<User {}.{}>".format(self.user_id, self.handle)
