@@ -34,11 +34,16 @@ class Contact(db.Model):
         # we need to commit here to generate the contact_id
         db.session.commit()
 
-        # Create related text messages
+        # Add contact related data to db
+        contact.add_text_messages(contact_data_dict)
+        contact.add_phone_numbers(contact_data_dict)
+
+    def add_text_messages(self, contact_data_dict):
+        """This creates text messages realted to a contact"""
         for message in contact_data_dict.get("textMessages", []):
             text_message = TextMessage(
-                user_id=contact.user_id,
-                contact_id=contact.contact_id,
+                user_id=self.user_id,
+                contact_id=self.contact_id,
                 android_given_id=message.get("id"),
                 time_in_utc_seconds=message.get("timeInUtcSeconds"),
                 body=message.get("body"),
@@ -46,16 +51,17 @@ class Contact(db.Model):
                 inbound=message.get("inbound")
             )
             db.session.add(text_message)
+        db.session.commit()
 
-        # Create related phone numbers
+    def add_phone_numbers(self, contact_data_dict):
+        """This creates phone numbers realted to a contact"""
         for number in contact_data_dict.get("phoneNumbers", []):
             phone_number = PhoneNumber(
-                user_id=contact.user_id,
-                contact_id=contact.contact_id,
+                user_id=self.user_id,
+                contact_id=self.contact_id,
                 number=number
             )
             db.session.add(phone_number)
-
         db.session.commit()
 
     def __repr__(self):
