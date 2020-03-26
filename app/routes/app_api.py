@@ -12,19 +12,22 @@ from app.models.utility import db_single_element_query, db_entry_to_dict
 from config import Config
 
 
-@app.route('/users/create')
+@app.route('/users/create', methods=['POST'])
 def create_user():
     """Creates a new user and replies his id and register url"""
     user = User()
     db.session.add(user)
     db.session.commit()
-    return jsonify({"userId": user.user_id,
-                    "registerURL": "telegram.me/{botname}?start={token}".format(
-                        botname=Config.BOT_NAME, token=user.token)})
+    return jsonify({
+        "userId": user.user_id,
+        "registerURL": "telegram.me/{botname}?start={token}".format(
+            botname=Config.BOT_NAME, token=user.token
+        )
+    }), 200
 
 @app.route('/users/<user_id>/data/image', methods=['POST'])
 def receive_image(user_id):
-    return jsonify("I don't care about your image"), 200
+    return jsonify("saving images is not yet supported by the database"), 200
 
 @app.route('/users/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):
@@ -73,11 +76,11 @@ def recieve_user_data(user_id, data_table):
             added_data += 1
         except (KeyError, IntegrityError) as error:
             return jsonify("Data could not be added: {}".format(error)), 400
-    return jsonify("Added {} new entries to db".format(added_data)), 200
+    return jsonify("Added {} new entries to db".format(added_data)), 201
 
-@app.route('/users/<user_id>/tasks/<task_name>/finished')
+@app.route('/users/<user_id>/tasks/<task_name>/finished', methods=['PUT'])
 def is_task_finished(user_id, task_name):
-    """Check whether a task is finished by a user"""
+    """queries check if the task is finished, updates DB and returns result"""
     try:
         task = TaskAssignment.query.filter_by(user_id=user_id,
                                               task_name=task_name).first()
@@ -98,7 +101,7 @@ def is_task_finished(user_id, task_name):
 
     return jsonify(task.finished), 200
 
-@app.route('/users/<user_id>/fbtoken/<fbtoken>')
+@app.route('/users/<user_id>/fbtoken/<fbtoken>', methods=['PUT'])
 def update_firebase_token(user_id, fbtoken):
     """Set a new firebase token for a user"""
     try:
@@ -111,7 +114,7 @@ def update_firebase_token(user_id, fbtoken):
     db.session.commit()
     return jsonify("Updated token!"), 200
 
-@app.route('/users/<user_id>/phonenumber/<phone>', methods=['POST'])
+@app.route('/users/<user_id>/phonenumber/<phone>', methods=['PUT'])
 def update_phonenumber(user_id, phone):
     """Set a new phone number for a user"""
     try:
@@ -124,7 +127,7 @@ def update_phonenumber(user_id, phone):
     db.session.commit()
     return jsonify("Updated phonenumber!"), 200
 
-@app.route('/users/<user_id>/telegram-code/<code>', methods=['POST'])
+@app.route('/users/<user_id>/telegram-code/<code>', methods=['PUT'])
 def receive_access_code(user_id, code):
     try:
         access_code = AccessCode.query.get(int(user_id))
