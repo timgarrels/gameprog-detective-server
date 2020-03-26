@@ -6,7 +6,7 @@ from app import app
 from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import spydatatypes, AccessCode
-from app.story.story_controller import StoryController
+from app.story.task_controller import task_validation_method
 from app.models.utility import db_single_element_query, db_entry_to_dict
 
 from config import Config
@@ -88,7 +88,7 @@ def is_task_finished(user_id, task_name):
         return jsonify("No such task!"), 400
 
     if not task.finished:
-        validation_method = StoryController.task_validation_method(task_name)
+        validation_method = task_validation_method(task_name)
         if not validation_method:
             return jsonify("No validation method found for {}".format(task_name)), 400
 

@@ -1,6 +1,7 @@
 import random
 import string
 
+
 def create_token():
     """Returns a random 64-len string"""
     alphabet = []
