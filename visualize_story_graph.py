@@ -34,7 +34,16 @@ def main():
         for reply, next_point in story["story_points"][story_point]["paths"].items():
             story_graph.edge(story_point, next_point, xlabel=reply)
 
-    story_graph.render(OUTPUT_FILE, format="pdf", view=True)
+    try:
+        story_graph.render(OUTPUT_FILE, format="pdf", view=True)
+        raise FileNotFoundError
+    except FileNotFoundError as e:
+        # xdg-open is used as default to open output file
+        # xdg-open might not be installed which will lead to system interpreting xdg-open as filename
+        if (str(e) == "[Errno 2] No such file or directory: 'xdg-open'"):
+            story_graph.render(OUTPUT_FILE, format="pdf", view=False)
+        else:
+            raise e
 
 if __name__ == "__main__":
     main()
