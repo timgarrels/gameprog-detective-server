@@ -6,7 +6,7 @@ from graphviz.backend import ExecutableNotFound
 
 from config import Config
 
-OUTPUT_FILE = "test.pdf"
+OUTPUT_FILE = "graphviz_story"
 
 
 def main():
@@ -36,12 +36,12 @@ def main():
 
     try:
         story_graph.render(OUTPUT_FILE, format="pdf", view=True)
-        raise FileNotFoundError
     except FileNotFoundError as e:
         # xdg-open is used as default to open output file
         # xdg-open might not be installed which will lead to system interpreting xdg-open as filename
         if (str(e) == "[Errno 2] No such file or directory: 'xdg-open'"):
             story_graph.render(OUTPUT_FILE, format="pdf", view=False)
+            print(f"Could not open the output file. Saving it to {OUTPUT_FILE}.pdf")
         else:
             raise e
 
