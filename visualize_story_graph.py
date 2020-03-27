@@ -2,8 +2,11 @@
 
 import json
 from graphviz import Digraph
+from graphviz.backend import ExecutableNotFound
 
 from config import Config
+
+OUTPUT_FILE = "test.pdf"
 
 
 def main():
@@ -31,8 +34,7 @@ def main():
         for reply, next_point in story["story_points"][story_point]["paths"].items():
             story_graph.edge(story_point, next_point, xlabel=reply)
 
-    story_graph.view()
-
+    story_graph.render(OUTPUT_FILE, format="pdf", view=True)
 
 if __name__ == "__main__":
     main()
