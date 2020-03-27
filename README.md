@@ -41,7 +41,7 @@ virtualenv --python=python3 .venv
 source .venv/bin/activate
 ```
 
-- Use `./manage.sh install` to install and setup the server
+- Use `sudo ./manage.sh install` to install and setup the server
 - Use `./manage.sh start` to start the server
 - For more commands use `./manage.sh help`
 
