@@ -17,6 +17,7 @@ if [ "$command" == "install" ]; then
     source .venv/bin/activate
     pip install --upgrade pip
     pip install -r requirements.txt
+    sudo apt install graphviz
     ./manage.sh reset_db
 elif [ "$command" == "start" ]; then
     if ps -p `cat logs/server_pid` > /dev/null; then
