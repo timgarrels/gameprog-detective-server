@@ -2,7 +2,6 @@
 
 import json
 from graphviz import Digraph
-from graphviz.backend import ExecutableNotFound
 
 from config import Config
 
