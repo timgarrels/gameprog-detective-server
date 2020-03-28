@@ -8,6 +8,7 @@ from app.models.exceptions import DatabaseError
 from app.models.game_models import User
 from app.story.exceptions import StoryPointInvalid, UserReplyInvalid
 from app.story.story import start_point, story_points, tasks
+from app.story import story as story_code
 
 
 class StoryController():
@@ -43,6 +44,10 @@ class StoryController():
         new_tasks = story_points[story_point_name].get("tasks", [])
         if new_tasks:
             task_controller.assign_tasks(user_id, new_tasks)
+
+        server_actions = story_points[story_point_name].get("actions", [])
+        for action in server_actions:
+            getattr(story_code, action, None)(user_id)
 
     @staticmethod
     def proceed_story(user_id, reply):

@@ -56,16 +56,15 @@ def validate_lookups():
     """Makes sure all task validation and placeholder methods referenced in story.json
     are implemented in story.py"""
 
-    # Assert validation methods are in lookup table
+    # Assert validation methods are defined
     missing_validation_methods = set()
 
     for task in tasks.values():
         referenced_validation_method = task["validation_method"]
-        if referenced_validation_method not in missing_validation_methods:
-            try:
-                getattr(story_code, referenced_validation_method)
-            except AttributeError:
-                missing_validation_methods.add(referenced_validation_method)
+        try:
+            getattr(story_code, referenced_validation_method)
+        except AttributeError:
+            missing_validation_methods.add(referenced_validation_method)
 
     if missing_validation_methods:
         raise KeyError(
@@ -74,7 +73,27 @@ def validate_lookups():
             )
         )
 
-    print("All validtion method lookups found!")
+    print("All validtion methods defined!")
+
+    # Assert server action methods are defined
+    missing_action_methods = set()
+
+    for story_point in story_points.values():
+        referenced_action_methods = story_point.get("actions", [])
+        for referenced_action_method in referenced_action_methods:
+            try:
+                getattr(story_code, referenced_action_method)
+            except AttributeError:
+                missing_action_methods.add(referenced_action_method)
+    
+    if missing_action_methods:
+        raise KeyError(
+            "There are referenced, but unkown server acion methods: {}".format(
+                missing_action_methods
+            )
+        )
+    
+    print("All server action methods defined!")
 
     # Assert placeholder methods are in lookup table
     missing_placeholders = set()
