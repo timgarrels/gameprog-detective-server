@@ -9,8 +9,7 @@
             ],
             "paths": {
                 "Ich bin bereit!": "first_contract"
-            },
-            "tasks": []
+            }
         },
         "first_contract": {
             "description": [
@@ -21,8 +20,7 @@
             ],
             "paths": {
                 "Ich werde ihn fragen": "interview"
-            },
-            "tasks": []
+            }
         },
         "interview": {
             "description": [
@@ -31,9 +29,7 @@
             "paths": {
                 "Ich habe ihnen den Bericht geschickt": "cameras"
             },
-            "tasks": [
-                "interview_caretaker"
-            ]
+            "tasks": ["interview_caretaker"]
         },
         "cameras": {
             "description": [
@@ -43,9 +39,7 @@
             "paths": {
                 "Ich habe Ihnen ein Foto geschickt": "hacking"
             },
-            "tasks": [
-                "investigate_cameras"
-            ]
+            "tasks": ["investigate_cameras"]
         },
         "hacking": {
             "description": [
@@ -56,9 +50,7 @@
             "paths": {
                 "Ist erledigt!": "analysis_evaluation"
             },
-            "tasks": [
-                "make_analyst_appointment"
-            ]
+            "tasks": ["make_analyst_appointment"]
         },
         "analysis_evaluation": {
             "description": [
@@ -69,9 +61,7 @@
             "paths": {
                 "Ich habe mit ihm geredet": "analysis_result"
             },
-            "tasks": [
-                "talk_to_analyst"
-            ]
+            "tasks": ["talk_to_analyst"]
         },
         "analysis_result": {
             "description": [
@@ -79,8 +69,7 @@
             ],
             "paths": {
                 "Wir konnten die Person identifizieren, die die Schlüssel gestohlen hat. Es handelt sich um {suspect}.": "observe_or_arrest"
-            },
-            "tasks": []
+            }
         },
         "observe_or_arrest": {
             "description": [
@@ -90,8 +79,7 @@
             "paths": {
                 "Sofort verhaften, der Fall ist klar wir sollten keine Zeit verlieren": "arrest_suspect",
                 "Wir sollten nicht voreilig handeln, ich würde sie gerne noch etwas beobachten": "observe_suspect"
-            },
-            "tasks": []
+            }
         },
         "arrest_suspect": {
             "description": [
@@ -110,8 +98,7 @@
             ],
             "paths": {
                 "Es ist noch niemand gekommen... aber - ich kann durchs Fenster gucken und - ich sehe eine Leiche!": "end"
-            },
-            "tasks": []
+            }
         },
         "observe_suspect": {
             "description": [
@@ -130,8 +117,7 @@
             ],
             "paths": {
                 "Oh mein Gott! Es gab Schüsse!": "observe_suspect.suspect_dead"
-            },
-            "tasks": []
+            }
         },
         "observe_suspect.suspect_dead": {
             "description": [
@@ -139,16 +125,14 @@
             ],
             "paths": {
                 "Ja... {suspect} ist tot.": "end"
-            },
-            "tasks": []
+            }
         },
         "end": {
             "description": [
                 "Hergott! Es sieht so aus als wäre das nur ein kleiner Fisch in einem viel gößeren Fall gewesen...",
                 "Kommissar {user_name}, es sieht so aus als haben wir es hier mit der Mafia zu tun - ich kann ihnen nur Glück wünschen..."
             ],
-            "paths": {},
-            "tasks": []
+            "paths": {}
         }
     },
 

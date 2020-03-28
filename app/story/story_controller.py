@@ -40,7 +40,7 @@ class StoryController():
         db.session.add(user)
         db.session.commit()
 
-        new_tasks = story_points[story_point_name]["tasks"]
+        new_tasks = story_points[story_point_name].get("tasks", [])
         if new_tasks:
             task_controller.assign_tasks(user_id, new_tasks)
 

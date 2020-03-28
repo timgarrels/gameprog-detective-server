@@ -37,7 +37,7 @@ def validate_references():
     referenced_tasks = []
     # referenced tasks in story points
     for story_point in story_points.values():
-        referenced_tasks.extend(story_point["tasks"])
+        referenced_tasks.extend(story_point.get("tasks", []))
 
     # find referenced, but undefined tasks
     for referenced_task in referenced_tasks:
