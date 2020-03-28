@@ -11,7 +11,7 @@ Im Rahmen dieses Seminars soll anhand von Spielprototypen demonstriert werden, w
 Der Spieler übernimmt die Rolle eines frisch beförderten Kommissars. Er erhält von seinem Vorgesetzten Hauptkommissar Anweisungen. Diese erfüllt er mithilfe der App, um sich in der Story voranzuspielen.
 
 ## Requirements
-- Ein Smartphone (Minimale Android Version 23)
+- Ein Smartphone (Minimale Android API Version 23)
 - Eine Telegram-Account
 
 ## Softwarekomponenten
@@ -36,11 +36,12 @@ Der Server bietet sowohl für die App als auch für den Bot die notwendigen API 
 Der Source-Code und Dokumentation des Servers ist in diesem Repo zu finden.
 
 #### Install and Start
-Voraussetzung ist ein installiertes python 3.8 package
-- `sudo ./manage.sh install` um den server zu installieren
-  (sudo only necessary to install graphviz to display story graph)
-- `./manage.sh start` um den server zu starten
-- für weitere befehle `./manage.sh help` benutzen
+Voraussetzung ist ein Linux System mit installiertem python 3.8
+1. `./manage.sh install` um den server zu installieren
+1. `./manage.sh start` um den server zu starten
+1. für weitere befehle `./manage.sh help` benutzen
+1. siehe Bot repo für Installation und Start des Bots
+1. nach Start von Server und Bot kann die App und damit das Spiel gestartet werden
 
 #### Architektur-Überblick
 Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet verschiedene API-Endpunkte (`/app/routes`). Außerdem wird eine Datenbank verwaltet. Deren ORM wird in `/app/models` implementiert. Der Story-Inhalt und der Story-verwaltende Code liegt unter `/app/story`.  
