@@ -85,7 +85,7 @@ elif [ "$command" == "reset_db" ]; then
     flask db migrate
     flask db upgrade
 elif [ "$command" == "log" ]; then
-    cat logs/server_log
+    less -r +F logs/server_log
 elif [ "$command" == "validate_story" ]; then
     python validate_story.py
 elif [ "$command" == "visualize_story" ]; then
