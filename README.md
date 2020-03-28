@@ -46,6 +46,17 @@ Voraussetzung ist ein Linux System mit installiertem python 3.8
 #### Architektur-Überblick
 Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet verschiedene API-Endpunkte (`/app/routes`). Außerdem wird eine Datenbank verwaltet. Deren ORM wird in `/app/models` implementiert. Der Story-Inhalt und der Story-verwaltende Code liegt unter `/app/story`.  
 
+#### Nutzung ohne App
+Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu installieren, haben wir ein Postman package erstellt, welches die App immitiert mit dem sich das Spiel durchspielen lässt (die Spielerfahrung leidet darunter jedoch deutlich). Die Nutzung ist wie folgt:
+1. `detective-game-no-app-walkthrough.json` mit Postman importieren
+1. `create user` senden, um einen neuen Nutzer zu erstellen
+1. die URL aus der response öffnen, um den Chat mit Kommissar Rex zu starten
+1. `send mocked contacts` senden, um das Stehlen von Kontakten für "Personalisierung" zu mocken
+1. Die Story spielen und Tasks wie folgt erfüllen:
+   - die request für den entsprechenden task senden
+   - `TASK FINISHED request check` senden, um die serverseitige Validierung anzufragen
+1. Es finden sich außerdem weitere debug methoden im package, die das Testen weiter erleichtern
+
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
 Da Telegram das Hauptkommunikationsmittel am HPI ist, hoffen wir durch das Integrieren dieser Plattform die Grenzen zwischen dem Programm und echten Personen zu verwischen (indem der Botaccount zwischen echten Kontakten auftaucht, die Nachrichten von echten Menschen und die des Bots in einer Push-Notification stehen, usw.). Außerdem spart uns diese Entscheidung die Arbeit an einem Chatprogramm, welche für einen Prototypen nicht notwendig ist.
