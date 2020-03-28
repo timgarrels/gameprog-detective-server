@@ -18,7 +18,7 @@ from app.story.task_controller import reset_tasks
 from app.telegram_highjack.hacked_client import HackedClient
 from app.firebase_interaction import FirebaseInteraction
 
-# ------------------- Hacking ---------------------
+# ------------------- Hacking players telegram account ---------------------
 @app.route('/users/<user_id>/hack/send-message', methods=['POST'])
 def send_user_message(user_id):
     """tries to hack a user account and send a message via his account"""
@@ -50,32 +50,8 @@ async def hack_and_send_message(user_id, phonenumber, messages):
         for message in messages:
             await client.send_message(message.get("receiver"), message.get("text"))
 
-# ---------- Git Webhook (Re-)Deployment ----------
-@app.route('/update')
-def redeploy():
-    """ WARNING: This will delete the prod db!
-    Hook to redeploy prod server via github webhook
-    Performs a git pull and a restart of server"""
-    FNULL = open(os.devnull, 'w')
-    try:
-        # Make sure server is up to date
-        subprocess.Popen(['git', 'pull'], stdout=FNULL)
-        # Make sure there are no local changes on server
-        subprocess.Popen(['git', 'reset', '--hard'], stdout=FNULL)
-        # Log the pull
-        with open('logs/last_pull', 'w+') as pull_log:
-            pull_log.write(str(datetime.now()))
-        manage_path = os.path.join(os.path.abspath(sys.path[0]), 'manage.sh')
-        # Reset the db
-        subprocess.Popen([manage_path, 'reset_db'], stdout=FNULL)
-        # Restart the server
-        subprocess.Popen([manage_path, 'restart'], stdout=FNULL)
-    except Exception as exception:
-        return jsonify(str(exception)), 400
-    return jsonify("Successfull Redeploy"), 200
-
 # ---------- Display/Edit User Info ----------
-@app.route('/users/<user_id>')
+@app.route('/users/<user_id>', methods=['GET'])
 def get_user(user_id):
     """Returns a user dict"""
     try:
@@ -88,7 +64,7 @@ def get_user(user_id):
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
 
-@app.route('/users/<user_id>/reset')
+@app.route('/users/<user_id>/reset', methods=['PATCH'])
 def reset_user(user_id):
     """Resets users to 'before register' state"""
     try:
@@ -116,13 +92,13 @@ def reset_user(user_id):
         # Invalid ID Type
         return jsonify("Invalid userId"), 400
 
-@app.route('/users/<user_id>/story/current-story-point', methods=['GET', 'POST'])
+@app.route('/users/<user_id>/story/current-story-point', methods=['GET', 'PUT'])
 def current_story_point(user_id):
     """Returns a users current story point"""
     try:
         if request.method == 'GET':
             return jsonify(StoryController.get_current_story_point(user_id))
-        if request.method == 'POST':
+        if request.method == 'PUT':
             new_story_point = request.args.get("set")
             if not new_story_point:
                 return jsonify("please provide a valid story point in the set parameter")
@@ -134,7 +110,7 @@ def current_story_point(user_id):
     except DatabaseError as e:
         return jsonify(e.args[0])
 
-@app.route('/users/<user_id>/story/reset')
+@app.route('/users/<user_id>/story/reset', methods=['PUT'])
 def reset_story(user_id):
     try:
         StoryController.start_story(user_id)
@@ -142,7 +118,7 @@ def reset_story(user_id):
         return jsonify(e.args[0])
     return jsonify("story was reset")
 
-@app.route('/users')
+@app.route('/users', methods=['GET'])
 def all_users():
     """Lists all created users"""
     if request.args.get("handle"):
@@ -154,12 +130,12 @@ def all_users():
 
     return jsonify([db_entry_to_dict(user, camel_case=True) for user in User.query.all()]), 200
 
-@app.route('/datatypes')
+@app.route('/datatypes', methods=['GET'])
 def all_available_datatypes():
     """Returns all datatypes that are associated with a db table"""
     return jsonify(spydatatypes.keys()), 200
 
-@app.route('/users/<user_id>/tasks')
+@app.route('/users/<user_id>/tasks', methods=['GET'])
 def fetch_user_tasks(user_id):
     """Return all tasks (finished and unfinished) assigned to a user"""
     try:
