@@ -17,6 +17,12 @@ if [ "$command" == "install" ]; then
     source .venv/bin/activate
     pip install --upgrade pip
     pip install -r requirements.txt
+    sudo apt install graphviz || sudo pacman -S graphviz || (
+        echo "==========================================================================="
+        echo "ERROR: graphviz could not be installed on your machine"
+        echo "       if you want to use visualize_story, please install graphviz manually"
+        echo "==========================================================================="
+    )
     ./manage.sh reset_db
     exit
 fi

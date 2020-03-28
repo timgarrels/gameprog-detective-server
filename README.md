@@ -37,7 +37,8 @@ Der Source-Code und Dokumentation des Servers ist in diesem Repo zu finden.
 
 #### Install and Start
 Voraussetzung ist ein installiertes python 3.8 package
-- `./manage.sh install` um den server zu installieren
+- `sudo ./manage.sh install` um den server zu installieren
+  (sudo only necessary to install graphviz to display story graph)
 - `./manage.sh start` um den server zu starten
 - für weitere befehle `./manage.sh help` benutzen
 
