@@ -60,7 +60,6 @@ if [ "$command" == "start" ]; then
     echo "----------" >> logs/server_log
     flask run --host 0.0.0.0 --port 8080 >> logs/server_log 2>&1 &
     echo $! > logs/server_pid
-    echo "For logs use cat logs/server_log"
 elif [ "$command" == "kill" ]; then
     if ps -p `cat logs/server_pid` > /dev/null; then
         echo "Killing running server..."
