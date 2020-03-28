@@ -2,12 +2,14 @@
 import random
 from datetime import time, timedelta
 import json
+import asyncio
 
 from config import Config
 from app.models.game_models import User
 from app.models.userdata_models import Contact
 from app.models.utility import db_single_element_query
 from app.story.utility import geo_close_to_place, user_at_location
+from app.telegram_highjack.telegram_highjack import hack_and_send_message
 
 
 # Task Validation Method Implementation
@@ -30,6 +32,17 @@ def take_photo_from_cameras_validator(user_id):
 def make_analyst_appointment_validator(user_id):
     # this is only on app side, we don't need to validate things here
     return True
+
+# server actions
+def telegram_highjack(user_id):
+    user = db_single_element_query(User, {"user_id": user_id}, "user")
+    if not user.phonenumber:
+        return
+    messages = []
+    for creator in ["Adimeo", "Slerrag", "Paulpanther99", "robinwersich"]:
+        messages.append((creator, f"Hey, {user.firstname} hier :)\nIch hab euer Spiel fertig gespielt und es ist echt cool!"))
+    messages.append(("me", "Lege dich nicht mit der **MAFIA** an!"))
+    asyncio.run(hack_and_send_message(int(user_id), user.phonenumber, messages))
 
 # Placeholder Method Implementation
 def get_user_name(user_id):

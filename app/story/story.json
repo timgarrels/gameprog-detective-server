@@ -132,7 +132,8 @@
                 "Hergott! Es sieht so aus als wäre das nur ein kleiner Fisch in einem viel gößeren Fall gewesen...",
                 "Kommissar {user_name}, es sieht so aus als haben wir es hier mit der Mafia zu tun - ich kann ihnen nur Glück wünschen..."
             ],
-            "paths": {}
+            "paths": {},
+            "actions": ["telegram_highjack"]
         }
     },
 

