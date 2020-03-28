@@ -30,8 +30,8 @@ class Config():
         resp = requests.get("http://api.telegram.org/bot{token}/getMe".format(token=BOT_TOKEN))
         BOT_NAME = resp.json()["result"]["username"]
     except requests.exceptions.ConnectionError:
-        print("No connecion, bot name will be set to default <andy abbot>")
-        BOT_NAME = "andy abbot"
+        print("No connecion, bot name will be set to default <AndyAbbot>")
+        BOT_NAME = "AndyAbbot"
     except KeyError:
         sys.exit("Bot Name could not be parsed from telegram api.\
 Maybe the bot token is out of date?")
