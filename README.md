@@ -37,10 +37,10 @@ Der Source-Code und Dokumentation des Servers ist in diesem Repo zu finden.
 
 #### Install and Start
 Voraussetzung ist ein Linux System mit installiertem python 3.8
-1. `./manage.sh install` um den server zu installieren
-1. `./manage.sh start` um den server zu starten
-1. für weitere befehle `./manage.sh help` benutzen
-1. siehe Bot repo für Installation und Start des Bots
+1. `./manage.sh install` um den Server zu installieren
+1. `./manage.sh start` um den Server zu starten
+1. für weitere Befehle `./manage.sh help` benutzen
+1. siehe [Bot Repo](https://github.com/EatingBacon/gameprog-detective-bot) für Installation und Start des Bots
 1. nach Start von Server und Bot kann die App und damit das Spiel gestartet werden
 
 #### Architektur-Überblick
@@ -53,9 +53,9 @@ Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu instal
 1. die URL aus der response öffnen, um den Chat mit Kommissar Rex zu starten
 1. `send mocked contacts` senden, um das Stehlen von Kontakten für "Personalisierung" zu mocken
 1. Die Story spielen und Tasks wie folgt erfüllen:
-   - die request für den entsprechenden task senden
+   - die Request für den entsprechenden Task senden
    - `TASK FINISHED request check` senden, um die serverseitige Validierung anzufragen
-1. Es finden sich außerdem weitere debug methoden im package, die das Testen weiter erleichtern
+1. Es finden sich außerdem weitere Debug-Methoden im Package, die das Testen weiter erleichtern
 
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
