@@ -2,7 +2,7 @@
 Ein Projekt im Rahmen des Game Programming Seminars am HPI im Wintersemester 2019.
 
 Dieses Readme beschreibt das gesamte Projekt und enthält außerdem die Beschreibung und Installationsanleitung der Serverkomponente (siehe [Server](https://github.com/EatingBacon/gameprog-detective-server#server)).  
-Dieses Repo enthält einerseits den Code der Serverkomponente (siehe 'Server') und außerdem das [Wiki](https://github.com/EatingBacon/gameprog-detective-server/wiki) unseres Projekts.
+Dieses Repo enthält einerseits den Code der Serverkomponente und außerdem die Dokumentation (das [Wiki](https://github.com/EatingBacon/gameprog-detective-server/wiki)) unseres Projekts.
 
 ## Einführung
 Im Rahmen dieses Seminars soll anhand von Spielprototypen demonstriert werden, wie Technologien missbraucht werden können. Wir versuchen in diesem Prototypen weitreichende Berechtigungen auf dem Smartphone des Spielers zu erlangen, um die gespielte Krimigeschichte adaptiv auf den Spieler anzupassen. Außerdem möchten wir die Grenze zwischen dem Spiel und der Realität des Spielers verwischen. Letztendlich möchten wir genug emotionale Bindung des Spielers erzeugen, um ihn zu Aktionen im echten Leben zu bewegen, wie z.B. Besuchen von (ungewöhnlichen) Orten, Aufstehen zu ungewöhnlichen Zeiten, das freiwillige Liefern von weitern Bild/Ton/Standortdaten.
