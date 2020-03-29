@@ -47,14 +47,14 @@ Voraussetzung ist ein Linux System mit installiertem python 3.8
 Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet verschiedene API-Endpunkte (`/app/routes`). Außerdem wird eine Datenbank verwaltet. Deren ORM wird in `/app/models` implementiert. Der Story-Inhalt und der Story-verwaltende Code liegt unter `/app/story`.  
 
 #### Nutzung ohne App
-Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu installieren, haben wir ein Postman package erstellt, welches die App immitiert mit dem sich das Spiel durchspielen lässt (die Spielerfahrung leidet darunter jedoch deutlich). Die Nutzung ist wie folgt:
+Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu installieren, haben wir ein Postman package erstellt. Dieses immitiert die App. Damit lässt sich das Spiel auch ohne Appnutzung durchspielen (die Spielerfahrung leidet darunter jedoch deutlich). Die Nutzung ist wie folgt:
 1. `detective-game-no-app-walkthrough.json` mit Postman importieren
 1. `create user` senden, um einen neuen Nutzer zu erstellen
 1. die URL aus der response öffnen, um den Chat mit Kommissar Rex zu starten
 1. `send mocked contacts` senden, um das Stehlen von Kontakten für "Personalisierung" zu mocken
-1. Die Story spielen und Tasks wie folgt erfüllen:
-   - die Request für den entsprechenden Task senden
-   - `TASK FINISHED request check` senden, um die serverseitige Validierung anzufragen
+1. Die Story spielen und neue Tasks in den folgenden **zwei**  Schritten erfüllen:
+   1. die Request für den entsprechenden Task senden
+   2. `TASK FINISHED request check` senden, um die serverseitige Validierung anzufragen
 1. Es finden sich außerdem weitere Debug-Methoden im Package, die das Testen weiter erleichtern
 
 ## FAQ
