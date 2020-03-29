@@ -23,8 +23,10 @@ class Config():
     try:
         FIREBASE_URL = os.environ[FIREBASE_URL_ENV_VAR]
     except KeyError:
-        print("You did not set {}".format(FIREBASE_URL_ENV_VAR))
-        sys.exit()
+        FIREBASE_URL = None
+    if not FIREBASE_URL:
+        print("You did not set {}".format(FIREBASE_URL_ENV_VAR), file=sys.stderr)
+        print("Communication with the app will not work!", file=sys.stderr)
 
     try:
         resp = requests.get("http://api.telegram.org/bot{token}/getMe".format(token=BOT_TOKEN))
