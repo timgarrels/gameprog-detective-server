@@ -27,7 +27,8 @@ def create_user():
 
 @app.route('/users/<user_id>/data/image', methods=['POST'])
 def receive_image(user_id):
-    return jsonify("saving images is not yet supported by the database"), 200
+    return jsonify("images are ignored for now - " +
+    "calling '.../finished' for this task will automatically complete the task"), 200
 
 @app.route('/users/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):
