@@ -48,6 +48,13 @@ Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet ver
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
 Da Telegram das Hauptkommunikationsmittel am HPI ist, hoffen wir durch das Integrieren dieser Plattform die Grenzen zwischen dem Programm und echten Personen zu verwischen (indem der Botaccount zwischen echten Kontakten auftaucht, die Nachrichten von echten Menschen und die des Bots in einer Push-Notification stehen, usw.). Außerdem spart uns diese Entscheidung die Arbeit an einem Chatprogramm, welche für einen Prototypen nicht notwendig ist.
-- *Warum heißt der Bot "AndyAbbot"?  
+- *Warum heißt der Bot "AndyAbbot?"  
 Weil Telegram Bots auf "bot" enden müssen, und wir einen möglichst menschlichen Eindruck vermitteln wollen, um eine höhere Bindung aufzubauen. "Andy" ist einfach ein häufiger Name und außerdem eine Alliteration
 Wir haben uns später jedoch entschieden, den Namen des Bots zu "Kommisssar Rex" umzubenennen
+- *Welche Annahmen wurden für den Prototypen getroffen?*  
+Folgende Annahmen wurden getroffen, damit wir an der Kernidee des Spiels arbeiten konnten. Die Annahmen haben einfache, aber zeitintensive Lösungen, die zur Demonstration des Game Konzeptes nicht notwendig sind:
+
+1. Der Spieler nutzt bereits Telegram (dies ist ein HPI Seminar und der IM-Dienst des HPIs (unter Studierenden)  ist Telegram) (Würde durch eigenen Chatclient in der App gelöst werden)
+2. Die App wird während des Spiels nicht vom Spieler deinstalliert (Würde durch "uninstall" Nachricht der App an den Server gelöst werden)
+3. Die App hat eine ununterbrochene Internetverbindung (Würde durch interne Queue in der App und regelmäßige Checks seitens des Servers gelöst werden)
+
