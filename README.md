@@ -7,7 +7,10 @@ Dieses Repo enthält einerseits den Code der Serverkomponente (siehe 'Server') u
 ## Einführung
 Im Rahmen dieses Seminars soll anhand von Spielprototypen demonstriert werden, wie Technologien missbraucht werden können. Wir versuchen in diesem Prototypen weitreichende Berechtigungen auf dem Smartphone des Spielers zu erlangen, um die gespielte Krimigeschichte adaptiv auf den Spieler anzupassen. Außerdem möchten wir die Grenze zwischen dem Spiel und der Realität des Spielers verwischen. Letztendlich möchten wir genug emotionale Bindung des Spielers erzeugen, um ihn zu Aktionen im echten Leben zu bewegen, wie z.B. Besuchen von (ungewöhnlichen) Orten, Aufstehen zu ungewöhnlichen Zeiten, das freiwillige Liefern von weitern Bild/Ton/Standortdaten.
 
-## Storyline
+## Ergebnis
+Im Rahmen des Seminars haben wir ein Framework für text-basierte Spiele entworfen. Das Framework benötigt `story.json` und `story.py` seitens des Framework-Nutzers. Anschließend kann das so spezifizierte Spiel über Telegram mithilfe eines Chatbots gespielt werden. Dabei bietet unser Framework vor allem an, sich Zugriff auf das Telefon des Nutzers zu verschaffen, damit an dessen Daten zu kommen und mit diesen Daten die Story zu personalisieren. Durch Nutzen des Chatbots schaffen wir außerdem eine "Erzählerfigur", mit der der Spieler direkt in Kontakt treten kann.
+
+## Beispiel-Storyline
 Der Spieler übernimmt die Rolle eines frisch beförderten Kommissars. Er erhält von seinem Vorgesetzten Hauptkommissar Anweisungen. Diese erfüllt er mithilfe der App, um sich in der Story voranzuspielen.
 
 ## Requirements
