@@ -11,23 +11,23 @@ from app.story.utility import geo_close_to_place, user_at_location
 
 
 # Task Validation Method Implementation
-def go_to_hbf_validator(user_id):
-    return user_at_location(user_id, "potsdam_hbf", timedelta(minutes=5), False, time(hour=6), time(hour=23))
+def go_to_hbf_validator(user_id, task_start_timestamp):
+    return user_at_location(user_id, "potsdam_hbf", task_start_timestamp, (time(hour=6), time(hour=23)))
 
-def go_to_hpi_validator(user_id):
-    return user_at_location(user_id, "hpi", timedelta(minutes=5), False)
+def go_to_hpi_validator(user_id, task_start_timestamp):
+    return user_at_location(user_id, "hpi", task_start_timestamp, (time(hour=9), time(hour=18)))
 
-def arrest_suspect_validator(user_id):
-    return user_at_location(user_id, "suspect_home", timedelta(minutes=2), False, time(hour=15, minute=55), time(hour=16, minute=5))
+def arrest_suspect_validator(user_id, task_start_timestamp):
+    return user_at_location(user_id, "suspect_home", task_start_timestamp, (time(hour=15, minute=55), time(hour=16, minute=5)))
 
-def observe_suspect_validator(user_id):
-    return user_at_location(user_id, "pub_a_la_pub", timedelta(minutes=10), False, time(hour=21), time(hour=1))
+def observe_suspect_validator(user_id, task_start_timestamp):
+    return user_at_location(user_id, "pub_a_la_pub", task_start_timestamp, (time(hour=20), time(hour=1)), wait_time=timedelta(minutes=10))
 
-def take_photo_from_cameras_validator(user_id):
+def take_photo_from_cameras_validator(user_id, task_start_timestamp):
     # sending the foto is mainly for atmosphere, so checking if it is actually valid has low pritority for now
     return True
 
-def make_analyst_appointment_validator(user_id):
+def make_analyst_appointment_validator(user_id, task_start_timestamp):
     # this is only on app side, we don't need to validate things here
     return True
 

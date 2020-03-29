@@ -6,7 +6,7 @@ from app import app
 from app import db
 from app.models.game_models import User, TaskAssignment
 from app.models.userdata_models import spydatatypes, AccessCode
-from app.story.task_controller import task_validation_method
+from app.story.task_controller import task_assignment_complete
 from app.models.utility import db_single_element_query, db_entry_to_dict
 
 from config import Config
@@ -79,7 +79,7 @@ def recieve_user_data(user_id, data_table):
     return jsonify("Added {} new entries to db".format(added_data)), 201
 
 @app.route('/users/<user_id>/tasks/<task_name>/finished', methods=['PUT'])
-def is_task_finished(user_id, task_name):
+def check_task_finished(user_id, task_name):
     """queries check if the task is finished, updates DB and returns result"""
     try:
         task = TaskAssignment.query.filter_by(user_id=user_id,
@@ -91,11 +91,7 @@ def is_task_finished(user_id, task_name):
         return jsonify("No such task!"), 400
 
     if not task.finished:
-        validation_method = task_validation_method(task_name)
-        if not validation_method:
-            return jsonify("No validation method found for {}".format(task_name)), 400
-
-        task.finished = validation_method(user_id)
+        task.finished = task_assignment_complete(task, user_id)
         db.session.add(task)
         db.session.commit()
 

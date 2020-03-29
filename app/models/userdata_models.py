@@ -122,7 +122,7 @@ class Location(db.Model):
         db.session.commit()
 
     def __repr__(self):
-        return "<Location {}.{} {}/{}>".format(self.location_id, self.time_in_utc_seconds, self.latitude, self.longitude)
+        return "<Location {}: {} {}/{}>".format(self.location_id, self.time_in_utc_seconds, self.latitude, self.longitude)
 
 class CalendarEvent(db.Model):
     """Models a calendar entry stolen from a user"""

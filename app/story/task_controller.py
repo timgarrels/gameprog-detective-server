@@ -1,4 +1,6 @@
 """Method collection to handle task assignment and completion"""
+from datetime import datetime
+
 import app.story.story as story_code
 from app import db
 from app.firebase_interaction import FirebaseInteraction
@@ -15,6 +17,7 @@ def assign_tasks(user_id, task_names):
         task_assignment = TaskAssignment()
         task_assignment.user_id = user_id
         task_assignment.task_name = task_name
+        task_assignment.start_time_in_utc_seconds = datetime.now().timestamp()
         db.session.add(task_assignment)
         db.session.commit()
 
@@ -46,7 +49,8 @@ def get_incomplete_tasks(user_id):
     user = User.get_user(user_id)
     return [task.task_name for task in user.task_assigments if not task.finished]
 
-def task_validation_method(task_name):
+def task_assignment_complete(task_assigment: TaskAssignment, user_id):
     """Gets the python validation method symbol for a sepcific task"""
-    validation_method = tasks[task_name]["validation_method"]
-    return getattr(story_code, validation_method, None)
+    validation_method_name = tasks[task_assigment.task_name]["validation_method"]
+    validation_method = getattr(story_code, validation_method_name, None)
+    return validation_method(user_id, task_assigment.start_time_in_utc_seconds)
