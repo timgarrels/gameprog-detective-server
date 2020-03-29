@@ -48,7 +48,7 @@ Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet ver
 
 #### Nutzung ohne App
 Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu installieren, haben wir ein Postman package erstellt. Dieses immitiert die App. Damit lässt sich das Spiel auch ohne Appnutzung durchspielen (die Spielerfahrung leidet darunter jedoch deutlich). Die Nutzung ist wie folgt:
-1. `detective-game-no-app-walkthrough.json` mit Postman importieren
+1. `detective-game-no-app-walkthrough.json` mit Postman **Desktop** importieren
 1. `create user` senden, um einen neuen Nutzer zu erstellen
 1. die URL aus der response öffnen, um den Chat mit Kommissar Rex zu starten
 1. `send mocked contacts` senden, um das Stehlen von Kontakten für "Personalisierung" zu mocken
