@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1bddb808-7557-4043-9ca7-394834c2ecf6",
+		"_postman_id": "a927b6e1-6660-41bc-8d69-83d11a2926ae",
 		"name": "detective-game-walkthrough",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -113,7 +113,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "[{\n\t\"timeInUtcSeconds\": {{$timestamp}},\n\t\"latitude\": 52.391514,\n\t\"longitude\": 13.065583\n}]",
+					"raw": "[{\n\t\"timeInUtcSeconds\": 1609498800,\n\t\"latitude\": 52.391514,\n\t\"longitude\": 13.065583\n}]",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -272,7 +272,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "[{\n\t\"timeInUtcSeconds\": {{$timestamp}},\n\t\"latitude\": 52.394258,\n\t\"longitude\": 13.133816\n}]",
+					"raw": "[{\n\t\"timeInUtcSeconds\": 1609502400,\n\t\"latitude\": 52.394258,\n\t\"longitude\": 13.133816\n}]",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -323,7 +323,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "[{\n\t\"timeInUtcSeconds\": {{$timestamp}},\n\t\"latitude\": 52.387854,\n\t\"longitude\": 13.126121\n}]",
+					"raw": "[{\n\t\"timeInUtcSeconds\": 1609513200,\n\t\"latitude\": 52.387854,\n\t\"longitude\": 13.126121\n}]",
 					"options": {
 						"raw": {
 							"language": "json"
