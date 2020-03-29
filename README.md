@@ -49,6 +49,8 @@ Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet ver
 #### Nutzung ohne App
 Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu installieren, haben wir ein Postman package erstellt. Dieses immitiert die App. Damit lässt sich das Spiel auch ohne Appnutzung durchspielen (die Spielerfahrung leidet darunter jedoch deutlich). Die Nutzung ist wie folgt:
 1. `detective-game-no-app-walkthrough.json` mit Postman **Desktop** importieren
+1. `remote_testing_environment.json` bzw. `localhost_testing_environment.json` importieren
+   (je nachdem, ob der Server auf einer anderen Rechner läuft oder nicht)
 1. `create user` senden, um einen neuen Nutzer zu erstellen
 1. die URL aus der response öffnen, um den Chat mit Kommissar Rex zu starten
 1. `send mocked contacts` senden, um das Stehlen von Kontakten für "Personalisierung" zu mocken
@@ -56,6 +58,18 @@ Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu instal
    1. die Request für den entsprechenden Task senden
    2. `TASK FINISHED request check` senden, um die serverseitige Validierung anzufragen
 1. Es finden sich außerdem weitere Debug-Methoden im Package, die das Testen weiter erleichtern
+
+#### Telegram Highjack
+Das Finale unseres Spiels ist der Highjack des Telgram Accounts des Nutzers durch die "Mafia".
+Es gibt 3 Möglichkeiten, diesen zu erleben:
+- Das Spiel ganz normal mit der App und allen Berechtigungen spielen (empfohlen für das beste Spielerlebnis)
+- Die App installieren, aber persönliche Daten mithilfe des Postman packages mocken (empfohlen für mehr Privatsphäre)
+  - Damit der Highjack funktioniert müssen die eigene Telefonnummer in den Einstellunge eingetragen und SMS Berechtigungen aktiviert werden
+- Das Spiel komplett ohne die App spielen (nicht empfohlen)
+  - persönliche Daten wie gehabt mit dem Postman package mocken
+  - über `send phonenumber` die eigene Telefonnummer an den Server schicken
+  - wenn das Ende der Story erreicht wird, wird ein Login-Versuch unternummen und ein Access Code von Telegram generiert.
+    Dieser muss dann über `send Telegram access code` geschickt werden
 
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
