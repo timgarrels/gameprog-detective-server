@@ -1,7 +1,7 @@
 # Detective Game
 Ein Projekt im Rahmen des Game Programming Seminars am HPI im Wintersemester 2019.
 
-Dieses Readme beschreibt das gesamte Projekt und enthält außerdem die Beschreibung und Installationsanleitung der Serverkomponente (siehe 'Server').  
+Dieses Readme beschreibt das gesamte Projekt und enthält außerdem die Beschreibung und Installationsanleitung der Serverkomponente (siehe [Server](https://github.com/EatingBacon/gameprog-detective-server#server)).  
 Dieses Repo enthält einerseits den Code der Serverkomponente (siehe 'Server') und außerdem das [Wiki](https://github.com/EatingBacon/gameprog-detective-server/wiki) unseres Projekts.
 
 ## Einführung
