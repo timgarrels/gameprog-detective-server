@@ -13,6 +13,9 @@ class FirebaseInteraction():
     def execute_call(relative_url, user_id, data=None):
         """Builds the full and token-authorized firebase url
         and posts teh given data object as json"""
+        if not Config.FIREBASE_URL:
+            return None
+
         try:
             user = db_single_element_query(User, {"user_id": user_id}, "user")
         except ValueError as e:
