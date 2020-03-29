@@ -59,7 +59,7 @@
                 "Gehen Sie doch so bald wie möglich zum HPI und besprechen die Ergebnisse"
             ],
             "paths": {
-                "Ich habe mit ihm geredet": "analysis_result"
+                "Wir haben die Ergebnisse soeben besprochen": "analysis_result"
             },
             "tasks": ["talk_to_analyst"]
         },
