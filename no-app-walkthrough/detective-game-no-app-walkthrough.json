@@ -52,7 +52,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "[{\n  \"displayNamePrimary\": \"Paul Methfessel\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"paul@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Tim Garrels\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"tim@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Antonio Dimeo\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"antonio@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Robin Wersich\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"robin@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n}]",
+					"raw": "[{\n  \"displayNamePrimary\": \"Paul Methfessel\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"paul@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Tim Garrels\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"tim@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Antonio Dimeo\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"antonio@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Robin Wersich\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"robin@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Joana Bergsieck\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"joana@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Jonas Kordt\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"jonas@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Clara Uktar\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"jonas@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Jakob Stigloher\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"jakob@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n},\n{\n  \"displayNamePrimary\": \"Ulrike Herwig\",\n  \"homeAddress\": \"HPI\",\n  \"email\": \"ulrike@gmail.com\",\n  \"organisation\": \"HPI\",\n  \"birthday\": \"01.01.2000\",\n  \"phoneNumbers\": [], \n  \"textMessages\": [] \n}]",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -569,6 +569,52 @@
 					]
 				},
 				"description": "reset only the story (and tasks), but not any other data for the user"
+			},
+			"response": []
+		},
+		{
+			"name": "send phonenumber",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{server_ip}}:8080/users/{{user_id}}/phonenumber/{{phonenumber}}",
+					"protocol": "http",
+					"host": [
+						"{{server_ip}}"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"{{user_id}}",
+						"phonenumber",
+						"{{phonenumber}}"
+					]
+				},
+				"description": "send your phonenumber in international format (+49...) to the server to enable the telegram highjack"
+			},
+			"response": []
+		},
+		{
+			"name": "send Telegram access code",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{server_ip}}:8080/users/{{user_id}}/telegram-code/{{telegram_code}}",
+					"protocol": "http",
+					"host": [
+						"{{server_ip}}"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"{{user_id}}",
+						"telegram-code",
+						"{{telegram_code}}"
+					]
+				},
+				"description": "the App would crawl your SMS and do this - if you don't use the app, you can do it manually here"
 			},
 			"response": []
 		}
