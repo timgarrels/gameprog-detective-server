@@ -12,7 +12,7 @@ Letztendlich möchten wir anhand des Spielprinzips (Interaktion durch Chat und G
 Im Rahmen des Seminars haben wir ein Framework für text-basierte Spiele entworfen. Das Framework benötigt `story.json` und `story.py` seitens des Framework-Nutzers. Anschließend kann das so spezifizierte Spiel über Telegram mithilfe eines Chatbots gespielt werden. Dabei bietet unser Framework vor allem an, sich Zugriff auf das Telefon des Nutzers zu verschaffen, damit an dessen Daten zu kommen und mit diesen Daten die Story zu personalisieren. Durch Nutzen des Chatbots schaffen wir außerdem eine "Erzählerfigur", mit der der Spieler direkt in Kontakt treten kann.
 
 ## Beispiel-Storyline
-Der Spieler übernimmt die Rolle eines frisch beförderten Kommissars. Er erhält von seinem Vorgesetzten Hauptkommissar Anweisungen. Diese erfüllt er mithilfe der App, um sich in der Story voranzuspielen.
+Der Spieler übernimmt die Rolle eines frisch beförderten Kommissars. Er erhält von seinem Vorgesetzten Hauptkommissar Anweisungen. Diese erfüllt er mithilfe der App, um sich in der Story voranzuspielen. (siehe [story.json](https://github.com/EatingBacon/gameprog-detective-server/blob/master/app/story/story.json))
 
 ## Requirements
 - Ein Smartphone (Minimale Android Version 23)
@@ -25,7 +25,7 @@ Die Software besteht aus 3 Hauptkomponenten, der datensammelnden App (im Folgend
 
 ### App
 Diese App ist der Hauptdatensammler des Spiels. Da wir über die Telegram-API nur an sehr begrenzte Daten kommen, versuchen wir mit dieser App an Berechtigungen auf dem Smartphone des Spielers zu erlangen. Die aus solchen Berechtigungen resultierenden Daten können wir dann über das Internet teilen und anhand dieser Daten das Verhalten des Bots anpassen.  
-Die App muss vom Spieler heruntergeladen werden, um den Telegram-Chat mit dem Bot zu starten (dabei wird ein Schlüssel übermittelt, damit die gesammelten Daten der App mit einem Telegram-User korreliert werden können). 
+Die App muss vom Spieler heruntergeladen werden, um den Telegram-Chat mit dem Bot zu starten (dabei wird ein Schlüssel übermittelt, damit die gesammelten Daten der App mit einem Telegram-User korreliert werden können). Für eine Liste der möglichen spionierten User Daten siehe [Spied User Data](https://github.com/EatingBacon/gameprog-detective-server/wiki/Spied-User-Data)
 
 [Link zum Repo der App](https://github.com/ADimeo/gameprog-detective-app)
 
