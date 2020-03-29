@@ -17,8 +17,7 @@ class StoryController():
     @staticmethod
     def start_story(user_id):
         """sets the users current story point to the story start"""
-        task_controller.reset_tasks(user_id)
-        StoryController.set_current_story_point(user_id, start_point)
+        StoryController.set_current_story_point(user_id, start_point, reset_tasks=True)
 
     @staticmethod
     def get_current_story_point(user_id):
