@@ -166,8 +166,15 @@
 				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "raw",
-					"raw": "",
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"contentType": "",
+							"type": "file",
+							"src": []
+						}
+					],
 					"options": {
 						"raw": {
 							"language": "json"
