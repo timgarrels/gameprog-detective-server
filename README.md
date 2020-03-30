@@ -74,7 +74,7 @@ Bevor die Story endet (dies kann auch manuell mit der debug request `set current
 - Der Sicherheitsmodus deaktiviert werden
 - Die Telefonnummer in den Einstellungen der App gesetzt werden (auch falls schon die richtige Nummer da steht muss sie noch einmal bestätigt werden)
 - SMS Berechtigungen müssen aktiviert sein
-**Disclaimer**: Unser Highjack richtet keinen Schaden an, trotzdem sollte die "gehackte" session danach in den Telegram Einstellungen entfernt werden
+**Disclaimer**: Unser Highjack richtet keinen Schaden an, trotzdem sollte die "gehackte" Session danach in den Telegram Einstellungen entfernt werden
 
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
