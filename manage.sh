@@ -37,7 +37,7 @@ fi
 [ -f env_vars ] && source env_vars
 
 if [ "$command" == "start" ]; then
-    if ps -p `cat logs/server_pid` > /dev/null; then
+    if [ -f logs/server_pid ] && ps -p `cat logs/server_pid` > /dev/null; then
         echo "server already running"
         exit
     fi
@@ -47,7 +47,7 @@ if [ "$command" == "start" ]; then
     echo $! > logs/server_pid
     echo "For logs use cat logs/server_log"
 elif [ "$command" == "kill" ]; then
-    if ps -p `cat logs/server_pid` > /dev/null; then
+    if [ -f logs/server_pid ] && ps -p `cat logs/server_pid` > /dev/null; then
         echo "Killing running server..."
         kill -9 `cat logs/server_pid`
     else
