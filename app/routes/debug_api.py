@@ -1,9 +1,13 @@
 """API Endpoints to get and reset data"""
 import subprocess
 import os, sys
+from pathlib import Path
+import shutil
 from datetime import datetime
 from flask import request, jsonify
 from sqlalchemy.exc import InvalidRequestError
+
+from config import Config
 
 from app import app, db
 from app.story.exceptions import StoryPointInvalid
@@ -48,6 +52,11 @@ def reset_user(user_id):
             db.session.commit()
 
             reset_tasks(user.user_id)
+
+            # remove sent images
+            image_folder = Path(Config.IMAGE_UPLOAD_FOLDER, f"user_{user.user_id}")
+            if image_folder.exists() and image_folder.is_dir():
+                shutil.rmtree(image_folder)
 
             return jsonify("User was reset"), 200
         else:
