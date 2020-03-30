@@ -91,7 +91,7 @@ def recieve_user_data(user_id, data_table):
             added_data += 1
         except (KeyError, IntegrityError) as error:
             return jsonify("Data could not be added: {}".format(error)), 400
-    return jsonify("Added {} new entries to db".format(added_data)), 201
+    return jsonify("Added {} new entries to db".format(added_data)), 200
 
 @app.route('/users/<user_id>/tasks/<task_name>/finished', methods=['GET'])
 def check_task_finished(user_id, task_name):
