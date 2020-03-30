@@ -70,10 +70,10 @@ Um das Spiel trotzdem spielen zu können, haben wir ein Postman package erstellt
 Das Finale unseres Spiels ist der Highjack des Telgram Accounts des Nutzers durch die "Mafia".
 Dies funktioniert offensichtlich nur, wenn der Sicherheitsmodus deaktiviert ist.
 Es reicht jedoch, den Sicherheitsmodus ausschließlich für den Highjack zu deaktivieren, sodass keine weiteren persönlichen Daten gesendet werden
-Bevor die Story endet (dies kann auch manuell mit der debug request `set current story point` und dem Parameter `end` hervorgerufen werden) müssen:
+Bevor die Story endet (dies kann auch manuell mit der debug request `set current story point` und dem Parameter `end` hervorgerufen werden) muss:
 - Der Sicherheitsmodus deaktiviert werden
 - Die Telefonnummer in den Einstellungen der App gesetzt werden (auch falls schon die richtige Nummer da steht muss sie noch einmal bestätigt werden)
-- SMS Berechtigungen müssen aktiviert sein
+- Die App SMS Berechtigungen haben
 **Disclaimer**: Unser Highjack richtet keinen Schaden an, trotzdem sollte die "gehackte" Session danach in den Telegram Einstellungen entfernt werden
 
 ## FAQ
