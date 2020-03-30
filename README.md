@@ -58,9 +58,9 @@ Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu instal
 1. `create user` senden, um einen neuen Nutzer zu erstellen
 1. die URL aus der response öffnen, um den Chat mit Kommissar Rex zu starten
 1. `send mocked contacts` senden, um das Stehlen von Kontakten für "Personalisierung" zu mocken
-1. Die Story spielen und neue Tasks in den folgenden **zwei**  Schritten erfüllen:
-   1. die Request für den entsprechenden Task senden (für den `take photo of cameras` task muss zuerst ein Bild ausgewählt werden)
-   2. `TASK FINISHED request check` senden, um die serverseitige Validierung anzufragen
+1. Die Story spielen und neue Tasks erfüllen, indem die entsprechende postman request geschickt wird
+   - die Tasks sind Story-chronologisch geordnet
+   - **Achtung!** - für den `take photo of cameras` task muss zuerst ein Bild in Postman ausgewählt werden
 1. Es finden sich außerdem weitere Debug-Methoden im Package, die das Testen weiter erleichtern
 
 #### Telegram Highjack
