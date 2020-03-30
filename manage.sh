@@ -10,6 +10,10 @@ if [ "$command" == "install" ]; then
         echo "Creating logs directory"
         mkdir -p logs
     fi
+    if [ ! -d image_upload ]; then
+        echo "Creating image_upload directory"
+        mkdir -p image_upload
+    fi
     if [ ! -d .venv ]; then
         echo "Creating virual environment"
         python3.8 -m venv .venv
@@ -72,14 +76,9 @@ elif [ "$command" == "restart" ]; then
     ./manage.sh kill
     ./manage.sh start
 elif [ "$command" == "reset_db" ]; then
-    if [ -f app/app.db ]; then
-        echo "Removing old db"
-        rm app/app.db
-    fi
-    if [ -d migrations/ ]; then
-        echo "Removing old migrations"
-        rm -rf migrations/
-    fi
+    [ -d app/image_upload ] && echo "Removing uploaded images" && rm -rf app/image_upload/*
+    [ -f app/app.db ] && echo "Removing old db" && rm app/app.db
+    [ -d migrations/ ] && echo "Removing old migrations" && rm -rf migrations/
     echo "Create new db"
     flask db init
     flask db migrate
