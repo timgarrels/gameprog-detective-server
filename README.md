@@ -64,7 +64,7 @@ Um das Spiel trotzdem spielen zu können, haben wir ein Postman package erstellt
    - die Aufgaben requests sind Story-chronologisch geordnet
    - **Achtung!** - für den `take photo of cameras` task muss zuerst ein Bild in Postman ausgewählt werden
    - alternativ kann auch jederzeit der Sicherheitsmodus deaktiviert und die Aufgabe mit der App erfüllt werden,
-     indem auf die Aufgabe getippt wird
+     indem erst die Daten produziert werden und dann auf die Aufgabe getippt wird
 
 #### Telegram Highjack
 Das Finale unseres Spiels ist der Highjack des Telgram Accounts des Nutzers durch die "Mafia".
