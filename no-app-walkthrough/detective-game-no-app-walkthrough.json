@@ -374,7 +374,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "[{\n\t\"timeInUtcSeconds\": {{$timestamp}},\n\t\"latitude\": 52.395616,\n\t\"longitude\": 13.056481\n}]",
+					"raw": "[{\n\t\"timeInUtcSeconds\": 1609531200,\n\t\"latitude\": 52.395616,\n\t\"longitude\": 13.056481\n},\n{\n\t\"timeInUtcSeconds\": 1609531500,\n\t\"latitude\": 52.395616,\n\t\"longitude\": 13.056481\n},\n{\n\t\"timeInUtcSeconds\": 1609531800,\n\t\"latitude\": 52.395616,\n\t\"longitude\": 13.056481\n}]",
 					"options": {
 						"raw": {
 							"language": "json"
