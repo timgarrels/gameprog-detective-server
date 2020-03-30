@@ -65,7 +65,12 @@ def user_at_location(
     :param lower_datetime_bound: only take gps data after this timestamp (UTC seconds) into account
     :param time_window_: time of day window in which the location visit must have happened
     :param wait_time: the time the user has to wait at place. None, if no wait required"""
-    relevant_locations = Location.query.filter_by(user_id=user_id).filter(Location.time_in_utc_seconds >= lower_datetime_bound).all()
+
+    relevant_locations = Location.query \
+        .filter_by(user_id=user_id) \
+        .filter(Location.time_in_utc_seconds >= lower_datetime_bound) \
+        .order_by(Location.time_in_utc_seconds) \
+        .all()
     
     waited_since = None
     for location in relevant_locations:

@@ -17,7 +17,7 @@ def assign_tasks(user_id, task_names):
         task_assignment = TaskAssignment()
         task_assignment.user_id = user_id
         task_assignment.task_name = task_name
-        task_assignment.start_time_in_utc_seconds = datetime.now().timestamp()
+        task_assignment.start_time_in_utc_seconds = int(datetime.now().timestamp())
         db.session.add(task_assignment)
         db.session.commit()
 
