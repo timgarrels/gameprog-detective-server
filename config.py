@@ -38,4 +38,7 @@ class Config():
         sys.exit("Bot Name could not be parsed from telegram api.\
 Maybe the bot token is out of date?")
 
+    IMAGE_UPLOAD_FOLDER = os.path.join(basedir, "app/image_upload")
+    ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png"}
+
     STORY_FILE = os.path.join(basedir, "app/story/story.json")

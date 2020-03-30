@@ -7,6 +7,9 @@ logs/
 # hacked sessions
 *.session
 
+# uploaded images
+app/image_upload
+
 # environment variables
 env_vars
 

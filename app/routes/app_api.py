@@ -1,6 +1,8 @@
 """API Endpoints used by the app"""
 from flask import jsonify, request
 from sqlalchemy.exc import IntegrityError
+import os
+import pathlib
 
 from app import app
 from app import db
@@ -27,8 +29,20 @@ def create_user():
 
 @app.route('/users/<user_id>/data/image', methods=['POST'])
 def receive_image(user_id):
-    return jsonify("images are ignored for now - " +
-    "calling '.../finished' for this task will automatically complete the task"), 200
+    if 'image' not in request.files:
+        return jsonify("no 'image' field found"), 400
+    image = request.files['image']
+    if image.filename == '':
+        return jsonify("no image was sent - did you choose one?")
+    extension = image.filename.split('.')[-1]
+    if extension not in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+        return jsonify("invalid file extension"), 400
+    user_folder = os.path.join(app.config["IMAGE_UPLOAD_FOLDER"], f"user_{user_id}")
+    pathlib.Path(user_folder).mkdir(parents=True, exist_ok=True)
+    filecount = len(os.listdir(user_folder))
+    filename = f"image_{filecount + 1}.{extension}"
+    image.save(os.path.join(user_folder, filename))
+    return jsonify("image saved successfully"), 200
 
 @app.route('/users/<user_id>/data/<data_type>', methods=['GET', 'POST'])
 def user_data_by_type(user_id, data_type):
