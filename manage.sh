@@ -17,13 +17,28 @@ if [ "$command" == "install" ]; then
     source .venv/bin/activate
     pip install --upgrade pip
     pip install -r requirements.txt
+    set_env=true
+    if [ -f env_vars ]; then
+        read -p "Firebase URL and bot token already set - reset them? (y/n): " reset_env
+        if [ $reset_env != "y" ]; then set_env=false; fi
+    fi
+    if $set_env; then
+        echo "==========================================================================="
+        read -p "Please enter the Firebase URL to communicate with the App: " fb_url
+        read -p "Please enter the token of your bot (received from the telegram bot father): " bot_token
+        echo "==========================================================================="
+        echo "export GP_FIREBASE_URL=$fb_url" > env_vars
+        echo "export GP_TELEGRAM_BOT_TOKEN=$bot_token" >> env_vars
+    fi
+    ./manage.sh reset_db
+    echo "==========================================================================="
+    echo "To use the visualize_story feature, we need to install graphviz:"
     sudo apt install graphviz || sudo pacman -S graphviz || (
         echo "==========================================================================="
         echo "ERROR: graphviz could not be installed on your machine"
         echo "       if you want to use visualize_story, please install graphviz manually"
         echo "==========================================================================="
     )
-    ./manage.sh reset_db
     exit
 fi
 
@@ -45,7 +60,6 @@ if [ "$command" == "start" ]; then
     echo "----------" >> logs/server_log
     flask run --host 0.0.0.0 --port 8080 >> logs/server_log 2>&1 &
     echo $! > logs/server_pid
-    echo "For logs use cat logs/server_log"
 elif [ "$command" == "kill" ]; then
     if [ -f logs/server_pid ] && ps -p `cat logs/server_pid` > /dev/null; then
         echo "Killing running server..."
@@ -71,7 +85,7 @@ elif [ "$command" == "reset_db" ]; then
     flask db migrate
     flask db upgrade
 elif [ "$command" == "log" ]; then
-    cat logs/server_log
+    less -r +F logs/server_log
 elif [ "$command" == "validate_story" ]; then
     python validate_story.py
 elif [ "$command" == "visualize_story" ]; then
