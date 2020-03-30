@@ -7,6 +7,7 @@ from app.models.game_models import User
 from app.models.userdata_models import Location
 from app.models import utility
 
+
 def geo_at_street(lat, lon, street):
     """Finds the closest address for given lat and lon and checks whether street is part of that adress
     Note: The API is really picky, and the gras behind the HPI is not part of the HPI anymore."""
