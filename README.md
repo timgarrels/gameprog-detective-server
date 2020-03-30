@@ -54,7 +54,7 @@ Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet ver
 Unsere App ist sehr datenhungrig. Deswegen startet die App per default in einem Sicherheitsmodus, der das Senden persönlicher Daten verhindert.
 Um das Spiel trotzdem spielen zu können, haben wir ein Postman package erstellt. Dieses bietet Mock-Daten an, welche die sonst von der App gestohlenen Daten ersetzen.
 1. `detective-game-no-app-walkthrough.json` mit Postman **Desktop** importieren
-1. Die Postman Umgebungsvariable `server_ip` auf die Adresse des Rechners, auf dem dieser Server läuft setzen
+1. Die Postman Umgebungsvariable `server_ip` auf die Adresse des Rechners setzten, auf dem die Serverkomponente (der Code dieses Repos) läuft
 1. Die App starten und *"Kommissar Rex kontaktieren"* tippen und in Telegram auf `STARTEN` tippen
    - alternativ (aber nicht empfohlen) kann komplett ohne App gespielt werden, indem die debug request `create user` gesendet wird
      und der erhaltene `telegram.me` Link geöffnet wird. Dann entfällt der nächste Schritt.
