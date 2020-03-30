@@ -10,9 +10,9 @@ if [ "$command" == "install" ]; then
         echo "Creating logs directory"
         mkdir -p logs
     fi
-    if [ ! -d image_upload ]; then
+    if [ ! -d app/image_upload ]; then
         echo "Creating image_upload directory"
-        mkdir -p image_upload
+        mkdir -p app/image_upload
     fi
     if [ ! -d .venv ]; then
         echo "Creating virual environment"
