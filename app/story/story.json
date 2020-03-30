@@ -149,7 +149,7 @@
         },
         "investigate_cameras": {
             "description": "Gehe zu Gleis 7 und mache ein Foto von den Kameras",
-            "datatype": "picture",
+            "datatype": "image",
             "permission_explanation": "Um ein Foto zu machen, benötigt die App zurgriff auf deine Kamera",
             "incomplete_message": [
                 "Ich habe noch kein Foto erhalten"
