@@ -93,24 +93,19 @@ def recieve_user_data(user_id, data_table):
             return jsonify("Data could not be added: {}".format(error)), 400
     return jsonify("Added {} new entries to db".format(added_data)), 201
 
-@app.route('/users/<user_id>/tasks/<task_name>/finished', methods=['PUT'])
+@app.route('/users/<user_id>/tasks/<task_name>/finished', methods=['GET'])
 def check_task_finished(user_id, task_name):
-    """queries check if the task is finished, updates DB and returns result"""
+    """check if task is complete"""
     try:
         task = TaskAssignment.query.filter_by(user_id=user_id,
                                               task_name=task_name).first()
     except ValueError:
-        return jsonify("Task not assigned yet"), 400
+        return jsonify("Invalid request"), 400
 
     if not task:
         return jsonify("No such task!"), 400
 
-    if not task.finished:
-        task.finished = task_assignment_complete(task, user_id)
-        db.session.add(task)
-        db.session.commit()
-
-    return jsonify(task.finished), 200
+    return jsonify(task_assignment_complete(task, user_id)), 200
 
 @app.route('/users/<user_id>/fbtoken/<fbtoken>', methods=['PUT'])
 def update_firebase_token(user_id, fbtoken):

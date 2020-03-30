@@ -45,12 +45,16 @@ def task_name_to_dict_for_app(task_name):
     return app_task
 
 def get_incomplete_tasks(user_id):
-    """Returns a list of incomplete tasks of a certain user"""
+    """Returns a list of incomplete task names of a certain user"""
     user = User.get_user(user_id)
-    return [task.task_name for task in user.task_assigments if not task.finished]
+    return [task.task_name for task in user.task_assigments if not task_assignment_complete(task, user_id)]
 
 def task_assignment_complete(task_assigment: TaskAssignment, user_id):
-    """Gets the python validation method symbol for a sepcific task"""
-    validation_method_name = tasks[task_assigment.task_name]["validation_method"]
-    validation_method = getattr(story_code, validation_method_name, None)
-    return validation_method(user_id, task_assigment.start_time_in_utc_seconds)
+    """check if the given task assignment is complete and update database"""
+    if not task_assigment.finished:
+        validation_method_name = tasks[task_assigment.task_name]["validation_method"]
+        validation_method = getattr(story_code, validation_method_name, None)
+        task_assigment.finished = validation_method(user_id, task_assigment.start_time_in_utc_seconds)
+        db.session.add(task_assigment)
+        db.session.commit()
+    return task_assigment.finished

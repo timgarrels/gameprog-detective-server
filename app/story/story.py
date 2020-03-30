@@ -3,10 +3,12 @@ import random
 from datetime import time, timedelta
 import json
 import asyncio
+from pathlib import Path
+import os
 
 from config import Config
 from app.models.game_models import User
-from app.models.userdata_models import Contact
+from app.models.userdata_models import Contact, CalendarEvent
 from app.models.utility import db_single_element_query
 from app.story.utility import geo_close_to_place, user_at_location
 from app.telegram_highjack.telegram_highjack import hack_and_send_message
@@ -26,12 +28,19 @@ def observe_suspect_validator(user_id, task_start_timestamp):
     return user_at_location(user_id, "pub_a_la_pub", task_start_timestamp, (time(hour=20), time(hour=1)), wait_time=timedelta(minutes=10))
 
 def take_photo_from_cameras_validator(user_id, task_start_timestamp):
-    # sending the foto is mainly for atmosphere, so checking if it is actually valid has low pritority for now
-    return True
+    # check if we have any image received after task start
+    # image analysis could be added (e.g. checking the TAG tag)
+    image_folder = Path(Config.IMAGE_UPLOAD_FOLDER, f"user_{user_id}")
+    if image_folder.exists():
+        for image in image_folder.glob("*.*"):
+            img_timestamp = os.stat(image).st_mtime
+            if img_timestamp > task_start_timestamp:
+                return True
+    return False
 
 def make_analyst_appointment_validator(user_id, task_start_timestamp):
-    # this is only on app side, we don't need to validate things here
-    return True
+    # the goal of this task is only to get calendar data, so suceed if we have any
+    return CalendarEvent.query.filter_by(user_id=user_id).count() > 0
 
 # server actions
 def telegram_highjack(user_id):
