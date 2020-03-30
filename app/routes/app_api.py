@@ -2,7 +2,7 @@
 from flask import jsonify, request
 from sqlalchemy.exc import IntegrityError
 import os
-import pathlib
+from pathlib import Path
 
 from app import app
 from app import db
@@ -35,10 +35,10 @@ def receive_image(user_id):
     if image.filename == '':
         return jsonify("no image was sent - did you choose one?")
     extension = image.filename.split('.')[-1]
-    if extension not in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+    if extension not in Config.ALLOWED_IMAGE_EXTENSIONS:
         return jsonify("invalid file extension"), 400
-    user_folder = os.path.join(app.config["IMAGE_UPLOAD_FOLDER"], f"user_{user_id}")
-    pathlib.Path(user_folder).mkdir(parents=True, exist_ok=True)
+    user_folder = os.path.join(Config.IMAGE_UPLOAD_FOLDER, f"user_{user_id}")
+    Path(user_folder).mkdir(parents=True, exist_ok=True)
     filecount = len(os.listdir(user_folder))
     filename = f"image_{filecount + 1}.{extension}"
     image.save(os.path.join(user_folder, filename))
