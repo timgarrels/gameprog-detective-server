@@ -39,6 +39,7 @@ def reset_user(user_id):
     try:
         user = User.query.get(int(user_id))
         if user:
+            # reset user data
             user.handle = None
             user.firstname = None
             user.current_story_point = None
@@ -46,11 +47,18 @@ def reset_user(user_id):
             user.phonenumber = None
             db.session.add(user)
 
+            # reset stolen data
+            for datatype in spydatatypes.values():
+                for entry in datatype.query.filter_by(user_id=user.user_id):
+                    db.session.delete(entry)
+
+            # reset personalization
             user_personalization = Personalization.query.get(user.user_id)
             if user_personalization:
                 db.session.delete(user_personalization)
             db.session.commit()
 
+            # reset tasks
             reset_tasks(user.user_id)
 
             # remove sent images
