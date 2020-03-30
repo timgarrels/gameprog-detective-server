@@ -56,21 +56,33 @@ def time_between(time, start, end):
     else:
         return start <= time or time <= end
 
-def user_at_location(user_id, place, timespan: timedelta, waited: bool, time_window_start: time=time.min, time_window_end: time=time.max):
+def user_at_location(
+    user_id, place, lower_datetime_bound: int,
+    time_window: (time, time) = (time.min, time.max), wait_time: timedelta=timedelta(0),
+):
     """Utility method for any location task.
     Checks whether a user was/stayed at a place during/for a given timespan before now during a certain time period.
-    place : key of places
-    timespan : timespan before now in which user had to be at locations once or had to wait at location
-    waited: if the user only had to be at location once during timespan or if he had to wait the whole time
-    time_window_start/end: time of day window in which the location visit must have happened"""
-    lower_time_barrier = (datetime.now() - timespan).timestamp()
-    recent_locations = Location.query.filter_by(user_id=user_id).filter(Location.time_in_utc_seconds >= lower_time_barrier).all()
-
-    locations_valid = \
-        [geo_close_to_place(location.latitude, location.longitude, place) and \
-        time_between(datetime.fromtimestamp(location.time_in_utc_seconds).time(), time_window_start, time_window_end) \
-        for location in recent_locations]
-    if waited:
-        return bool(recent_locations) and all(locations_valid)
-    else:
-        return any(locations_valid)
+    :param place: key of places
+    :param lower_datetime_bound: only take gps data after this timestamp (UTC seconds) into account
+    :param time_window_: time of day window in which the location visit must have happened
+    :param wait_time: the time the user has to wait at place. None, if no wait required"""
+    relevant_locations = Location.query \
+        .filter_by(user_id=user_id) \
+        .filter(Location.time_in_utc_seconds >= lower_datetime_bound) \
+        .order_by(Location.time_in_utc_seconds) \
+        .all()
+    
+    waited_since = None
+    for location in relevant_locations:
+        location_datetime = datetime.fromtimestamp(location.time_in_utc_seconds)
+        location_valid = \
+            geo_close_to_place(location.latitude, location.longitude, place) and \
+            time_between(location_datetime.time(), *time_window)
+        if location_valid:
+            waited_since = waited_since or location_datetime
+            time_waited = location_datetime - waited_since
+            if time_waited >= wait_time:
+                return True
+        else:
+            waited_since = None
+    return False
