@@ -50,41 +50,38 @@ Voraussetzung ist ein Linux System mit installiertem python 3.8
 #### Architektur-Überblick
 Der Server wird durch eine Flask App (`/app`) implementiert. Diese verwaltet verschiedene API-Endpunkte (`/app/routes`). Außerdem wird eine Datenbank verwaltet. Deren ORM wird in `/app/models` implementiert. Der Story-Inhalt und der Story-verwaltende Code liegt unter `/app/story`.  
 
-#### Nutzung ohne App
-Unsere App ist sehr datenhungrig. Um das Spiel zu testen, ohne die App zu installieren, haben wir ein Postman package erstellt. Dieses immitiert die App. Damit lässt sich das Spiel auch ohne Appnutzung durchspielen (die Spielerfahrung leidet darunter jedoch deutlich). Die Nutzung ist wie folgt:
+#### Spielen ohne Freigeben persönlicher Daten
+Unsere App ist sehr datenhungrig. Deswegen startet die App per default in einem Sicherheitsmodus, der das Senden persönlicher Daten verhindert.
+Um das Spiel trotzdem spielen zu können, haben wir ein Postman package erstellt. Dieses bietet Mock-Daten an, welche die sonst von der App gestohlenen Daten ersetzen.
 1. `detective-game-no-app-walkthrough.json` mit Postman **Desktop** importieren
-1. `remote_testing_environment.json` bzw. `localhost_testing_environment.json` importieren
-   (je nachdem, ob der Server auf einer anderen Rechner läuft oder nicht)
-1. `create user` senden, um einen neuen Nutzer zu erstellen
-1. die URL aus der response öffnen, um den Chat mit Kommissar Rex zu starten
+1. Die Postman Umgebungsvariable `server_ip` auf die Adresse des Rechners setzten, auf dem die Serverkomponente (der Code dieses Repos) läuft
+1. Die App starten und *"Kommissar Rex kontaktieren"* tippen und in Telegram auf `STARTEN` tippen
+   - alternativ (aber nicht empfohlen) kann komplett ohne App gespielt werden, indem die debug request `create user` gesendet wird
+     und der erhaltene `telegram.me` Link geöffnet wird. Dann entfällt der nächste Schritt.
+1. mit der debug request `display all users` die eigene user id finden und in die Postman Umgebungsvariable `user_id` eintragen
 1. `send mocked contacts` senden, um das Stehlen von Kontakten für "Personalisierung" zu mocken
-1. Die Story spielen und neue Tasks erfüllen, indem die entsprechende postman request geschickt wird
-   - die Tasks sind Story-chronologisch geordnet
+1. Die Story spielen und neue Aufgaben erfüllen, indem die entsprechende Postman request geschickt wird
+   - die Aufgaben requests sind Story-chronologisch geordnet
    - **Achtung!** - für den `take photo of cameras` task muss zuerst ein Bild in Postman ausgewählt werden
-1. Es finden sich außerdem weitere Debug-Methoden im Package, die das Testen weiter erleichtern
+   - alternativ kann auch jederzeit der Sicherheitsmodus deaktiviert und die Aufgabe mit der App erfüllt werden,
+     indem erst die Daten produziert werden und dann auf die Aufgabe getippt wird
 
 #### Telegram Highjack
 Das Finale unseres Spiels ist der Highjack des Telgram Accounts des Nutzers durch die "Mafia".
-Es gibt 3 Möglichkeiten, diesen zu erleben:
-- Das Spiel ganz normal mit der App und allen Berechtigungen spielen (empfohlen für das beste Spielerlebnis)
-- Die App installieren, aber persönliche Daten mithilfe des Postman packages mocken (empfohlen für mehr Privatsphäre)
-  - Damit der Highjack funktioniert müssen die eigene Telefonnummer in den Einstellunge eingetragen und SMS Berechtigungen aktiviert werden
-- Das Spiel komplett ohne die App spielen (nicht empfohlen)
-  - persönliche Daten wie gehabt mit dem Postman package mocken
-  - über `send phonenumber` die eigene Telefonnummer an den Server schicken
-  - wenn das Ende der Story erreicht wird, wird ein Login-Versuch unternummen und ein Access Code von Telegram generiert.
-    Dieser muss dann über `send Telegram access code` geschickt werden
+Dies funktioniert offensichtlich nur, wenn der Sicherheitsmodus deaktiviert ist.
+Es reicht jedoch, den Sicherheitsmodus ausschließlich für den Highjack zu deaktivieren, sodass keine weiteren persönlichen Daten gesendet werden
+Bevor die Story endet (dies kann auch manuell mit der debug request `set current story point` und dem Parameter `end` hervorgerufen werden) muss:
+- Der Sicherheitsmodus deaktiviert werden
+- Die Telefonnummer in den Einstellungen der App gesetzt werden (auch falls schon die richtige Nummer da steht muss sie noch einmal bestätigt werden)
+- Die App SMS Berechtigungen haben
+**Disclaimer**: Unser Highjack richtet keinen Schaden an, trotzdem sollte die "gehackte" Session danach in den Telegram Einstellungen entfernt werden
 
 ## FAQ
 - *Warum benutzen wir Telegram und simulieren die Kommunikation nicht auch in der App?*  
 Da Telegram das Hauptkommunikationsmittel am HPI ist, hoffen wir durch das Integrieren dieser Plattform die Grenzen zwischen dem Programm und echten Personen zu verwischen (indem der Botaccount zwischen echten Kontakten auftaucht, die Nachrichten von echten Menschen und die des Bots in einer Push-Notification stehen, usw.). Außerdem spart uns diese Entscheidung die Arbeit an einem Chatprogramm, welche für einen Prototypen nicht notwendig ist.
-- *Warum heißt der Bot "AndyAbbot?"  
-Weil Telegram Bots auf "bot" enden müssen, und wir einen möglichst menschlichen Eindruck vermitteln wollen, um eine höhere Bindung aufzubauen. "Andy" ist einfach ein häufiger Name und außerdem eine Alliteration
-Wir haben uns später jedoch entschieden, den Namen des Bots zu "Kommisssar Rex" umzubenennen
 - *Welche Annahmen wurden für den Prototypen getroffen?*  
 Folgende Annahmen wurden getroffen, damit wir an der Kernidee des Spiels arbeiten konnten. Die Annahmen haben einfache, aber zeitintensive Lösungen, die zur Demonstration des Game Konzeptes nicht notwendig sind:
 
 1. Der Spieler nutzt bereits Telegram (dies ist ein HPI Seminar und der IM-Dienst des HPIs (unter Studierenden)  ist Telegram) (Würde durch eigenen Chatclient in der App gelöst werden)
 2. Die App wird während des Spiels nicht vom Spieler deinstalliert (Würde durch "uninstall" Nachricht der App an den Server gelöst werden)
 3. Die App hat eine ununterbrochene Internetverbindung (Würde durch interne Queue in der App und regelmäßige Checks seitens des Servers gelöst werden)
-
