@@ -95,7 +95,7 @@
 					"script": {
 						"id": "cdc3e821-5a2c-4b0a-b39c-b6ae575878f1",
 						"exec": [
-							"pm.environment.set('current_task', \"interview_caretaker\");"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -156,7 +156,7 @@
 					"script": {
 						"id": "cdc3e821-5a2c-4b0a-b39c-b6ae575878f1",
 						"exec": [
-							"pm.environment.set('current_task', \"investigate_cameras\");"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -217,7 +217,7 @@
 					"script": {
 						"id": "cdc3e821-5a2c-4b0a-b39c-b6ae575878f1",
 						"exec": [
-							"pm.environment.set('current_task', \"make_analyst_appointment\");"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -228,7 +228,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "[{\n  \"title\": \"arbeiten\",\n  \"eventLocation\": \"HPI\",\n  \"startInUtcSeconds\": null,\n  \"endInUtcSeconds\": null\n}]",
+					"raw": "[{\n  \"title\": \"mein privater Termin\",\n  \"eventLocation\": null,\n  \"startInUtcSeconds\": null,\n  \"endInUtcSeconds\": null\n}]",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -261,7 +261,7 @@
 					"script": {
 						"id": "8e5ff97b-2d87-4fda-b952-913251b4297b",
 						"exec": [
-							"pm.environment.set('current_task', \"talk_to_analyst\");"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -312,7 +312,7 @@
 					"script": {
 						"id": "2c2a4dd4-1d87-4d79-aef4-783b21480b88",
 						"exec": [
-							"pm.environment.set('current_task', \"arrest_suspect\");"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -363,7 +363,7 @@
 					"script": {
 						"id": "31104c57-60df-4a5d-8a09-f15dfb31646c",
 						"exec": [
-							"pm.environment.set('current_task', \"observe_suspect\");"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -403,42 +403,6 @@
 					]
 				},
 				"description": "post the location of the Pub a la Pub with the current timestamp"
-			},
-			"response": []
-		},
-		{
-			"name": "TASK FINISHED request check",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "87a578ce-c111-4294-b95b-d155b2ba75ee",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"url": {
-					"raw": "http://{{server_ip}}:8080/users/{{user_id}}/tasks/{{current_task}}/finished",
-					"protocol": "http",
-					"host": [
-						"{{server_ip}}"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"{{user_id}}",
-						"tasks",
-						"{{current_task}}",
-						"finished"
-					]
-				},
-				"description": "request the server to check if the recently provided data fulfilled the task"
 			},
 			"response": []
 		},
